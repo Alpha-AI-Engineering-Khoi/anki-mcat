@@ -1453,6 +1453,12 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat = QMenu("MCAT", self)
         m.menuTools.addMenu(self.menu_mcat)
 
+        # Today is the front door: "what do I do right now?" — so it leads.
+        self.action_mcat_today = QAction("Today...", self)
+        self.action_mcat_today.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_today)
+        qconnect(self.action_mcat_today.triggered, self.on_mcat_today)
+
         self.action_mcat_readiness = QAction("Readiness...", self)
         self.action_mcat_readiness.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_readiness)
@@ -1538,6 +1544,11 @@ title="{}" {}>{}</button>""".format(
         # Update Toolbar states
         self.toolbarWeb.hide_if_allowed()
         self.bottomWeb.hide_if_allowed()
+
+    def on_mcat_today(self) -> None:
+        import aqt.mcat_today
+
+        aqt.mcat_today.show(self)
 
     def on_mcat_readiness(self) -> None:
         import aqt.mcat_readiness

@@ -123,6 +123,20 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     dialog.exec()
 
 
+def open_for(mw, topic: "prog.Topic", stage: str | None = None) -> None:  # type: ignore[no-untyped-def]
+    """Open one encode stage for a preselected topic (entry point for the Today
+    panel). ``stage`` is "prime" / "connect" / "build"; anything else falls back
+    to the topic-picker launcher. Keeps ``show(mw)`` as the standalone flow."""
+    if stage == "prime":
+        _prime_dialog(mw, topic)
+    elif stage == "connect":
+        _connect_dialog(mw, topic)
+    elif stage == "build":
+        _build_dialog(mw, topic)
+    else:
+        show(mw)
+
+
 def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-def]
     from aqt.qt import (
         QCheckBox,
