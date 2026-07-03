@@ -51,6 +51,35 @@ def sentences(text: str) -> list[str]:
     return [p.strip() for p in parts if len(p.strip()) > 15]
 
 
+# --- sanitization (QA-6: XSS + invisible payloads) --------------------------
+# Anki renders note fields as HTML, so raw markup from a source (or an edited
+# card) must never reach a card: a `<script>`/`on*=` handler would execute, and
+# zero-width / control / RTL-override characters can smuggle invisible payloads.
+
+# Only real HTML tags: "<" (optional "/") then a letter -- so scientific
+# inequalities ("DeltaG < 0", "Keq > 1") are preserved, while <script>, </b>,
+# <img ...> and on*= handlers inside tags are stripped.
+_HTML_TAG = re.compile(r"</?[a-zA-Z][^>]*>")
+_INVISIBLE = re.compile(
+    "[\u0000-\u0008\u000b\u000c\u000e-\u001f"  # C0 controls, keeping \t \n \r
+    "\u007f-\u009f"  # DEL + C1 controls
+    "\u200b-\u200f"  # zero-width chars + LRM/RLM
+    "\u202a-\u202e"  # bidi embeddings / RTL-LTR overrides
+    "\u2060\u2066-\u2069\ufeff]"  # word-joiner, bidi isolates, BOM
+)
+
+
+def sanitize(text: str) -> str:
+    """Strip HTML tags (``<script>``, ``on*=`` handlers, any ``<...>``) and
+    zero-width / control / direction-override characters.
+
+    ponytail: a regex scrub with stdlib ``re``, not a full HTML parser \u2014 enough
+    to neutralize injected markup and invisible payloads in our extracted text."""
+    if not text:
+        return text
+    return _INVISIBLE.sub("", _HTML_TAG.sub("", text))
+
+
 # --- source loading ---------------------------------------------------------
 
 
@@ -66,7 +95,7 @@ def load_source(path: str | os.PathLike | None = None) -> tuple[str, list[dict]]
         para = para.strip()
         if not para or para.startswith("#"):
             continue
-        spans.append({"id": f"S{len(spans) + 1}", "text": para})
+        spans.append({"id": f"S{len(spans) + 1}", "text": sanitize(para)})
     return topic, spans
 
 
@@ -154,6 +183,8 @@ def _live_draft(spans: list[dict], topic: str, n: int) -> list[dict]:
     """Call OpenAI to draft candidate cards, each linked to a source span."""
     import openai
 
+    if not spans:
+        return []  # nothing to ground against -> ship no cards
     client = openai.OpenAI(api_key=api_key())
     numbered = "\n".join(f'[{s["id"]}] {s["text"]}' for s in spans)
     prompt = (
@@ -174,8 +205,10 @@ def _live_draft(spans: list[dict], topic: str, n: int) -> list[dict]:
     valid_spans = {s["id"] for s in spans}
     for c in data.get("cards", []):
         span = c.get("source_span", "")
+        # Drop ungrounded cards: never coerce an invalid span to S1 and ship it
+        # as if it were grounded (false provenance).
         if span not in valid_spans:
-            span = spans[0]["id"]
+            continue
         out.append(_card(c.get("front", ""), c.get("back", ""), topic, span,
                          "live-draft", c.get("ctype", "basic")))
     return out
@@ -303,6 +336,11 @@ def concept_candidates(
     return _terms(spans, limit=10) or [topic_name]
 
 
+# The detail must share at least a little vocabulary with a span for that span to
+# count as its provenance; below this we honestly report "no confident source".
+_OVERFLOW_MIN_MATCH = 0.05
+
+
 def draft_overflow_card(
     detail: str, spans: list[dict], topic: str, live: bool | None = None
 ) -> dict:
@@ -320,11 +358,13 @@ def draft_overflow_card(
                 best_sent, best_score, span_id = sent, score, span["id"]
     term = detail.strip()
     verb = "are" if term.lower().endswith("s") else "is"
+    # Honest provenance: only attribute a span (and reuse its sentence as the
+    # back) when a span actually matches. Never manufacture S1 when nothing does.
     back = ""
-    if best_sent:
+    if best_score >= _OVERFLOW_MIN_MATCH:
         back = re.split(r"(?<=[.;])\s", best_sent)[0].strip().rstrip(".") + "."
-    if not span_id and spans:
-        span_id = spans[0]["id"]
+    else:
+        span_id = ""
     return _card(f"What {verb} {term}?", back, topic, span_id, "overflow")
 
 
@@ -467,6 +507,21 @@ def _self_test() -> None:
     overflow = draft_overflow_card("cofactor", spans, topic, live=False)
     assert overflow["front"].lower().startswith("what") and overflow["back"]
     assert overflow["source_span"] in {s["id"] for s in spans}
+    # honest provenance: no manufactured S1 when nothing matches / no source.
+    nomatch = draft_overflow_card("zxqw nonsense token", spans, topic, live=False)
+    assert nomatch["source_span"] == "" and nomatch["back"] == "", nomatch
+    assert draft_overflow_card("cofactor", [], topic, live=False)["source_span"] == ""
+
+    # QA-6 sanitizer: strips HTML tags / on*= handlers and invisible payloads.
+    dirty = "<script>bad()</script><img src=x onerror=alert(1)>ke\u200bep\u202e me"
+    clean = sanitize(dirty)
+    assert "<script>" not in clean and "onerror" not in clean, clean
+    assert "\u200b" not in clean and "\u202e" not in clean, clean
+    assert "keep me" in clean, clean
+    # ...but must NOT eat scientific inequalities ("<" / ">" that aren't tags).
+    ineq = sanitize("At equilibrium DeltaG < 0 and Keq > 1 holds.")
+    assert "< 0" in ineq and "> 1" in ineq, ineq
+    assert load_source()  # sanitized source still loads (no-op on clean source)
 
     # paraphrase test (7d): exactly 2 reworded stems, answer = the card's back.
     src_card = {"front": "What is an enzyme?", "back": "A biological catalyst.", "topic": topic}
