@@ -56,7 +56,10 @@ def sentences(text: str) -> list[str]:
 # card) must never reach a card: a `<script>`/`on*=` handler would execute, and
 # zero-width / control / RTL-override characters can smuggle invisible payloads.
 
-_HTML_TAG = re.compile(r"<[^>]*>")
+# Only real HTML tags: "<" (optional "/") then a letter -- so scientific
+# inequalities ("DeltaG < 0", "Keq > 1") are preserved, while <script>, </b>,
+# <img ...> and on*= handlers inside tags are stripped.
+_HTML_TAG = re.compile(r"</?[a-zA-Z][^>]*>")
 _INVISIBLE = re.compile(
     "[\u0000-\u0008\u000b\u000c\u000e-\u001f"  # C0 controls, keeping \t \n \r
     "\u007f-\u009f"  # DEL + C1 controls
@@ -515,6 +518,9 @@ def _self_test() -> None:
     assert "<script>" not in clean and "onerror" not in clean, clean
     assert "\u200b" not in clean and "\u202e" not in clean, clean
     assert "keep me" in clean, clean
+    # ...but must NOT eat scientific inequalities ("<" / ">" that aren't tags).
+    ineq = sanitize("At equilibrium DeltaG < 0 and Keq > 1 holds.")
+    assert "< 0" in ineq and "> 1" in ineq, ineq
     assert load_source()  # sanitized source still loads (no-op on clean source)
 
     # paraphrase test (7d): exactly 2 reworded stems, answer = the card's back.
