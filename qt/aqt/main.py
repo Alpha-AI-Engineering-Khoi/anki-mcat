@@ -1474,6 +1474,20 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat.addAction(self.action_mcat_weak)
         qconnect(self.action_mcat_weak.triggered, self.on_mcat_weak_topics)
 
+        self.action_mcat_recall_focus = QAction(
+            "Recall: interleaved Focus session...", self
+        )
+        self.action_mcat_recall_focus.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_recall_focus)
+        qconnect(self.action_mcat_recall_focus.triggered, self.on_mcat_recall_focus)
+
+        self.action_mcat_recall_cap = QAction(
+            "Recall: apply phase-aware cap", self
+        )
+        self.action_mcat_recall_cap.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_recall_cap)
+        qconnect(self.action_mcat_recall_cap.triggered, self.on_mcat_recall_cap)
+
         self.action_mcat_encode = QAction("Encode (Prime \u00b7 Connect \u00b7 Build)...", self)
         self.action_mcat_encode.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_encode)
@@ -1569,6 +1583,16 @@ title="{}" {}>{}</button>""".format(
         import aqt.mcat_weak_topics
 
         aqt.mcat_weak_topics.show(self)
+
+    def on_mcat_recall_focus(self) -> None:
+        import aqt.mcat_recall
+
+        aqt.mcat_recall.start_focus(self)
+
+    def on_mcat_recall_cap(self) -> None:
+        import aqt.mcat_recall
+
+        aqt.mcat_recall.apply_cap(self)
 
     def on_mcat_encode(self) -> None:
         import aqt.mcat_encode
