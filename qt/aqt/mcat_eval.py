@@ -3,18 +3,20 @@
 
 """Re-runnable held-out eval for the MCAT AI layer (challenges 7f + 7e).
 
-Deterministic with AI switched OFF (offline generation + offline judge), and it
-uses the live OpenAI path with --live. It:
+Factual judging is the live LLM judge's job (--live). With AI OFF the eval is
+deterministic but the judge is only a STRUCTURAL screen, so offline it reports
+just the parts it can stand behind (structure + leakage + baseline) and defers
+the factual verdict to --live -- it never claims an offline factual accuracy. It:
   1. drafts cards from the bundled source, and also runs a simpler baseline;
-  2. screens every card with Card Check (correct-useful / wrong / bad-teaching);
+  2. screens every card with Card Check (structural offline; factual with --live);
   3. checks that Draft beats the baseline on correct-useful rate;
-  4. measures the judge against the human-labeled set (accuracy + the safety
-     metric: leaked-wrong rate) so we never trust the judge blind;
-  5. scans drafted cards for leakage (near-copies of the gold/test set, 7e);
+  4. with --live, measures the judge against the human-labeled set (accuracy +
+     the safety metric: leaked-wrong rate) so we never trust the judge blind;
+  5. scans the source for leakage of the gold/test items (7e);
   6. applies a cutoff declared BEFORE looking and blocks failures.
 
-Run:  python mcat_eval.py           (offline, deterministic)
-      python mcat_eval.py --live    (uses OpenAI if key + SDK present)
+Run:  python mcat_eval.py           (offline: structure + leakage + baseline)
+      python mcat_eval.py --live    (live LLM judge: the real factual verdict)
 """
 
 from __future__ import annotations
@@ -99,18 +101,29 @@ def run(live: bool = False) -> dict:
     dups = _dup_vs_gold(drafted, gold)
 
     beats_baseline = draft_q > base_q
-    verdict = (
-        cal["leaked_wrong_rate"] <= MAX_LEAKED_WRONG_RATE
-        and cal["precision_correct_useful"] >= MIN_JUDGE_PRECISION
-        and len(leaks) <= MAX_LEAKAGE
-        and beats_baseline
-    )
+    # Factual judging happens ONLY with the live LLM judge. Offline, Card Check
+    # is a STRUCTURAL screen (mcat_cardcheck.offline_judge), so its accuracy /
+    # leaked-wrong measure structure, not truth -- they must NOT gate a factual
+    # verdict. Offline we stand behind only the deterministic parts (leakage +
+    # beats-baseline); the factual verdict requires --live.
+    factual = bool(live)
+    deterministic_ok = len(leaks) <= MAX_LEAKAGE and beats_baseline
+    if factual:
+        verdict = "PASS" if (
+            deterministic_ok
+            and cal["leaked_wrong_rate"] <= MAX_LEAKED_WRONG_RATE
+            and cal["precision_correct_useful"] >= MIN_JUDGE_PRECISION
+        ) else "FAIL"
+    else:
+        verdict = ("PASS (deterministic only \u2014 run --live for the factual judge)"
+                   if deterministic_ok else "FAIL (deterministic checks)")
     shipped = draft_counts[cc.CORRECT]
     blocked = draft_counts[cc.WRONG] + draft_counts[cc.BAD_TEACHING]
 
     report = {
         "mode": "live" if live else "offline",
         "ai_available": mcat_ai.ai_available(),
+        "factual_checked": factual,
         "topic": topic,
         "spans": len(spans),
         "draft": draft_counts, "draft_quality": round(draft_q, 3),
@@ -120,32 +133,41 @@ def run(live: bool = False) -> dict:
         "leakage_flagged": len(leaks),
         "dup_vs_gold": len(dups),
         "shipped": shipped, "blocked": blocked,
-        "verdict": "PASS" if verdict else "FAIL",
+        "verdict": verdict,
     }
     _print(report)
     return report
 
 
 def _print(r: dict) -> None:
+    factual = r["factual_checked"]
     print(f"\nMCAT AI eval  (mode: {r['mode']}, ai_available={r['ai_available']})")
     print(f"Source: {r['topic']}  ({r['spans']} spans)")
     print("Pre-registered cutoff: leaked-wrong <= "
           f"{int(MAX_LEAKED_WRONG_RATE*100)}%, precision(correct-useful) >= "
           f"{MIN_JUDGE_PRECISION}, leakage <= {MAX_LEAKAGE}, draft beats baseline")
     d, b = r["draft"], r["baseline"]
+    tag = "" if factual else "  (structural screen only)"
     print(f"\nDraft:    {sum(d.values()):>3} cards -> "
           f"correct-useful {d['correct-useful']}, bad-teaching "
           f"{d['correct-but-bad-teaching']}, wrong {d['wrong']}  "
-          f"(quality={r['draft_quality']})")
+          f"(quality={r['draft_quality']}){tag}")
     print(f"Baseline: {sum(b.values()):>3} cards -> "
           f"correct-useful {b['correct-useful']}, bad-teaching "
           f"{b['correct-but-bad-teaching']}, wrong {b['wrong']}  "
-          f"(quality={r['baseline_quality']})")
-    print(f"Beats baseline: {'YES' if r['beats_baseline'] else 'NO'}")
+          f"(quality={r['baseline_quality']}){tag}")
+    print(f"Beats baseline: {'YES' if r['beats_baseline'] else 'NO'}" +
+          ("" if factual
+           else "  (structural/format quality; factual comparison needs --live)"))
     c = r["calibration"]
-    print(f"\nJudge vs human labels (n={c['n']}): accuracy={c['accuracy']}, "
-          f"leaked-wrong rate={c['leaked_wrong_rate']}, "
-          f"precision(correct-useful)={c['precision_correct_useful']}")
+    if factual:
+        print(f"\nJudge vs human labels (n={c['n']}): accuracy={c['accuracy']}, "
+              f"leaked-wrong rate={c['leaked_wrong_rate']}, "
+              f"precision(correct-useful)={c['precision_correct_useful']}")
+    else:
+        print("\nJudge (offline): STRUCTURAL screen only \u2014 NOT a factual check. "
+              "Keyword/regex can't verify truth, so no factual accuracy/leaked-wrong "
+              "is claimed offline. Run with --live for the real LLM judge.")
     print(f"Leakage (7e) source vs gold/test items: {r['leakage_flagged']} "
           f"(threshold jaccard>={LEAKAGE_JACCARD}); drafted duplicating a gold "
           f"card: {r['dup_vs_gold']} (info, de-duplicated)")
