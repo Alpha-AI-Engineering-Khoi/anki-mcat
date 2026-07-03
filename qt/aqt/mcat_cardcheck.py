@@ -94,7 +94,9 @@ def live_judge(card: dict, src_text: str) -> str:
     except Exception:
         import mcat_ai  # type: ignore
 
-    client = openai.OpenAI(api_key=mcat_ai.api_key())
+    # timeout so a stalled network can't hang the UI (QA-5); model_for lets the
+    # safety-critical judge run on a stronger model via MCAT_OPENAI_MODEL_JUDGE.
+    client = openai.OpenAI(api_key=mcat_ai.api_key(), timeout=mcat_ai.API_TIMEOUT)
     prompt = (
         "Classify this flashcard against the SOURCE as exactly one of: "
         "correct-useful, wrong, correct-but-bad-teaching. 'wrong' = the answer "
@@ -105,7 +107,7 @@ def live_judge(card: dict, src_text: str) -> str:
         f"CARD back: {card.get('back')}"
     )
     resp = client.chat.completions.create(
-        model=os.environ.get("MCAT_OPENAI_MODEL", "gpt-4o-mini"),
+        model=mcat_ai.model_for("judge"),
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
         temperature=0.0,
