@@ -29,12 +29,6 @@ _WORD = re.compile(r"[a-z0-9]+")
 _STOP = {"what", "is", "are", "the", "a", "an", "does", "do", "of", "in", "on",
          "how", "why", "which", "blank", "fill", "and", "to", "for", "its"}
 
-# antonym / contradiction pairs used to flag a card that reverses a known fact
-_ANTONYMS = [
-    {"up", "raise", "raises", "increase", "increases", "higher", "high"},
-    {"down", "lower", "lowers", "decrease", "decreases", "reduced", "low"},
-]
-
 # domain contradictions of the bundled source's ground-truth facts
 _KNOWN_FALSE = [
     (r"noncompetitive", r"(rais\w+|increas\w+|up)\b.*v ?max|v ?max.*(rais\w+|increas\w+|up)"),
@@ -101,35 +95,6 @@ def offline_judge(card: dict, src_text: str, gold: list[dict]) -> str:
     return CORRECT
 
 
-def _best_gold(front: str, gold: list[dict]) -> dict | None:
-    best, best_s = None, 0.25
-    ft = _tok(front) - _STOP
-    for g in gold:
-        gt = _tok(g.get("front", "")) - _STOP
-        if not gt:
-            continue
-        s = len(ft & gt) / len(ft | gt) if (ft | gt) else 0.0
-        if s > best_s:
-            best, best_s = g, s
-    return best
-
-
-def _contradicts(back: str, gold: dict) -> bool:
-    bt = _tok(back)
-    for fact in gold.get("key_facts", []):
-        facing = _tok(fact)
-        shared = bt & facing
-        if not shared:
-            continue
-        # if they talk about the same thing but with opposite polarity, contradiction
-        for lo, hi in ((_ANTONYMS[0], _ANTONYMS[1]), (_ANTONYMS[1], _ANTONYMS[0])):
-            if (facing & lo) and (bt & hi) and not (bt & lo):
-                return True
-        if ("unchanged" in facing or "unchanged" in fact) and (bt & (_ANTONYMS[0] | _ANTONYMS[1])):
-            return True
-    return False
-
-
 def live_judge(card: dict, src_text: str) -> str:
     import openai
 
@@ -179,8 +144,9 @@ def calibrate(labeled: list[dict], src_text: str, gold: list[dict],
     marked wrong."""
     n = len(labeled)
     correct = 0
-    passed = 0          # judge said correct-useful
+    passed = 0            # judge said correct-useful
     passed_but_wrong = 0  # judge said correct-useful, human said wrong
+    passed_but_bad = 0    # judge said correct-useful, human said bad-teaching
     confusion: dict[str, dict[str, int]] = {}
     for item in labeled:
         human = item["label"]
@@ -193,9 +159,10 @@ def calibrate(labeled: list[dict], src_text: str, gold: list[dict],
             passed += 1
             if human == WRONG:
                 passed_but_wrong += 1
+            elif human == BAD_TEACHING:
+                passed_but_bad += 1
     precision_correct = (
-        (passed - passed_but_wrong - _passed_but_bad(labeled, src_text, gold, live))
-        / passed if passed else 1.0
+        (passed - passed_but_wrong - passed_but_bad) / passed if passed else 1.0
     )
     return {
         "n": n,
@@ -208,17 +175,9 @@ def calibrate(labeled: list[dict], src_text: str, gold: list[dict],
     }
 
 
-def _passed_but_bad(labeled, src_text, gold, live) -> int:
-    return sum(
-        1 for it in labeled
-        if classify(it, src_text, gold, live=live) == CORRECT
-        and it["label"] == BAD_TEACHING
-    )
-
-
 def _self_test() -> None:
     import mcat_ai  # local run
-    topic, spans = load = mcat_ai.load_source()
+    topic, spans = mcat_ai.load_source()
     src = mcat_ai.source_text(spans)
     gold = [json.loads(l) for l in
             (mcat_ai.DATA_DIR / "goldset.jsonl").read_text().splitlines() if l.strip()]
