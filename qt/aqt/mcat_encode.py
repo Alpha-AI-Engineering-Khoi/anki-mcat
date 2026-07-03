@@ -496,6 +496,16 @@ def _build_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
         if item is None:
             showInfo("Select the detail concept you couldn't relate.", parent=dialog)
             return
+        if not spans:
+            # No bundled source for this topic, so a card made here could not
+            # trace back to a named source. Block it rather than adding untraced.
+            showInfo(
+                f"\u201c{topic.name}\u201d has no bundled source document yet, so a "
+                "card made here couldn't be traced to a named source.\n\nSend to "
+                "cards is disabled for this topic.",
+                parent=dialog,
+            )
+            return
         _confirm_overflow_card(mw, topic, spans, item.text(0).strip())
 
     def persist() -> None:
@@ -557,7 +567,7 @@ def _confirm_overflow_card(mw, topic: "prog.Topic", spans: list[dict], detail: s
         QVBoxLayout,
         qconnect,
     )
-    from aqt.utils import disable_help_button, showWarning, tooltip
+    from aqt.utils import askUser, disable_help_button, showWarning, tooltip
 
     card = ai.draft_overflow_card(detail, spans, topic.tag)
 
@@ -591,10 +601,24 @@ def _confirm_overflow_card(mw, topic: "prog.Topic", spans: list[dict], detail: s
     layout.addWidget(buttons)
 
     def do_add() -> None:
-        front_text = front.text().strip()
-        back_text = back.toPlainText().strip()
+        # Sanitize before the fields become HTML in a note (QA-6): raw <script> /
+        # on*= handlers or invisible chars must never reach a rendered card.
+        front_text = ai.sanitize(front.text()).strip()
+        back_text = ai.sanitize(back.toPlainText()).strip()
         if not front_text or not back_text:
             showWarning("A card needs both a front and a back.", parent=dialog)
+            return
+        # Provenance gate: only tag a REAL span id. If the draft has no verified
+        # source, make the learner confirm rather than silently adding untraced.
+        valid_span_ids = {s["id"] for s in spans}
+        span_id = card["source_span"] if card["source_span"] in valid_span_ids else ""
+        if not span_id and not askUser(
+            "This card has no verified source span, so it won't trace back to a "
+            "named source. Add it anyway?",
+            parent=dialog,
+            defaultno=True,
+            title="No verified source",
+        ):
             return
         col = mw.col
         notetype = col.models.by_name("Basic") or col.models.current()
@@ -606,8 +630,8 @@ def _confirm_overflow_card(mw, topic: "prog.Topic", spans: list[dict], detail: s
         if len(note.fields) > 1:
             note.fields[1] = back_text
         tags = [topic.tag, "mcat::overflow"]
-        if card["source_span"]:
-            tags.append(f"mcat::src::{card['source_span']}")
+        if span_id:
+            tags.append(f"mcat::src::{span_id}")
         note.tags = tags
         deck_id = col.decks.current()["id"]
         add_note(parent=mw, note=note, target_deck_id=deck_id).success(
