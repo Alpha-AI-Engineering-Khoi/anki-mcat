@@ -103,25 +103,58 @@ def source_text(spans: Iterable[dict]) -> str:
     return "\n".join(s["text"] for s in spans)
 
 
-# --- OpenAI key / availability ----------------------------------------------
+# --- OpenAI key / availability / config -------------------------------------
+
+# Explicit timeout (s) so a stalled network can't hang the UI on a live call (QA-5).
+API_TIMEOUT = 20
 
 
-def api_key() -> str | None:
-    if os.environ.get("OPENAI_API_KEY"):
-        return os.environ["OPENAI_API_KEY"].strip()
-    here = pathlib.Path(__file__).resolve()
-    candidates = [par / ".env" for par in here.parents]
-    for env in candidates:
+def model_for(task: str) -> str:
+    """Model for one task: ``MCAT_OPENAI_MODEL_<TASK>`` -> ``MCAT_OPENAI_MODEL``
+    -> ``gpt-4o-mini``. Lets the safety-critical judge run on a stronger model
+    via config alone, with no code change (e.g. ``MCAT_OPENAI_MODEL_JUDGE``)."""
+    return (
+        os.environ.get(f"MCAT_OPENAI_MODEL_{task.upper()}")
+        or os.environ.get("MCAT_OPENAI_MODEL")
+        or "gpt-4o-mini"
+    )
+
+
+def _find_env_key(start: pathlib.Path) -> str | None:
+    """First ``OPENAI_API_KEY`` in a ``.env`` from ``start`` upward, stopping at
+    the anki repo root (an ancestor holding both ``qt/`` and ``rslib/``). Scoped
+    to the repo so a key is never harvested from an arbitrary dir above it
+    (QA-5, secret hygiene)."""
+    for par in start.resolve().parents:
+        env = par / ".env"
         try:
             for line in env.read_text(encoding="utf-8").splitlines():
                 if line.strip().startswith("OPENAI_API_KEY"):
                     return line.split("=", 1)[1].strip().strip('"').strip("'")
         except OSError:
-            continue
+            pass
+        if (par / "qt").is_dir() and (par / "rslib").is_dir():
+            break  # reached the repo root; do not look above it
     return None
 
 
+def api_key() -> str | None:
+    env_key = os.environ.get("OPENAI_API_KEY")
+    if env_key and env_key.strip():
+        return env_key.strip()
+    return _find_env_key(pathlib.Path(__file__))
+
+
 def ai_available() -> bool:
+    """True only if a live call could really run. A user can force AI OFF (QA-5)
+    with ``MCAT_OFFLINE`` / ``MCAT_AI_DISABLED`` or by setting ``OPENAI_API_KEY``
+    explicitly empty -- none of which is overridden by a key sitting in a
+    ``.env`` (that was the old kill-switch hole)."""
+    if os.environ.get("MCAT_OFFLINE") or os.environ.get("MCAT_AI_DISABLED"):
+        return False
+    raw = os.environ.get("OPENAI_API_KEY")
+    if raw is not None and not raw.strip():
+        return False
     if api_key() is None:
         return False
     try:
@@ -185,7 +218,7 @@ def _live_draft(spans: list[dict], topic: str, n: int) -> list[dict]:
 
     if not spans:
         return []  # nothing to ground against -> ship no cards
-    client = openai.OpenAI(api_key=api_key())
+    client = openai.OpenAI(api_key=api_key(), timeout=API_TIMEOUT)
     numbered = "\n".join(f'[{s["id"]}] {s["text"]}' for s in spans)
     prompt = (
         "You draft MCAT flashcards ONLY from the numbered source below. "
@@ -195,7 +228,7 @@ def _live_draft(spans: list[dict], topic: str, n: int) -> list[dict]:
         "not in the source.\n\nSOURCE:\n" + numbered
     )
     resp = client.chat.completions.create(
-        model=os.environ.get("MCAT_OPENAI_MODEL", "gpt-4o-mini"),
+        model=model_for("draft"),
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
         temperature=0.2,
@@ -209,9 +242,15 @@ def _live_draft(spans: list[dict], topic: str, n: int) -> list[dict]:
         # as if it were grounded (false provenance).
         if span not in valid_spans:
             continue
-        out.append(_card(c.get("front", ""), c.get("back", ""), topic, span,
-                         "live-draft", c.get("ctype", "basic")))
-    return out
+        front = (c.get("front", "") or "").strip()
+        back = (c.get("back", "") or "").strip()
+        if not front or not back:
+            continue  # QA-7: drop garbage cards with an empty front or back
+        out.append(_card(front, back, topic, span, "live-draft",
+                         c.get("ctype", "basic")))
+    # QA-7: if the model returned nothing usable, ship the honest offline draft
+    # rather than an empty deck.
+    return out or _offline_draft(spans, topic)
 
 
 def draft_cards(spans: list[dict], topic: str, n: int = 24,
@@ -257,7 +296,7 @@ def _live_list(kind: str, spans: list[dict], topic_name: str, n: int = 8) -> lis
     """Ask OpenAI for a short list of items grounded in the source."""
     import openai
 
-    client = openai.OpenAI(api_key=api_key())
+    client = openai.OpenAI(api_key=api_key(), timeout=API_TIMEOUT)
     asks = {
         "scope": "the big-picture ideas to skim first (not memorizable details)",
         "keywords": "the key terms a learner should connect to their own life",
@@ -271,13 +310,22 @@ def _live_list(kind: str, spans: list[dict], topic_name: str, n: int = 8) -> lis
         + src
     )
     resp = client.chat.completions.create(
-        model=os.environ.get("MCAT_OPENAI_MODEL", "gpt-4o-mini"),
+        model=model_for("list"),
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
         temperature=0.2,
     )
-    items = json.loads(resp.choices[0].message.content).get("items", [])
-    return [str(x).strip() for x in items if str(x).strip()][:n]
+    items = json.loads(resp.choices[0].message.content).get("items")
+    # QA-7: require a real list of non-empty strings. A bare string would
+    # char-explode; other junk stringifies. Empty after cleaning -> raise so the
+    # caller degrades to its deterministic offline list (never [] / garbage).
+    cleaned = (
+        [x.strip() for x in items if isinstance(x, str) and x.strip()][:n]
+        if isinstance(items, list) else []
+    )
+    if not cleaned:
+        raise ValueError("live list returned no usable items")
+    return cleaned
 
 
 def scope_list(spans: list[dict], topic_name: str, live: bool | None = None) -> list[str]:
@@ -368,21 +416,46 @@ def draft_overflow_card(
     return _card(f"What {verb} {term}?", back, topic, span_id, "overflow")
 
 
+# A tiny stopword set so the baseline blanks a real key term (the first salient
+# content word) rather than a function word.
+_BASELINE_STOP = {
+    "the", "a", "an", "and", "are", "is", "was", "were", "of", "to", "in", "on",
+    "at", "by", "for", "its", "it", "they", "this", "that", "as", "or", "with",
+    "from", "such", "many", "each", "both", "than", "then", "into", "when",
+    "which", "while", "their", "there", "these", "those", "have", "has",
+}
+
+
+def _key_term(text: str) -> str:
+    """First salient content word (>=4 letters, not a stopword) \u2014 a legitimate
+    'key term' pick that avoids the longest-word trap. '' if none found."""
+    for w in re.findall(r"[A-Za-z][A-Za-z\-]+", text):
+        if len(w) >= 4 and w.lower() not in _BASELINE_STOP:
+            return w
+    return ""
+
+
 def baseline_cards(spans: list[dict], topic: str) -> list[dict]:
     """A deliberately simpler generator (the baseline Draft must beat).
 
-    Naive cloze: blank the longest word in each sentence and put the whole
-    verbatim sentence on the back. Tends to make wordy, low-teaching cards.
+    Legitimate simple cloze: for EACH sentence, blank a KEY term (the first
+    salient content word, not the longest word) inside a SHORT Q&A stem (the
+    sentence's first clause), with that term as the short answer. It competes
+    with Draft on the same short-Q&A format axis instead of losing on a length
+    rule by construction. Being unselective (one card per sentence, no quality
+    filtering) it still makes weaker cards than Draft's selective extraction \u2014 so
+    Draft wins the real (live factual) comparison. A fair fight, not a rig.
     """
     cards: list[dict] = []
     for span in spans:
         for sent in sentences(span["text"]):
-            words = re.findall(r"[A-Za-z][A-Za-z\-]{4,}", sent)
-            if not words:
+            stem = re.split(r"(?<=[.;,])\s", sent)[0].strip().rstrip(",;.")
+            term = _key_term(stem)
+            if not term:
                 continue
-            target = max(words, key=len)
-            front = "Fill in the blank: " + sent.replace(target, "_____", 1)
-            cards.append(_card(front, sent, topic, span["id"], "baseline",
+            front = "Fill in the blank: " + re.sub(
+                rf"\b{re.escape(term)}\b", "_____", stem, count=1)
+            cards.append(_card(front, term, topic, span["id"], "baseline",
                                "cloze"))
     return cards
 
@@ -431,7 +504,7 @@ def _live_paraphrase(card: dict, spans: list[dict]) -> list[dict]:
     card + source. Tops up from the offline reword if it returns fewer than 2."""
     import openai
 
-    client = openai.OpenAI(api_key=api_key())
+    client = openai.OpenAI(api_key=api_key(), timeout=API_TIMEOUT)
     grounding = source_text(spans) if spans else (
         (card.get("front", "") + "\n" + card.get("back", "")).strip()
     )
@@ -445,7 +518,7 @@ def _live_paraphrase(card: dict, spans: list[dict]) -> list[dict]:
         f"SOURCE:\n{grounding}"
     )
     resp = client.chat.completions.create(
-        model=os.environ.get("MCAT_OPENAI_MODEL", "gpt-4o-mini"),
+        model=model_for("paraphrase"),
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
         temperature=0.3,
@@ -456,8 +529,11 @@ def _live_paraphrase(card: dict, spans: list[dict]) -> list[dict]:
     for q in data.get("questions", [])[:2]:
         stem = str(q.get("stem", "")).strip()
         if stem:
-            out.append({"stem": stem, "answer": str(q.get("answer", "")).strip() or back})
-    for extra in _offline_paraphrase(card):  # guarantee exactly 2
+            # QA-7: the graded key is ALWAYS the card's own back. A model's
+            # free-text "answer" can hallucinate and corrupt the Performance
+            # metric, so we never trust it as the key.
+            out.append({"stem": stem, "answer": back})
+    for extra in _offline_paraphrase(card):  # guarantee exactly 2 (answer=back)
         if len(out) >= 2:
             break
         out.append(extra)
@@ -483,7 +559,23 @@ def paraphrase_questions(
     return _offline_paraphrase(card)
 
 
+def _fake_openai(payload: str):
+    """Stand-in ``openai`` module whose create() returns a fixed JSON body, so
+    the live paths can be exercised in the self-test with no network or key."""
+    import types
+
+    resp = types.SimpleNamespace(choices=[types.SimpleNamespace(
+        message=types.SimpleNamespace(content=payload))])
+    chat = types.SimpleNamespace(
+        completions=types.SimpleNamespace(create=lambda **_k: resp))
+    mod = types.ModuleType("openai")
+    mod.OpenAI = lambda **_k: types.SimpleNamespace(chat=chat)
+    return mod
+
+
 def _self_test() -> None:
+    import sys
+
     topic, spans = load_source()
     assert topic == "MCAT::BioBiochem::Enzymes", topic
     assert len(spans) >= 9, len(spans)
@@ -492,8 +584,22 @@ def _self_test() -> None:
     for c in drafted:
         assert c["source_span"] in {s["id"] for s in spans}
         assert c["topic"] == topic
+
+    # Fair baseline (QA-4): a real simple cloze -- SHORT key-term answers and a
+    # short Q&A stem, NOT the old strawman ("Fill in the blank: "+whole sentence
+    # front AND whole sentence back) that lost on length by construction.
     base = baseline_cards(spans, topic)
-    assert len(base) >= 8
+    assert len(base) >= 8, len(base)
+    for c in base:
+        assert c["ctype"] == "cloze" and c["origin"] == "baseline", c
+        assert c["front"].startswith("Fill in the blank:") and "_____" in c["front"], c
+        assert c["source_span"] in {s["id"] for s in spans}
+        assert 0 < len(c["back"]) <= 60, c  # a short key term, not a sentence
+    # It blanks the KEY term, not the longest word: the "Enzymes are biological
+    # catalysts" card is keyed on "Enzymes" (7 chars) though "biological" (10) is
+    # longer -- so the fair baseline competes on format, not a rigged length.
+    enz = next((c for c in base if c["back"] == "Enzymes"), None)
+    assert enz and "_____ are biological catalysts" in enz["front"], enz
 
     # encode front-half generators (offline paths).
     scope = scope_list(spans, "Enzymes", live=False)
@@ -533,6 +639,77 @@ def _self_test() -> None:
     # robust to an unparseable / non-question front, and to no source spans.
     weird = paraphrase_questions({"front": "Mitochondrion ___ of the cell", "back": "Powerhouse"}, [], live=False)
     assert len(weird) == 2 and all(w["answer"] == "Powerhouse" for w in weird), weird
+
+    # per-task model config: MCAT_OPENAI_MODEL_<TASK> -> MCAT_OPENAI_MODEL -> default.
+    assert model_for("judge") == "gpt-4o-mini"
+    os.environ["MCAT_OPENAI_MODEL"] = "m-all"
+    os.environ["MCAT_OPENAI_MODEL_JUDGE"] = "m-judge"
+    assert model_for("judge") == "m-judge" and model_for("draft") == "m-all"
+    os.environ.pop("MCAT_OPENAI_MODEL", None)
+    os.environ.pop("MCAT_OPENAI_MODEL_JUDGE", None)
+
+    # QA-5 .env scope: never harvest a key from a dir ABOVE the anki repo root.
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        root = pathlib.Path(td)
+        (root / ".env").write_text("OPENAI_API_KEY=sk-farancestor\n", encoding="utf-8")
+        repo = root / "repo"
+        (repo / "qt" / "aqt").mkdir(parents=True)
+        (repo / "rslib").mkdir()
+        stub = repo / "qt" / "aqt" / "mcat_ai.py"
+        stub.write_text("# stub", encoding="utf-8")
+        assert _find_env_key(stub) is None, "harvested a key above the repo root"
+        (repo / ".env").write_text('OPENAI_API_KEY="sk-inrepo"\n', encoding="utf-8")
+        assert _find_env_key(stub) == "sk-inrepo", "in-repo .env key not found"
+
+    # QA-5 kill-switch + QA-7 live-output validation, with openai + a key mocked
+    # in so AI would otherwise be ON. Restored in finally.
+    saved_openai = sys.modules.get("openai")
+    os.environ["OPENAI_API_KEY"] = "sk-test"
+    try:
+        sys.modules["openai"] = _fake_openai("{}")
+        assert ai_available() is True, "sanity: AI should be ON with key + openai"
+        for flag in ("MCAT_OFFLINE", "MCAT_AI_DISABLED"):
+            os.environ[flag] = "1"
+            assert ai_available() is False, f"{flag} must force AI OFF"
+            os.environ.pop(flag)
+        os.environ["OPENAI_API_KEY"] = ""  # explicitly empty = a real OFF switch
+        assert ai_available() is False, "empty OPENAI_API_KEY must force AI OFF"
+        os.environ["OPENAI_API_KEY"] = "sk-test"
+
+        # _live_draft: garbage cards (empty front/back) -> offline draft, not [].
+        sys.modules["openai"] = _fake_openai(json.dumps({"cards": [
+            {"front": "", "back": "", "source_span": spans[0]["id"]},
+            {"front": "x", "back": "", "source_span": spans[0]["id"]}]}))
+        ld = _live_draft(spans, topic, 5)
+        assert ld and all(c["origin"] == "offline-draft" for c in ld), \
+            "empty live draft must fall back to the offline draft"
+        # a valid live card is kept and grounded.
+        sys.modules["openai"] = _fake_openai(json.dumps({"cards": [
+            {"front": "What is X?", "back": "Y.", "source_span": spans[0]["id"]}]}))
+        ld2 = _live_draft(spans, topic, 5)
+        assert len(ld2) == 1 and ld2[0]["origin"] == "live-draft", ld2
+
+        # _live_list: a bare string (not a list) must NOT char-explode; the
+        # caller degrades to the deterministic offline list.
+        sys.modules["openai"] = _fake_openai(json.dumps({"items": "alpha, beta"}))
+        assert scope_list(spans, "Enzymes", live=True) == \
+            scope_list(spans, "Enzymes", live=False), "garbage list must fall back offline"
+
+        # _live_paraphrase: a hallucinated answer is IGNORED; key = card's back.
+        sys.modules["openai"] = _fake_openai(json.dumps({"questions": [
+            {"stem": "Reworded one?", "answer": "HALLUCINATED"},
+            {"stem": "Reworded two?", "answer": "ALSO WRONG"}]}))
+        lpq = _live_paraphrase(src_card, spans)
+        assert len(lpq) == 2 and all(q["answer"] == "A biological catalyst." for q in lpq), lpq
+    finally:
+        os.environ.pop("OPENAI_API_KEY", None)
+        os.environ.pop("MCAT_OFFLINE", None)
+        os.environ.pop("MCAT_AI_DISABLED", None)
+        if saved_openai is not None:
+            sys.modules["openai"] = saved_openai
+        else:
+            sys.modules.pop("openai", None)
 
     print(f"mcat_ai self-test OK: {len(spans)} spans, "
           f"{len(drafted)} drafted, {len(base)} baseline, "
