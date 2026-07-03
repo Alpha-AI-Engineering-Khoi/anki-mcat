@@ -2,6 +2,11 @@ __pycache__
 .mypy_cache
 .DS_Store
 anki.prof
+
+# Local secrets (OpenAI key etc.) — never commit the real .env
+.env
+.env.*
+!.env.example
 target
 /user.bazelrc
 .dmypy.json
