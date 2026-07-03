@@ -1478,6 +1478,11 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat.addAction(self.action_mcat_paraphrase)
         qconnect(self.action_mcat_paraphrase.triggered, self.on_mcat_paraphrase)
 
+        self.action_mcat_ablation = QAction("Study-feature ablation...", self)
+        self.action_mcat_ablation.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_ablation)
+        qconnect(self.action_mcat_ablation.triggered, self.on_mcat_ablation)
+
         self.menu_mcat.addSeparator()
 
         self.action_mcat_library = QAction("Library...", self)
@@ -1563,6 +1568,11 @@ title="{}" {}>{}</button>""".format(
         import aqt.mcat_paraphrase
 
         aqt.mcat_paraphrase.show(self)
+
+    def on_mcat_ablation(self) -> None:
+        import aqt.mcat_ablation
+
+        aqt.mcat_ablation.show(self)
 
     def hide_menubar(self) -> None:
         self.form.menubar.setFixedHeight(0)
