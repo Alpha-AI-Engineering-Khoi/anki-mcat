@@ -8,12 +8,27 @@ from __future__ import annotations
 
 import html as _html
 
-# Accent + semantic colors that read on both light and dark Qt themes.
-ACCENT = "#5b6cf0"
-GOOD = "#1f9d55"
-WARN = "#c77d0a"
-BAD = "#c0271f"
-MUTED = "#888"
+def _night() -> bool:
+    try:
+        from aqt import theme
+
+        return bool(theme.theme_manager.night_mode)
+    except Exception:
+        return False
+
+
+# Accent + semantic colors resolved for the current Qt theme, so text stays
+# legible (the old fixed values were tuned for dark and failed contrast on the
+# light theme, e.g. MUTED "#888" is ~3.5:1 on white). ACCENT matches the iOS
+# app's brand indigo. ponytail: hues are fixed at import; a mid-session
+# light/dark toggle only restyles on the next app run, which is fine — the bar
+# track (the worst offender on the wrong theme) is re-read live in bar().
+_DARK = _night()
+ACCENT = "#7c8cff" if _DARK else "#4b45c9"
+GOOD = "#3fb984" if _DARK else "#157347"
+WARN = "#e0912f" if _DARK else "#b23a0a"
+BAD = "#e0564e" if _DARK else "#c0271f"
+MUTED = "#9aa0a6" if _DARK else "#5d636e"
 
 
 def esc(text: str) -> str:
@@ -21,13 +36,33 @@ def esc(text: str) -> str:
 
 
 def bar(fraction: float, color: str) -> str:
-    """A thin inline progress bar (0..1) as an HTML table (Qt-rich-text safe)."""
+    """A thin, full-width inline progress bar (0..1) as an HTML table.
+
+    Qt's rich-text engine (QTextBrowser) ignores ``width`` set via the CSS
+    ``style`` attribute on table cells — it only honors the HTML ``width``
+    *attribute* — so a single style-sized fill cell renders as an even 50/50
+    split regardless of value (why a 100% bar looked half full). Size BOTH cells
+    with the ``width`` attribute (summing to 100%), and collapse to a single cell
+    at the extremes so an empty 0%-width cell can't claim a minimum column width.
+    """
     pct = max(0, min(100, round(fraction * 100)))
+    fill = f"background:{color};height:8px"
+    # Re-read the theme so an empty track never renders near-black on the light
+    # theme (the previous fixed "#3a3a3a" did exactly that).
+    track_bg = "#3a3a3a" if _night() else "#e6e8ec"
+    track = f"background:{track_bg};height:8px"
+    if pct >= 100:
+        cells = f"<td style='{fill}'></td>"
+    elif pct <= 0:
+        cells = f"<td style='{track}'></td>"
+    else:
+        cells = (
+            f"<td width='{pct}%' style='{fill}'></td>"
+            f"<td width='{100 - pct}%' style='{track}'></td>"
+        )
     return (
         f"<table cellspacing='0' cellpadding='0' width='100%' "
-        f"style='margin:4px 0'><tr>"
-        f"<td style='background:{color};height:7px;width:{pct}%'></td>"
-        f"<td style='background:#3a3a3a;height:7px'></td></tr></table>"
+        f"style='margin:4px 0'><tr>{cells}</tr></table>"
     )
 
 

@@ -126,7 +126,9 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
 
     detail = QLabel("")
     detail.setWordWrap(True)
-    detail.setStyleSheet("color:#888")
+    # Native secondary text: a disabled-role label adapts to light/dark instead
+    # of a fixed "#888" that failed contrast on the light theme.
+    detail.setEnabled(False)
     layout.addWidget(detail)
 
     buttons = QDialogButtonBox()
