@@ -1,0 +1,18 @@
+{"id": "J01", "front": "How do enzymes speed up a reaction?", "back": "They lower the activation energy by stabilizing the transition state.", "source_span": "S1", "label": "correct-useful"}
+{"id": "J02", "front": "What is Km?", "back": "The substrate concentration at which rate is half of Vmax.", "source_span": "S5", "label": "correct-useful"}
+{"id": "J03", "front": "A low Km means the enzyme has ___ affinity for its substrate.", "back": "high", "source_span": "S5", "label": "correct-useful"}
+{"id": "J04", "front": "What does a competitive inhibitor do?", "back": "Raises apparent Km, leaves Vmax unchanged.", "source_span": "S8", "label": "correct-useful"}
+{"id": "J05", "front": "What does a noncompetitive inhibitor do?", "back": "Lowers Km and raises Vmax.", "source_span": "S8", "label": "wrong"}
+{"id": "J06", "front": "Do enzymes change the equilibrium position?", "back": "Yes, enzymes shift equilibrium toward products.", "source_span": "S1", "label": "wrong"}
+{"id": "J07", "front": "What is a cofactor?", "back": "A small organic vitamin-derived molecule like NAD+.", "source_span": "S3", "label": "wrong"}
+{"id": "J08", "front": "Vmax is measured in units of moles.", "back": "True", "source_span": "S5", "label": "wrong"}
+{"id": "J09", "front": "Enzymes.", "back": "Proteins that catalyze reactions by lowering activation energy, acting on a substrate at an active site, often needing cofactors or coenzymes, regulated by inhibitors, allostery, and feedback inhibition.", "source_span": "S1", "label": "correct-but-bad-teaching"}
+{"id": "J10", "front": "What is the active site and induced fit and what are cofactors and coenzymes and apoenzymes?", "back": "The active site binds substrate; induced fit changes shape; cofactors are inorganic, coenzymes organic; apoenzyme is inactive.", "source_span": "S2", "label": "correct-but-bad-teaching"}
+{"id": "J11", "front": "The turnover number is called ___.", "back": "kcat", "source_span": "S6", "label": "correct-useful"}
+{"id": "J12", "front": "On a Lineweaver-Burk plot the x-intercept equals ___.", "back": "-1/Km", "source_span": "S7", "label": "correct-useful"}
+{"id": "J13", "front": "What is denaturation?", "back": "It is when the enzyme is used up during the reaction.", "source_span": "S4", "label": "wrong"}
+{"id": "J14", "front": "What binds only the enzyme-substrate complex?", "back": "An uncompetitive inhibitor, which lowers both Km and Vmax.", "source_span": "S8", "label": "correct-useful"}
+{"id": "J15", "front": "Describe everything about enzyme kinetics.", "back": "Michaelis-Menten, Km, Vmax, kcat, Lineweaver-Burk, and all inhibition types.", "source_span": "S5", "label": "correct-but-bad-teaching"}
+{"id": "J16", "front": "Feedback inhibition means the end product inhibits ___.", "back": "an enzyme early in the pathway.", "source_span": "S10", "label": "correct-useful"}
+{"id": "J17", "front": "A holoenzyme is the inactive protein without its cofactor.", "back": "True", "source_span": "S3", "label": "wrong"}
+{"id": "J18", "front": "What kind of curve do allosteric enzymes show?", "back": "Sigmoidal, due to cooperativity.", "source_span": "S9", "label": "correct-useful"}
