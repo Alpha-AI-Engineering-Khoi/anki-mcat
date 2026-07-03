@@ -194,6 +194,140 @@ def draft_cards(spans: list[dict], topic: str, n: int = 24,
     return _offline_draft(spans, topic)
 
 
+# --- lower-order list generators (scope / keywords / concepts) --------------
+# These feed the "encode front-half" panels (Prime / Connect / Build). AI does
+# only this lower-order surfacing; the learner supplies the relationships and
+# answers. Each has a deterministic offline fallback so it works with AI OFF.
+
+
+def _terms(spans: list[dict], limit: int = 8) -> list[str]:
+    """Salient defined terms from the source (offline), in reading order."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for span in spans:
+        for sent in sentences(span["text"]):
+            m = _DEFN.match(sent)
+            if not m:
+                continue
+            term = m.group("term").strip().rstrip(",")
+            key = term.lower()
+            if key in seen or len(term.split()) > 5:
+                continue
+            seen.add(key)
+            out.append(term)
+            if len(out) >= limit:
+                return out
+    return out
+
+
+def _live_list(kind: str, spans: list[dict], topic_name: str, n: int = 8) -> list[str]:
+    """Ask OpenAI for a short list of items grounded in the source."""
+    import openai
+
+    client = openai.OpenAI(api_key=api_key())
+    asks = {
+        "scope": "the big-picture ideas to skim first (not memorizable details)",
+        "keywords": "the key terms a learner should connect to their own life",
+        "concepts": "the concepts to place in an outline map",
+    }
+    src = source_text(spans) if spans else topic_name
+    prompt = (
+        f"For the MCAT topic \u201c{topic_name}\u201d, list about {n} short items: "
+        f"{asks.get(kind, 'key points')}. Base them ONLY on the SOURCE. "
+        "Return JSON {\"items\":[\"..\"]}. Each item under 12 words.\n\nSOURCE:\n"
+        + src
+    )
+    resp = client.chat.completions.create(
+        model=os.environ.get("MCAT_OPENAI_MODEL", "gpt-4o-mini"),
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"},
+        temperature=0.2,
+    )
+    items = json.loads(resp.choices[0].message.content).get("items", [])
+    return [str(x).strip() for x in items if str(x).strip()][:n]
+
+
+def scope_list(spans: list[dict], topic_name: str, live: bool | None = None) -> list[str]:
+    """Big-picture 'skim' points for Prime. Offline: the lead clause of each
+    source span; with no source, a generic skim scaffold from the topic name."""
+    if live is None:
+        live = ai_available()
+    if live:
+        try:
+            return _live_list("scope", spans, topic_name)
+        except Exception:
+            pass
+    out: list[str] = []
+    for span in spans:
+        sents = sentences(span["text"])
+        if not sents:
+            continue
+        lead = re.split(r"(?<=[.;])\s", sents[0])[0].strip().rstrip(".")
+        if len(lead) > 8:
+            out.append(lead)
+    if not out:
+        out = [
+            f"Skim {topic_name} end-to-end for the big picture.",
+            f"See how the parts of {topic_name} fit together.",
+            f"Note where {topic_name} shows up on the MCAT.",
+            f"List what you do NOT yet understand about {topic_name}.",
+        ]
+    return out[:8]
+
+
+def keyword_candidates(
+    spans: list[dict], topic_name: str, live: bool | None = None
+) -> list[str]:
+    """Candidate keywords for Connect. AI-off fallback = the topic name."""
+    if live is None:
+        live = ai_available()
+    if live:
+        try:
+            return _live_list("keywords", spans, topic_name)
+        except Exception:
+            pass
+    return _terms(spans, limit=8) or [topic_name]
+
+
+def concept_candidates(
+    spans: list[dict], topic_name: str, live: bool | None = None
+) -> list[str]:
+    """Candidate concepts for Build. AI-off fallback = the topic name."""
+    if live is None:
+        live = ai_available()
+    if live:
+        try:
+            return _live_list("concepts", spans, topic_name)
+        except Exception:
+            pass
+    return _terms(spans, limit=10) or [topic_name]
+
+
+def draft_overflow_card(
+    detail: str, spans: list[dict], topic: str, live: bool | None = None
+) -> dict:
+    """Draft ONE flashcard for a detail the learner couldn't relate, linked to
+    the best-matching source span (the Build -> Recall overflow bridge).
+
+    ponytail: offline-only draft (the deterministic path). The learner edits the
+    draft before it's added, so a bespoke single-card live prompt buys little;
+    ceiling: no live drafting for overflow cards."""
+    best_sent, best_score, span_id = "", 0.0, ""
+    for span in spans:
+        for sent in sentences(span["text"]):
+            score = jaccard(detail, sent)
+            if score > best_score:
+                best_sent, best_score, span_id = sent, score, span["id"]
+    term = detail.strip()
+    verb = "are" if term.lower().endswith("s") else "is"
+    back = ""
+    if best_sent:
+        back = re.split(r"(?<=[.;])\s", best_sent)[0].strip().rstrip(".") + "."
+    if not span_id and spans:
+        span_id = spans[0]["id"]
+    return _card(f"What {verb} {term}?", back, topic, span_id, "overflow")
+
+
 def baseline_cards(spans: list[dict], topic: str) -> list[dict]:
     """A deliberately simpler generator (the baseline Draft must beat).
 
@@ -224,8 +358,23 @@ def _self_test() -> None:
         assert c["topic"] == topic
     base = baseline_cards(spans, topic)
     assert len(base) >= 8
+
+    # encode front-half generators (offline paths).
+    scope = scope_list(spans, "Enzymes", live=False)
+    assert len(scope) >= 3, scope
+    kws = keyword_candidates(spans, "Enzymes", live=False)
+    assert kws and all(isinstance(k, str) and k for k in kws), kws
+    cons = concept_candidates(spans, "Enzymes", live=False)
+    assert cons, cons
+    # AI-off fallback with no source is the topic name.
+    assert keyword_candidates([], "Kinematics", live=False) == ["Kinematics"]
+    overflow = draft_overflow_card("cofactor", spans, topic, live=False)
+    assert overflow["front"].lower().startswith("what") and overflow["back"]
+    assert overflow["source_span"] in {s["id"] for s in spans}
+
     print(f"mcat_ai self-test OK: {len(spans)} spans, "
           f"{len(drafted)} drafted, {len(base)} baseline, "
+          f"{len(scope)} scope, {len(kws)} keywords, {len(cons)} concepts, "
           f"ai_available={ai_available()}")
 
 

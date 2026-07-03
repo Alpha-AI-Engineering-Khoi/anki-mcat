@@ -1468,6 +1468,11 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat.addAction(self.action_mcat_weak)
         qconnect(self.action_mcat_weak.triggered, self.on_mcat_weak_topics)
 
+        self.action_mcat_encode = QAction("Encode (Prime \u00b7 Connect \u00b7 Build)...", self)
+        self.action_mcat_encode.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_encode)
+        qconnect(self.action_mcat_encode.triggered, self.on_mcat_encode)
+
         self.menu_mcat.addSeparator()
 
         self.action_mcat_library = QAction("Library...", self)
@@ -1543,6 +1548,11 @@ title="{}" {}>{}</button>""".format(
         import aqt.mcat_weak_topics
 
         aqt.mcat_weak_topics.show(self)
+
+    def on_mcat_encode(self) -> None:
+        import aqt.mcat_encode
+
+        aqt.mcat_encode.show(self)
 
     def hide_menubar(self) -> None:
         self.form.menubar.setFixedHeight(0)
