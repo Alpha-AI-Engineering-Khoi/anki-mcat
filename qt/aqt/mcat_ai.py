@@ -347,6 +347,102 @@ def baseline_cards(spans: list[dict], topic: str) -> list[dict]:
     return cards
 
 
+# --- paraphrase generator (7d "the paraphrase test") ------------------------
+# Two reworded, exam-style questions that test the SAME idea as a card in new
+# words. This is what turns Performance from a fake (Memory x a constant) into a
+# measurement: the learner answers the reworded stems and we score real
+# transfer. Answer key is always the card's own back, so grading is unambiguous.
+
+
+_FRONT_SUBJECT = re.compile(r"(?i)^\s*what\s+(?:is|are|was|were)\s+(?P<subj>.+?)\s*\??\s*$")
+
+
+def _subject_of(front: str) -> str:
+    """The noun phrase a card front asks about, for rewording. Falls back to the
+    whole (html-stripped) front when it isn't a 'What is X?'-shaped question."""
+    plain = re.sub(r"<[^>]+>", " ", front or "")
+    plain = re.sub(r"\s+", " ", plain).strip().rstrip("?").strip()
+    m = _FRONT_SUBJECT.match(plain)
+    if m:
+        return m.group("subj").strip()
+    m2 = re.match(
+        r"(?i)^(?:define|describe|name|list|explain|which|how|why|state)\b[:,]?\s*(?P<rest>.+)$",
+        plain,
+    )
+    if m2 and m2.group("rest").strip():
+        return m2.group("rest").strip()
+    return plain or "this concept"
+
+
+def _offline_paraphrase(card: dict) -> list[dict]:
+    """Deterministic reword (AI-off fallback): reframe the front as two exam-
+    style stems while keeping the card back as the answer key."""
+    subject = _subject_of(card.get("front", ""))
+    answer = (card.get("back", "") or "").strip()
+    stems = [
+        f"Which of the following best describes {subject}?",
+        f"In an exam passage you encounter {subject}. What key idea is being tested?",
+    ]
+    return [{"stem": s, "answer": answer} for s in stems]
+
+
+def _live_paraphrase(card: dict, spans: list[dict]) -> list[dict]:
+    """Ask OpenAI for two reworded, exam-style questions grounded ONLY in the
+    card + source. Tops up from the offline reword if it returns fewer than 2."""
+    import openai
+
+    client = openai.OpenAI(api_key=api_key())
+    grounding = source_text(spans) if spans else (
+        (card.get("front", "") + "\n" + card.get("back", "")).strip()
+    )
+    prompt = (
+        "Rewrite the flashcard below as EXACTLY 2 NEW, exam-style questions that "
+        "test the SAME idea in different words (application / 'which of the "
+        "following' framing). Ground them ONLY in the CARD and SOURCE \u2014 invent "
+        "no facts. Each answer MUST be the card's correct answer, restated "
+        "faithfully. Return JSON {\"questions\":[{\"stem\":..,\"answer\":..}]}.\n\n"
+        f"CARD FRONT: {card.get('front', '')}\nCARD BACK: {card.get('back', '')}\n\n"
+        f"SOURCE:\n{grounding}"
+    )
+    resp = client.chat.completions.create(
+        model=os.environ.get("MCAT_OPENAI_MODEL", "gpt-4o-mini"),
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"},
+        temperature=0.3,
+    )
+    data = json.loads(resp.choices[0].message.content)
+    back = (card.get("back", "") or "").strip()
+    out: list[dict] = []
+    for q in data.get("questions", [])[:2]:
+        stem = str(q.get("stem", "")).strip()
+        if stem:
+            out.append({"stem": stem, "answer": str(q.get("answer", "")).strip() or back})
+    for extra in _offline_paraphrase(card):  # guarantee exactly 2
+        if len(out) >= 2:
+            break
+        out.append(extra)
+    return out[:2]
+
+
+def paraphrase_questions(
+    card: dict, spans: list[dict] | None = None, live: bool | None = None
+) -> list[dict]:
+    """Return EXACTLY 2 reworded, exam-style questions that test the same idea as
+    ``card``, each ``{"stem", "answer"}`` with the card's back as the answer key.
+
+    Live OpenAI path (grounded in the card + source) with a deterministic offline
+    reword fallback, so the paraphrase test runs with AI switched OFF."""
+    spans = spans or []
+    if live is None:
+        live = ai_available()
+    if live:
+        try:
+            return _live_paraphrase(card, spans)
+        except Exception:
+            pass  # AI-off: degrade gracefully to the deterministic reword
+    return _offline_paraphrase(card)
+
+
 def _self_test() -> None:
     topic, spans = load_source()
     assert topic == "MCAT::BioBiochem::Enzymes", topic
@@ -372,10 +468,21 @@ def _self_test() -> None:
     assert overflow["front"].lower().startswith("what") and overflow["back"]
     assert overflow["source_span"] in {s["id"] for s in spans}
 
+    # paraphrase test (7d): exactly 2 reworded stems, answer = the card's back.
+    src_card = {"front": "What is an enzyme?", "back": "A biological catalyst.", "topic": topic}
+    pqs = paraphrase_questions(src_card, spans, live=False)
+    assert len(pqs) == 2, pqs
+    for q in pqs:
+        assert q["stem"] and q["answer"] == "A biological catalyst."
+        assert q["stem"].lower() != src_card["front"].lower(), q  # actually reworded
+    # robust to an unparseable / non-question front, and to no source spans.
+    weird = paraphrase_questions({"front": "Mitochondrion ___ of the cell", "back": "Powerhouse"}, [], live=False)
+    assert len(weird) == 2 and all(w["answer"] == "Powerhouse" for w in weird), weird
+
     print(f"mcat_ai self-test OK: {len(spans)} spans, "
           f"{len(drafted)} drafted, {len(base)} baseline, "
           f"{len(scope)} scope, {len(kws)} keywords, {len(cons)} concepts, "
-          f"ai_available={ai_available()}")
+          f"{len(pqs)} paraphrase Qs, ai_available={ai_available()}")
 
 
 if __name__ == "__main__":

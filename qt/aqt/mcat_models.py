@@ -265,7 +265,15 @@ def memory_score(retrievabilities: list[float]) -> ScoreRange | None:
     return ScoreRange.make(mean - margin, mean, mean + margin)
 
 
-def performance_score(memory: ScoreRange, coverage_fraction: float) -> ScoreRange:
+def performance_score(
+    memory: ScoreRange, coverage_fraction: float, measured: ScoreRange | None = None
+) -> ScoreRange:
+    # When we have measured paraphrase accuracy (the learner answered reworded,
+    # exam-style questions), Performance IS that measurement of real transfer \u2014
+    # not a discount of Memory. See mcat_paraphrase. Otherwise fall back to the
+    # provisional blend below (kept so every score still computes with no data).
+    if measured is not None:
+        return measured
     c = _clamp01(coverage_fraction)
 
     def blend(mem: float, transfer: float) -> float:
@@ -312,6 +320,7 @@ class ReadinessAssessment:
     reasons: list[str] = field(default_factory=list)
     missing_data: list[str] = field(default_factory=list)
     best_next_thing: str = ""
+    performance_measured: bool = False  # True when Performance is real (7d), not provisional
 
     @property
     def meets_graded_review_threshold(self) -> bool:
@@ -336,6 +345,8 @@ def make_assessment(
     graded_reviews: int,
     studied_card_count: int,
     weakest_studied_topic: str | None = None,
+    measured_accuracy: ScoreRange | None = None,
+    measured_attempts: int = 0,
 ) -> ReadinessAssessment:
     cards_with_memory = len(retrievabilities)
     meets_reviews = graded_reviews >= GRADED_REVIEW_THRESHOLD
@@ -344,9 +355,11 @@ def make_assessment(
     gated = meets_reviews and meets_coverage and computed_memory is not None
 
     memory = performance = readiness = None
+    performance_measured = False
     if gated and computed_memory is not None:
-        perf = performance_score(computed_memory, coverage.fraction_covered)
+        perf = performance_score(computed_memory, coverage.fraction_covered, measured_accuracy)
         memory, performance, readiness = computed_memory, perf, readiness_projection(perf)
+        performance_measured = measured_accuracy is not None
 
     reasons: list[str] = []
     if memory is not None:
@@ -355,10 +368,19 @@ def make_assessment(
             f"Memory is the mean real FSRS retrievability of {cards_with_memory} studied "
             f"{noun} ({memory.percent_point}%, 95% interval {memory.percent_range_text})."
         )
-        reasons.append(
-            "Performance discounts Memory by the recall\u2192application gap and the "
-            "un-covered share; Readiness maps that onto the 472\u2013528 scale."
-        )
+        if performance is not None and performance_measured:
+            gap = round((memory.point - performance.point) * 100)
+            noun_q = "question" if measured_attempts == 1 else "questions"
+            reasons.append(
+                f"Performance is measured against {measured_attempts} reworded {noun_q} "
+                f"({performance.percent_point}%, 95% CI {performance.percent_range_text}); "
+                f"memory\u2192performance gap = {gap}%."
+            )
+        else:
+            reasons.append(
+                "Performance discounts Memory by the recall\u2192application gap and the "
+                "un-covered share; Readiness maps that onto the 472\u2013528 scale."
+            )
     reasons.append(
         f"Coverage is {coverage.percent_covered}% of {coverage.total_topics} outline topics "
         f"({coverage.covered_topics} with at least one card)."
@@ -384,7 +406,14 @@ def make_assessment(
     if without_memory > 0:
         verb = "card has" if without_memory == 1 else "cards have"
         missing.append(f"{without_memory} studied {verb} no FSRS memory state and are excluded from Memory.")
-    missing.append("Performance is not yet calibrated against held-out exam-style questions.")
+    if measured_accuracy is None:
+        # Drop this once Performance is measured against real reworded questions.
+        missing.append("Performance is not yet calibrated against held-out exam-style questions.")
+    elif measured_attempts < GRADED_REVIEW_THRESHOLD:
+        missing.append(
+            f"Performance is measured on {measured_attempts} reworded "
+            f"{'question' if measured_attempts == 1 else 'questions'} \u2014 answer more to tighten it."
+        )
     missing.append("Past-prediction accuracy: not enough history yet.")
 
     best_next = _best_next_thing(
@@ -404,6 +433,7 @@ def make_assessment(
         reasons=reasons,
         missing_data=missing,
         best_next_thing=best_next,
+        performance_measured=performance_measured,
     )
 
 
@@ -482,12 +512,35 @@ def weakest_studied_topic(col, deck: str) -> str | None:  # type: ignore[no-unty
     return SECTION_NAMES.get(best, best)
 
 
+def _gather_paraphrase(col):  # type: ignore[no-untyped-def]  # -> (ScoreRange | None, int)
+    """Measured paraphrase accuracy + attempt count, or (None, 0) with no data.
+
+    ponytail: the tally is collection-wide (mcat_paraphrase stores per source
+    card id, not per deck), so measured Performance is a global transfer signal.
+    Ceiling: not deck-scoped."""
+    try:
+        from aqt import mcat_paraphrase as pp  # lazy: avoids an import cycle
+
+        correct, attempts = pp.results_summary(col)
+        return pp.paraphrase_accuracy(correct, attempts), attempts
+    except Exception:
+        return None, 0
+
+
 def assess(col, deck: str) -> ReadinessAssessment:  # type: ignore[no-untyped-def]
-    """Full deck-scoped assessment: coverage + evidence + best-next-thing."""
+    """Full deck-scoped assessment: coverage + evidence + best-next-thing.
+
+    Performance is driven by measured paraphrase accuracy when the learner has
+    answered enough reworded questions (>= mcat_paraphrase.MIN_PARAPHRASE_ATTEMPTS);
+    otherwise it stays the provisional blend."""
     coverage = gather_coverage(col, deck)
     retrievabilities, graded, studied = gather_evidence(col, deck)
     weakest = weakest_studied_topic(col, deck)
-    return make_assessment(coverage, retrievabilities, graded, studied, weakest)
+    measured, attempts = _gather_paraphrase(col)
+    return make_assessment(
+        coverage, retrievabilities, graded, studied, weakest,
+        measured_accuracy=measured, measured_attempts=attempts,
+    )
 
 
 def _self_test() -> None:
@@ -511,12 +564,35 @@ def _self_test() -> None:
     assert 85 <= scored.memory.percent_point <= 95
     assert SCALE_MIN <= scored.readiness.point <= SCALE_MAX
     assert scored.memory_confidence == "high"
+    # Provisional path keeps the old honesty caveat and is not marked measured.
+    assert not scored.performance_measured
+    assert any("not yet calibrated" in mi for mi in scored.missing_data)
+
+    # Measured Performance (7d): when paraphrase accuracy is supplied, Performance
+    # IS that measurement (not a Memory discount) and the gap is reported.
+    measured = ScoreRange.make(0.60, 0.65, 0.70)
+    real = make_assessment(
+        covered, retr, 300, 100, weakest_studied_topic="Physics",
+        measured_accuracy=measured, measured_attempts=20,
+    )
+    assert real.is_scored and real.performance is not None and real.performance_measured
+    assert real.performance.percent_point == 65, real.performance.percent_point
+    gap = real.memory.percent_point - real.performance.percent_point
+    assert gap > 0, gap  # Performance != Memory
+    assert any("memory\u2192performance gap" in r for r in real.reasons), real.reasons
+    assert not any("not yet calibrated" in mi for mi in real.missing_data)
+
     print("mcat_models self-test: OK")
     print(
         f"  coverage {covered.percent_covered}% ({covered.covered_topics}/{covered.total_topics}), "
         f"memory {scored.memory.percent_range_text}, "
         f"performance {scored.performance.percent_range_text}, "
         f"readiness {scored.readiness.range_text}, confidence {scored.memory_confidence}"
+    )
+    print(
+        f"  measured Performance: memory {real.memory.percent_point}% vs "
+        f"performance {real.performance.percent_point}% "
+        f"\u2192 memory\u2192performance gap {gap}% (real, not Memory\u00d7constant)"
     )
 
 
