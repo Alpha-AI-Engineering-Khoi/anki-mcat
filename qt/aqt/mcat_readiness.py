@@ -43,18 +43,27 @@ def _render(deck: str, a: "m.ReadinessAssessment") -> str:
 def _scored(a: "m.ReadinessAssessment") -> str:
     mem, perf, rdy = a.memory, a.performance, a.readiness
     assert mem and perf and rdy
+    # 7d: once Performance is measured against reworded questions it is no longer
+    # provisional — say so, and drop the blanket provisional caveat.
+    perf_tag = "measured (paraphrase test)" if a.performance_measured else "provisional"
+    rdy_tag = "from measured Performance" if a.performance_measured else "provisional"
+    caveat = (
+        ""
+        if a.performance_measured
+        else f"<p style='color:{ui.MUTED}'>{ui.esc(m.PROVISIONAL_LABEL)}</p>"
+    )
     return (
         "<h3>Your three scores</h3>"
         f"<p><b style='color:{ui.GOOD}'>Memory {mem.percent_range_text}</b> "
         f"(≈{mem.percent_point}%) &middot; real FSRS recall &middot; confidence: {a.memory_confidence}"
         f"{ui.bar(mem.point, ui.GOOD)}</p>"
         f"<p><b style='color:{ui.WARN}'>Performance {perf.percent_range_text}</b> "
-        f"(≈{perf.percent_point}%) &middot; provisional"
+        f"(≈{perf.percent_point}%) &middot; {perf_tag}"
         f"{ui.bar(perf.point, ui.WARN)}</p>"
         f"<p><b style='color:{ui.ACCENT}'>Readiness {rdy.range_text}</b> "
-        f"(≈{rdy.point}) &middot; MCAT 472–528 &middot; provisional"
+        f"(≈{rdy.point}) &middot; MCAT 472–528 &middot; {rdy_tag}"
         f"{ui.bar((rdy.point - m.SCALE_MIN) / (m.SCALE_MAX - m.SCALE_MIN), ui.ACCENT)}</p>"
-        f"<p style='color:{ui.MUTED}'>{ui.esc(m.PROVISIONAL_LABEL)}</p>"
+        f"{caveat}"
     )
 
 
