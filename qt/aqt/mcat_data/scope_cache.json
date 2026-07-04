@@ -1,0 +1,1410 @@
+{
+  "_meta": {
+    "model": "gpt-5.5",
+    "reasoning": "low",
+    "domains": [
+      "en.wikipedia.org",
+      "libretexts.org"
+    ]
+  },
+  "MCAT::ChemPhys::Kinematics": {
+    "name": "Kinematics & translational motion",
+    "items": [
+      "Motion description",
+      "Reference frames",
+      "Position and displacement",
+      "Velocity and speed",
+      "Acceleration",
+      "Kinematic relationships",
+      "Vector components",
+      "Projectile motion"
+    ],
+    "sources": [
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28Lumen%29/01%3A_Model_1/1.01%3A_Kinematics",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/03%253A_Two-Dimensional_Kinematics/3.04%253A_Projectile_Motion",
+      "https://phys.libretexts.org/Courses/Gettysburg_College/Phys_111%3A_Physics%2C_symmetry_and_conservation/02%3A_Forces_and_Kinematics/2.03%3A_N3%29_2_Dimensional_Kinematics_and_Projectile_Motion",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/3%3A_Two-Dimensional_Kinematics/3.1%3A_Motion_in_Two_Dimensions",
+      "https://phys.libretexts.org/Courses/Gettysburg_College/Phys_111%3A_Physics_Symmetry_and_Conservation/02%3A_Forces_and_Kinematics/2.03%3A_N3%29_2_Dimensional_Kinematics_and_Projectile_Motion",
+      "https://phys.libretexts.org/Courses/Gettysburg_College/Phys_111%3A_Physics_Symmetry_and_Conservation/02%3A_Forces_and_Kinematics/2.03%3A_N3%29_2_Dimensional_Kinematics_and_Projectile_Motion/2.3.02%3A_Motion_in_Two_Dimensions_and_Projectile_Motion",
+      "https://en.wikipedia.org/wiki/Kinematics",
+      "https://phys.libretexts.org/Courses/Prince_Georges_Community_College/Kinematics_With_Video_Examples/02%253A_Two-Dimensional_Kinematics/2.07%253A_Projectile_Motion",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/03%3A_Two-Dimensional_Kinematics/3.04%3A_Projectile_Motion",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28Lumen%29/02%3A_Model_2/2.01%3A_Kinematics",
+      "https://phys.libretexts.org/Courses/Merrimack_College/Conservation_Laws_Newton%27s_Laws_and_Kinematics_version_2.0/16%3A_N3%29_2_Dimensional_Kinematics_and_Projectile_Motion/16.02%3A_Motion_in_Two_Dimensions_and_Projectile_Motion",
+      "https://en.wikipedia.org/wiki/Projectile_motion"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::ForceAndEnergy": {
+    "name": "Force, work & energy",
+    "items": [
+      "Newtonian force",
+      "Vector components",
+      "Net force",
+      "Work as transfer",
+      "Work-energy theorem",
+      "Kinetic energy",
+      "Potential energy",
+      "Power"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Force",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/07%253A_Work_Energy_and_Energy_Resources/7.01%253A_Work-_The_Scientific_Definition",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/6%253A_Work_and_Energy/6.4%253A_Work-Energy_Theorem",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/07%3A_Work_Energy_and_Energy_Resources/7.01%3A_Work-_The_Scientific_Definition",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/6%3A_Work_and_Energy/6.4%3A_Work-Energy_Theorem",
+      "https://phys.libretexts.org/Courses/Kettering_University/Electricity_and_Magnetism_with_Applications_to_Amateur_Radio_and_Wireless_Technology/03%253A_The_Electric_Potential/3.02%253A_Work_and_Energy",
+      "https://en.wikipedia.org/wiki/Work_%28physics%29",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/6%3A_Work_and_Energy",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/6%3A_Work_and_Energy/6.1%3A_Introduction",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/6%253A_Work_and_Energy/6.2%253A_Work_Done_by_a_Constant_Force",
+      "https://phys.libretexts.org/Courses/University_of_California_Davis/UCD%3A_Physics_7A_-_General_Physics/02%3A_Applying_Models_to_Mechanical_Phenomena/2.02%3A_Force",
+      "https://phys.libretexts.org/Bookshelves/Electricity_and_Magnetism/Electromagnetics_and_Applications_%28Staelin%29/05%3A_Electromagnetic_Forces/5.04%3A_Forces_computed_using_energy_methods"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::Fluids": {
+    "name": "Fluids & hydrostatics",
+    "items": [
+      "Fluid pressure",
+      "Hydrostatic equilibrium",
+      "Density and depth",
+      "Pascal's principle",
+      "Archimedes' principle",
+      "Buoyancy",
+      "Continuity equation",
+      "Bernoulli's principle"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Hydrostatics",
+      "https://en.wikipedia.org/wiki/Hydrodynamica",
+      "https://en.wikipedia.org/wiki/Fluid_mechanics",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28OpenStax%29/Book%3A_University_Physics_I_-_Mechanics_Sound_Oscillations_and_Waves_%28OpenStax%29/14%3A_Fluid_Mechanics/14.03%3A_Fluids_Density_and_Pressure_%28Part_2%29",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/12%253A_Fluid_Dynamics_and_Its_Biological_and_Medical_Applications/12.02%253A_Bernoullis_Equation",
+      "https://phys.libretexts.org/Courses/Skyline/Survey_of_Physics/06%3A_Fluid_Statics",
+      "https://en.wikipedia.org/wiki/Hydrostatic_pressure",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/11%3A_Fluid_Dynamics_and_Its_Applications/11.3%3A_Bernoullis_Equation",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/10%3A_Fluids/10.5%3A_Fluids_in_Motion",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/11%3A_Fluid_Statics",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28OpenStax%29/Book%3A_University_Physics_I_-_Mechanics_Sound_Oscillations_and_Waves_%28OpenStax%29/14%3A_Fluid_Mechanics/14.S%3A_Fluid_Mechanics_%28Summary%29",
+      "https://eng.libretexts.org/Bookshelves/Mechanical_Engineering/Engineering_Statics%3A_Open_and_Interactive_%28Baker_and_Haynes%29/07%3A_Centroids_and_Centers_of_Gravity/7.09%3A_Fluid_Statics"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::Thermodynamics": {
+    "name": "Thermodynamics",
+    "items": [
+      "System and surroundings",
+      "State functions",
+      "Heat and work",
+      "Internal energy",
+      "Laws of thermodynamics",
+      "Enthalpy",
+      "Entropy",
+      "Gibbs free energy"
+    ],
+    "sources": [
+      "https://eng.libretexts.org/Bookshelves/Materials_Science/TLP_Library_II/12%3A_Phase_Diagrams_and_Solidification/12.2%3A_Thermodynamics%3A_Basic_Terms",
+      "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Thermodynamics_and_Chemical_Equilibrium_%28Ellgen%29/09%3A_The_Second_Law_-_Entropy_and_Spontaneous_Change/9.13%3A_Defining_the_Helmholtz_and_Gibbs_Free_Energies",
+      "https://en.wikipedia.org/wiki/Gibbs_free_energy",
+      "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_%28Physical_and_Theoretical_Chemistry%29/Thermodynamics/Energies_and_Potentials/Free_Energy/Gibbs_%28Free%29_Energy",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28OpenStax%29/University_Physics_II_-_Thermodynamics_Electricity_and_Magnetism_%28OpenStax%29/03%3A_The_First_Law_of_Thermodynamics/3.08%3A_The_First_Law_of_Thermodynamics_%28Summary%29",
+      "https://phys.libretexts.org/Courses/Skyline/Survey_of_Physics/12%3A_Thermodynamics",
+      "https://chem.libretexts.org/Courses/can/CHEM_220%3A_General_Chemistry_II_-_Chemical_Dynamics/07%3A_Thermodynamics",
+      "https://en.wikipedia.org/wiki/Laws_of_thermodynamics",
+      "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Physical_Chemistry_for_the_Biosciences_%28LibreTexts%29/04%3A_The_Second_Law_of_Thermodynamics/4.06%3A_Gibbs_Energy",
+      "https://chem.libretexts.org/Courses/Valley_City_State_University/Chem_122/Chapter_5%3A_Chemical_Equilibrium/5.7%3A_Gibbs_Energy",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Map%3A_Chemistry_-_The_Central_Science_%28Brown_et_al.%29/05%3A_Thermochemistry/5.S%3A_Thermochemistry_%28Summary%29",
+      "https://en.wikipedia.org/wiki/Thermodynamics"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::ElectrostaticsAndCircuits": {
+    "name": "Electrostatics & circuits",
+    "items": [
+      "Charge and force",
+      "Electric fields",
+      "Electric potential",
+      "Voltage and current",
+      "Resistance and Ohm’s law",
+      "Circuit energy",
+      "Series and parallel",
+      "Capacitance"
+    ],
+    "sources": [
+      "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Introductory_Electrical_Engineering/A_First_Course_in_Electrical_and_Computer_Engineering_%28Scharf%29/04%3A_Linear_Algebra/4.09%3A_Circuit_Analysis",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/19%3A_Electric_Current_and_Resistance/19.2%3A_Electric_Current",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28OpenStax%29/University_Physics_II_-_Thermodynamics_Electricity_and_Magnetism_%28OpenStax%29/10%253A_Direct-Current_Circuits/10.08%253A_Direct-Current_Circuits_%28Summary%29",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/20%3A_Electric_Current_Resistance_and_Ohm%27s_Law/20.02%3A_Ohms_Law_-_Resistance_and_Simple_Circuits",
+      "https://workforce.libretexts.org/Bookshelves/Electronics_Technology/Electric_Circuits_I_-_Direct_Current_%28Kuphaldt%29/02%3A_Ohm%27s_Law/2.01%3A_Ohms_Law_-_How_Voltage_Current_and_Resistance_Relate",
+      "https://phys.libretexts.org/Bookshelves/Electricity_and_Magnetism/Electromagnetics_I_%28Ellingson%29/05%3A_Electrostatics",
+      "https://workforce.libretexts.org/Bookshelves/Electronics_Technology/Electric_Circuits_I_-_Direct_Current_%28Kuphaldt%29/02%253A_Ohm%27s_Law/2.01%253A_Ohms_Law_-_How_Voltage_Current_and_Resistance_Relate",
+      "https://eng.libretexts.org/Bookshelves/Introductory_Engineering/Introduction_to_Engineering_-_Thinking_Like_an_Engineer/11%3A_Circuit_Fundamentals/11.02%3A_Physical_Meaning",
+      "https://phys.libretexts.org/Workbench/Physics_3A/08%3A_Flow_Transport_and_Exponential/8.05%3A_Electric_Circuits",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28OpenStax%29/University_Physics_II_-_Thermodynamics_Electricity_and_Magnetism_%28OpenStax%29/09%253A_Current_and_Resistance/9.08%253A_Current_and_Resistance_%28Summary%29",
+      "https://math.libretexts.org/Bookshelves/Calculus/Calculus_%28OpenStax%29/08%3A_Introduction_to_Differential_Equations/8.05%3A_First-order_Linear_Equations",
+      "https://phys.libretexts.org/Courses/Skyline/Survey_of_Physics/08%3A_Electric_Current_and_Resistance"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::Optics": {
+    "name": "Light & optics",
+    "items": [
+      "Light as waves",
+      "Geometric optics",
+      "Reflection",
+      "Refraction",
+      "Image formation",
+      "Interference",
+      "Diffraction",
+      "Polarization"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Diffraction",
+      "https://en.wikipedia.org/wiki/Specular_reflection",
+      "https://en.wikipedia.org/wiki/Refraction",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28OpenStax%29/University_Physics_III_-_Optics_and_Modern_Physics_%28OpenStax%29/01%3A_The_Nature_of_Light/1.0S%3A_1.S%3A_The_Nature_of_Light_%28Summary%29",
+      "https://en.wikipedia.org/wiki/Optics",
+      "https://en.wikipedia.org/wiki/Fresnel_equations",
+      "https://phys.libretexts.org/Bookshelves/Optics",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/27%3A_Wave_Optics/27.08%3A_Polarization",
+      "https://en.wikipedia.org/wiki/Fresnel%27s_physical_optics",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/27%253A_Wave_Optics/27.08%253A_Polarization",
+      "https://phys.libretexts.org/Workbench/PhysClips_Light/04%3A_Interference",
+      "https://phys.libretexts.org/Courses/Prince_Georges_Community_College/PHY_2040%3A_General_Physics_III/04%3A_Geometric_Optics/4.2%3A_Reflection_Refraction_and_Dispersion"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::SoundAndWaves": {
+    "name": "Sound & waves",
+    "items": [
+      "Mechanical wave nature",
+      "Longitudinal pressure waves",
+      "Frequency wavelength speed",
+      "Amplitude and intensity",
+      "Superposition and interference",
+      "Standing waves resonance",
+      "Doppler effect",
+      "Sound perception"
+    ],
+    "sources": [
+      "https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Understanding_Sound_%28Abbot%29/03%3A_Traveling_waves/3.05%3A_Wavelength_speed_and_frequency",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28OpenStax%29/Book%3A_University_Physics_I_-_Mechanics_Sound_Oscillations_and_Waves_%28OpenStax%29/17%3A_Sound/17.02%3A_Sound_Waves",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/16%3A_Sound/16.1%3A_Introduction",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/15%253A_Waves_and_Vibrations/15.5%253A_Waves",
+      "https://phys.libretexts.org/Bookshelves/Conceptual_Physics/Introduction_to_Physics_%28Park%29/03%3A_Unit_2-_Mechanics_II_-_Energy_and_Momentum_Oscillations_and_Waves_Rotation_and_Fluids/05%3A_Oscillations_and_Waves/5.07%3A_Sound",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Mechanics_and_Relativity_%28Idema%29/09%3A_Waves/9.07%3A_The_Doppler_Effect",
+      "https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Acoustics/01%3A_Fundamentals/1.01%3A_Fundamentals_of_Acoustics",
+      "https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Waves%3A_An_Interactive_Tutorial_%28Forinash_and_Christian%29/4%3A_Applications/4.1%3A_Doppler_Effect",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/University_Physics_%28OpenStax%29/Book%3A_University_Physics_I_-_Mechanics_Sound_Oscillations_and_Waves_%28OpenStax%29/17%3A_Sound/17.S%3A_Sound_%28Summary%29",
+      "https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Understanding_Sound_%28Abbot%29/03%3A_Traveling_waves",
+      "https://phys.libretexts.org/Courses/Georgia_State_University/GSU-TM-Physics_I_%282211%29/11%3A_Waves/11.05%3A_Sound_Waves",
+      "https://phys.libretexts.org/Bookshelves/College_Physics/College_Physics_1e_%28OpenStax%29/16%3A_Oscillatory_Motion_and_Waves/16.09%3A_Waves"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::AtomicAndNuclear": {
+    "name": "Atomic & nuclear phenomena",
+    "items": [
+      "Atomic structure",
+      "Nuclear composition",
+      "Isotopes and nuclides",
+      "Nuclear stability",
+      "Radioactive decay",
+      "Half-life kinetics",
+      "Binding energy",
+      "Fission and fusion"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Atomic_nucleus",
+      "https://en.wikipedia.org/wiki/Radioactive_decay",
+      "https://en.wikipedia.org/wiki/Atom",
+      "https://en.wikipedia.org/wiki/Nuclide",
+      "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_%28Physical_and_Theoretical_Chemistry%29/Nuclear_Chemistry/Fission_and_Fusion/Fission_and_Fusion",
+      "https://en.wikipedia.org/wiki/Nuclear_fission",
+      "https://chem.libretexts.org/Courses/North_Central_State_College/CHEM_1010%3A_Introductory_Chemistry/13%3A_Radioactivity_and_Nuclear_Chemistry/13.07%3A_The_Discovery_of_Fission_and_the_Atomic_Bomb",
+      "https://en.wikipedia.org/wiki/Nuclear_fission_product",
+      "https://chem.libretexts.org/Courses/Los_Angeles_Trade_Technical_College/Chem_51/19%3A_Nuclear_Chemistry/19.01%3A_Radioactivity",
+      "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_%28Boundless%29/30%3A_Nuclear_Physics_and_Radioactivity/30.2%3A_Radioactivity",
+      "https://chem.libretexts.org/Courses/Portland_Community_College/CH105%3A_Allied_Health_Chemistry_II/07%3A_Nuclear_Chemistry/7.05%3A_Nuclear_Fission_and_Nuclear_Fusion",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Map%3A_Chemistry_-_The_Central_Science_%28Brown_et_al.%29/21%3A_Nuclear_Chemistry/21.S%3A_Nuclear_Chemistry_%28Summary%29"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::AcidsAndBases": {
+    "name": "Acids & bases",
+    "items": [
+      "Acid-base definitions",
+      "Proton transfer",
+      "Conjugate pairs",
+      "Acid-base strength",
+      "Dissociation equilibria",
+      "pH scale",
+      "Buffers",
+      "Titrations"
+    ],
+    "sources": [
+      "https://chem.libretexts.org/Courses/Pasadena_City_College/Chem_2A_%28Ku%29_Textbook/13%3A_Acids_and_Bases",
+      "https://chem.libretexts.org/Courses/Nassau_Community_College/Principles_of_Chemistry/12%3A_Acids_and_Bases",
+      "https://chem.libretexts.org/Courses/Anoka-Ramsey_Community_College/Introduction_to_Chemistry/15%3A_Acids_and_Bases",
+      "https://chem.libretexts.org/Courses/Williams_School/Chemistry_I/09%3A_Acid-Base_Chemistry",
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Fundamentals_of_General_Organic_and_Biological_Chemistry_%28LibreTexts%29/10%3A_Acids_and_Bases",
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Fundamentals_of_General_Organic_and_Biological_Chemistry_%28LibreTexts%29/10%3A_Acids_and_Bases/10.01%3A_Acids_and_Bases_Definitions",
+      "https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Introduction_to_Inorganic_Chemistry_%28Wikibook%29/03%3A_Acid-Base_Chemistry",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Book%3A_General_Chemistry%3A_Principles_Patterns_and_Applications_%28Averill%29/02%3A_Molecules_Ions_and_Chemical_Formulas/2.05%3A_Acids_and_Bases",
+      "https://chem.libretexts.org/Courses/Pasadena_City_College/PCC_Chemistry_2A/09%3A_Acids_and_Bases",
+      "https://chem.libretexts.org/Courses/Victor_Valley_College/CHEM100_Victor_Valley_College/08%3A_Acids_and_Bases",
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_%28LibreTexts%29/14%3A_Acids_and_Bases",
+      "https://chem.libretexts.org/Courses/Taft_College/CHEM_1510%3A_Introductory_College_Chemistry/16%3A_Acids_and_Bases"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::Solutions": {
+    "name": "Solutions & solubility",
+    "items": [
+      "Solution components",
+      "Aqueous solutions",
+      "Solubility limits",
+      "Saturation states",
+      "Dynamic equilibrium",
+      "Intermolecular interactions",
+      "Temperature and pressure",
+      "Concentration units"
+    ],
+    "sources": [
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_%28LibreTexts%29/13%253A_Solutions",
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introduction_to_General_Chemistry_%28Malik%29/05%3A_Solutions/5.02%3A_Solubility",
+      "https://chem.libretexts.org/Courses/California_State_University_Chico/General_Chemistry_112/01%3A_Solutions",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Map%3A_Chemistry_-_The_Central_Science_%28Brown_et_al.%29/13%3A_Properties_of_Solutions/13.02%3A_Saturated_Solutions_and_Solubility",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Map%3A_Structure_and_Properties_%28Tro%29/14%3A_Solutions",
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Chemistry_for_Allied_Health_%28Soult%29/07%3A_Solids_Liquids_and_Gases/7.07%3A_Solubility",
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_%28LibreTexts%29/07%3A_Chemical_Reactions/7.05%3A_Aqueous_Solutions_and_Solubility_-_Compounds_Dissolved_in_Water?mt-language=UK",
+      "https://chem.libretexts.org/Courses/Brevard_College/CHE_104%253A_Principles_of_Chemistry_II/03%253A_Solutions_and_Colloids",
+      "https://chem.libretexts.org/Courses/Southwestern_College/Atoms_First_-_Introductory_Chemistry_for_Science_and_Engineering/07%3A_Aqueous_Solutions/7.03%3A_Describing_Solubility",
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Fundamentals_of_General_Organic_and_Biological_Chemistry_%28LibreTexts%29/09%3A_Solutions",
+      "https://chem.libretexts.org/Courses/University_of_British_Columbia/UBC_Introductory_Chemistry/05%3A_Solutions",
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Beginning_Chemistry_%28Ball%29/11%3A_Solutions"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::ReactionKinetics": {
+    "name": "Reaction kinetics",
+    "items": [
+      "Reaction rates",
+      "Rate laws",
+      "Reaction order",
+      "Integrated rate laws",
+      "Half-life trends",
+      "Activation energy",
+      "Reaction mechanisms",
+      "Catalysis"
+    ],
+    "sources": [
+      "https://chem.libretexts.org/Courses/Pacific_Union_College/Kinetics/08%3A_Chemical_Kinetics",
+      "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Thermodynamics_and_Chemical_Equilibrium_%28Ellgen%29/05%3A_Chemical_Kinetics_Reaction_Mechanisms_and_Chemical_Equilibrium/5.01%3A_Chemical_Kinetics",
+      "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Thermodynamics_and_Chemical_Equilibrium_%28Ellgen%29/01%3A_Introduction_-_Background_and_a_Look_Ahead/1.02%3A_Chemical_Kinetics",
+      "https://chem.libretexts.org/Workbench/Chemistry_LHS_Bridge/09%3A_Kinetics",
+      "https://chem.libretexts.org/Courses/University_of_Toronto/Chemistry%3A_Physical_Principles/06%3A_Chemical_Kinetics",
+      "https://chem.libretexts.org/Courses/College_of_the_Canyons/CHEM_202%3A_General_Chemistry_II_OER/03%3A_Chemical_Kinetics",
+      "https://chem.libretexts.org/Courses/Smith_College/CHM_118%3A_Advanced_General_Chemistry_%28Strom%29/08%3A_Kinetics",
+      "https://chem.libretexts.org/Courses/Williams_School/Chemistry_IIA/03%3A_Chemical_Kinetics",
+      "https://chem.libretexts.org/Courses/Pacific_Union_College/Kinetics/08%3A_Chemical_Kinetics/8.02%3A_Reaction_Order",
+      "https://chem.libretexts.org/Courses/can/CHEM_220%3A_General_Chemistry_II_-_Chemical_Dynamics/06%3A_Chemical_Kinetics",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Chemistry_2e_%28OpenStax%29/12%3A_Kinetics",
+      "https://chem.libretexts.org/Courses/Gettysburg_College/Chem_108%3A_Textbook/12%3A_Kinetics"
+    ],
+    "citations": []
+  },
+  "MCAT::ChemPhys::Electrochemistry": {
+    "name": "Electrochemistry",
+    "items": [
+      "Redox reactions",
+      "Galvanic cells",
+      "Electrolytic cells",
+      "Anodes and cathodes",
+      "Cell potential",
+      "Standard reduction potentials",
+      "Nernst equation",
+      "Thermodynamic spontaneity"
+    ],
+    "sources": [
+      "https://chem.libretexts.org/Bookshelves/Analytical_Chemistry/Supplemental_Modules_%28Analytical_Chemistry%29/Electrochemistry/Basics_of_Electrochemistry/Electrochemistry/Nernst_Equation",
+      "https://chem.libretexts.org/Bookshelves/Analytical_Chemistry/Supplemental_Modules_%28Analytical_Chemistry%29/Electrochemistry/Basics_of_Electrochemistry/Electrochemistry",
+      "https://chem.libretexts.org/Bookshelves/Analytical_Chemistry/Supplemental_Modules_%28Analytical_Chemistry%29/Electrochemistry",
+      "https://chem.libretexts.org/Bookshelves/Analytical_Chemistry/Supplemental_Modules_%28Analytical_Chemistry%29/Electrochemistry/Voltaic_Cells/Electrochemical_Cells_under_Nonstandard_Conditions/Concentration_Cell",
+      "https://chem.libretexts.org/Bookshelves/Analytical_Chemistry/Supplemental_Modules_%28Analytical_Chemistry%29/Electrochemistry/Electrolytic_Cells",
+      "https://chem.libretexts.org/Bookshelves/Analytical_Chemistry/Supplemental_Modules_%28Analytical_Chemistry%29/Analytical_Sciences_Digital_Library/Courseware/Analytical_Electrochemistry%253A_Potentiometry/03_Potentiometric_Theory/05_The_Nernst_Equation",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Chem1_%28Lower%29/16%3A_Electrochemistry/16.02%3A_Galvanic_cells_and_Electrodes",
+      "https://chem.libretexts.org/Courses/University_of_Kentucky/UK%3A_General_Chemistry/17%3A_Electrochemistry/17.4%3A_The_Nernst_Equation",
+      "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Physical_Chemistry_for_the_Biosciences_%28LibreTexts%29/07%253A_Electrochemistry/7.04%253A_Types_of_Electrochemical_Cells",
+      "https://chem.libretexts.org/Ancillary_Materials/Laboratory_Experiments/Wet_Lab_Experiments/General_Chemistry_Labs/General_Chemistry_Labs_II/19.1%3A_Spontaneity_as_Viewed_using_Electrochemistry._Galvanic_Concentration_and_Electrolytic_Cells",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Map%3A_Chemistry_%28Zumdahl_and_Decoste%29/11%3A_Electrochemistry/11.1%3A_Galvanic_Cells",
+      "https://chem.libretexts.org/Bookshelves/Analytical_Chemistry/Supplemental_Modules_%28Analytical_Chemistry%29/Electrochemistry/Basics_of_Electrochemistry/Electrochemistry/Galvanic_Cells"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::FoundationsOfComprehension": {
+    "name": "Foundations of comprehension",
+    "items": [
+      "Word recognition",
+      "Language comprehension",
+      "Background knowledge",
+      "Vocabulary meaning",
+      "Language structures",
+      "Discourse context",
+      "Inference making",
+      "Strategic monitoring"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Reading_comprehension",
+      "https://en.wikipedia.org/wiki/Simple_view_of_reading",
+      "https://en.wikipedia.org/wiki/Science_of_reading",
+      "https://human.libretexts.org/Bookshelves/Research_and_Information_Literacy/Steps_to_Success_Crossing_the_Bridge_Between_Literacy_Research_and_Practice_2Ed._%28Munger%29/01%3A_Chapters/1.04%3A_Language_Comprehension_Ability-_One_of_Two_Essential_Components_of_Reading_Comprehension",
+      "https://human.libretexts.org/Bookshelves/Research_and_Information_Literacy/Steps_to_Success_Crossing_the_Bridge_Between_Literacy_Research_and_Practice_2Ed._%28Munger%29/01%253A_Chapters/1.04%253A_Language_Comprehension_Ability-_One_of_Two_Essential_Components_of_Reading_Comprehension",
+      "https://bio.libretexts.org/Workbench/Human_Physiology%3A_A_Students_Open_Path_to_Understanding_the_Body/09%3A_The_Central_Nervous_System/9.06%3A_9.6_How_Does_the_Brain_Work",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Cognitive_Psychology/Cognitive_Psychology_and_Cognitive_Neuroscience_%28Wikibooks%29/09%3A_Comprehension/9.15%3A_Language_Comprehension_and_Production",
+      "https://human.libretexts.org/Bookshelves/Research_and_Information_Literacy/Steps_to_Success_Crossing_the_Bridge_Between_Literacy_Research_and_Practice_2Ed._%28Munger%29/01%3A_Chapters/1.03%3A_Word_Recognition_Skills-_One_of_Two_Essential_Components_of_Reading_Comprehension",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Cognitive_Psychology/Cognitive_Psychology_and_Cognitive_Neuroscience_%28Wikibooks%29/09%3A_Comprehension",
+      "https://en.wikipedia.org/wiki/Cognitive_discourse_analysis",
+      "https://socialsci.libretexts.org/Bookshelves/Education_and_Professional_Development/Book%3A_How_to_Learn_Like_a_Pro_%28Nissila%29/Unit_03_Overview--College_Level_Critical_Thinking_and_Reading_Unit_Terms/03.1%3A_Lesson_3.1%3A_Comprehending_College_Level_Reading_by_Using_the_Reading_Apprenticeship_Approach",
+      "https://human.libretexts.org/Bookshelves/Composition/Introductory_Composition/Writing_for_Success_%281st_Canadian_Edition%29/2%3A_Working_with_Words%3A_Which_Word_Is_Right/2.5%3A_Reading_Comprehension_Techniques"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::ReasoningWithinText": {
+    "name": "Reasoning within the text",
+    "items": [
+      "Main ideas",
+      "Textual evidence",
+      "Author purpose",
+      "Author perspective",
+      "Tone and style",
+      "Logical inference",
+      "Argument structure",
+      "Hidden assumptions"
+    ],
+    "sources": [
+      "https://human.libretexts.org/Courses/Community_College_of_Allegheny_County/Developmental_Studies_%28103%29/06%3A_Inferences/6.02%3A_Making_Inferences",
+      "https://human.libretexts.org/Courses/Community_College_of_Allegheny_County/Reading_and_Writing_for_Learning/13%3A_Academic_Literacy-_Business_Marketing_%28Week_13%29/13.03%3A_Making_Accurate_Inferences_Based_on_Text_Evidence/13.3.01%3A_Making_Inferences",
+      "https://human.libretexts.org/Bookshelves/Composition/Introductory_Composition/Writing_for_Success_%281st_Canadian_Edition%29/2%3A_Working_with_Words%3A_Which_Word_Is_Right/2.5%3A_Reading_Comprehension_Techniques",
+      "https://human.libretexts.org/Bookshelves/Composition/Introductory_Composition/Book%3A_The_Roadrunners_Guide_to_English_%28Crisp_et_al.%29/01%3A_Reading_and_Writing_Process/1.07%3A_Unstated_Main_Idea",
+      "https://human.libretexts.org/Courses/Delaware_County_Community_College/Cultivating_Possibilities_through_Literacy/02%3A_Strategies_to_Guide_Comprehension/2.02%3A_Inferences",
+      "https://human.libretexts.org/Courses/Chattahoochee_Technical_College/Light_Bulb%3A_Rhetoric_and_Composition/05%3A_Analysis_and_Synthesis/5.08%3A_Making_Inferences",
+      "https://human.libretexts.org/Bookshelves/Literature_and_Literacy/Literacy_and_Critical_Thinking/Literacy_for_College_Success_%28Schmidt_and_Winter%29/02%3A_Comprehending_and_Communicating_Clearly/2.02%3A_What_is_the_Point_Thesis_and_Main_Ideas",
+      "https://human.libretexts.org/Courses/City_College_of_San_Francisco/Writing_and_Critical_Thinking_Through_Literature_%28Ringo_and_Kashyap%29/01%3A_Introduction/1.05%3A_Inferences_in_Literature",
+      "https://chem.libretexts.org/Under_Construction/iLearn_Collaborative/Copy_of_DCW-English-10-Semester-1_curated.imscc/01%3A_Quarter_1/01%3A_Week_2_-_Perspective/02%3A_Author%27s_Perspective_and_Purpose",
+      "https://human.libretexts.org/Bookshelves/Languages/English_as_a_Second_Language/Reading_Writing_Research_and_Reasoning%253A_An_Advanced_ESL_Text/01%253A_Critical_Reading/1.06%253A_Finding_Main_Ideas_and_Support",
+      "https://human.libretexts.org/Sandboxes/Team%3A_ESL_%28OERI%29/Reading_Writing_Research_and_Reasoning%3A_An_Advanced_ESL_Text_%28remix_version%29/01%3A_Critical_Reading/1.08%3A_Main_Ideas_and_Supporting_Details",
+      "https://human.libretexts.org/Bookshelves/Composition/Introductory_Composition/Book%253A_The_Roadrunners_Guide_to_English_%28Crisp_et_al.%29/04%253A_Style_Tone_and_Inference"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::ReasoningBeyondText": {
+    "name": "Reasoning beyond the text",
+    "items": [
+      "Text inferencing",
+      "Reading beyond lines",
+      "Premises and conclusions",
+      "Argument evaluation",
+      "Unstated assumptions",
+      "Evidence support",
+      "Alternative explanations",
+      "Logical fallacies"
+    ],
+    "sources": [
+      "https://human.libretexts.org/Bookshelves/Philosophy/Logic_and_Reasoning/Critical_Reasoning%3A_A_User%27s_Manual_%28Southworth_and_Swoyer%29/02%3A_Arguments/2.08%3A_Evaluating_Arguments",
+      "https://human.libretexts.org/Courses/Coalinga_College/Critical_Thinking%253A_Argumentative_Reading_and_Writing_%28CID_ENGL105%29/02%253A_Critical_Reading_Strategies/2.04%253A_Inferences_and_Assumptions",
+      "https://human.libretexts.org/Bookshelves/Composition/Introductory_Composition/Rhetoric_-_What_Why_and_How/03%3A_Critical_Thinking/3.01%3A_Breaking_down_critical_thinking_into_categories",
+      "https://human.libretexts.org/Bookshelves/Research_and_Information_Literacy/Critical_Thinking_in_Academic_Research_%28Gruwell_and_Ewing%29/03%3A_Analyzing_Arguments/3.01%3A_Is_It_an_Argument",
+      "https://human.libretexts.org/Bookshelves/Philosophy/Logic_and_Reasoning/Critical_Reasoning%3A_A_User%27s_Manual_%28Southworth_and_Swoyer%29/02%3A_Arguments/2.01%3A_Arguments",
+      "https://socialsci.libretexts.org/Bookshelves/Counseling_and_Guidance/College_Success/03%3A_Thinking_about_Thought/3.02%3A_Its_Critical",
+      "https://human.libretexts.org/Bookshelves/Research_and_Information_Literacy/Critical_Thinking_in_Academic_Research_%28Gruwell_and_Ewing%29/03%3A_Analyzing_Arguments/3.02%3A_Standard_Argument_Form",
+      "https://human.libretexts.org/Bookshelves/Philosophy/Logic_and_Reasoning/Critical_Reasoning%3A_A_User%27s_Manual_%28Southworth_and_Swoyer%29/04%3A_Perception-_Expectation_and_Inference/4.04%3A_Going_Beyond_the_Information_Given",
+      "https://human.libretexts.org/Bookshelves/Philosophy/Logic_and_Reasoning/Critical_Reasoning%3A_A_User%27s_Manual_%28Southworth_and_Swoyer%29/02%3A_Arguments/2.03%3A_Identifying_Arguments_in_their_Natural_Habitat",
+      "https://human.libretexts.org/Courses/Lumen_Learning/Book%253A_Introduction_to_Philosophy-1_%28Lumen%29/01%253A_Main_Body/01.1%253A_Arguments__The_Basics",
+      "https://human.libretexts.org/Bookshelves/Philosophy/Logic_and_Reasoning/Thinking_Well_-_A_Logic_And_Critical_Thinking_Textbook_4e_%28Lavin%29/01%3A_Basic_Concepts/1.01%3A_Vital_Course_Concepts",
+      "https://human.libretexts.org/Under_Construction/Clean_Up_%28Pressbooks%29/Arguments_in_Context_-_An_Introduction_to_Critical_Thinking_%28Robinson%29/01%3A_An_Introduction_to_Reasoning/01.01%3A_Reasoning_and_Argument"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::Philosophy": {
+    "name": "Humanities: philosophy",
+    "items": [
+      "Philosophical inquiry",
+      "Metaphysics",
+      "Epistemology",
+      "Ethics",
+      "Logic",
+      "Aesthetics",
+      "Political philosophy",
+      "Philosophy of science"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Epistemology",
+      "https://en.wikipedia.org/wiki/Metaphysics",
+      "https://en.wikipedia.org/wiki/Philosophy",
+      "https://en.wikipedia.org/wiki/Outline_of_philosophy",
+      "https://human.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Philosophy-1_%28Lumen%29/03%3A_Unit_2%3A_Epistemology/03.1%3A_Epistemology__Overview",
+      "https://human.libretexts.org/Bookshelves/Philosophy",
+      "https://en.wikipedia.org/wiki/Outline_of_metaphysics",
+      "https://en.wikipedia.org/wiki/Metaphysical_aesthetics",
+      "https://human.libretexts.org/Bookshelves/Philosophy/Introduction_to_Philosophy/Introduction_to_Philosophy_%28OpenStax%29/01%253A_Introduction_to_Philosophy/1.01%253A_What_is_Philosophy",
+      "https://human.libretexts.org/Bookshelves/Humanities",
+      "https://human.libretexts.org/Courses/Lumen_Learning/Book%3A_Philosophy_in_the_Humanities_%28Lumen%29/03%3A_Module_1%3A_Introduction__Foundations_of_Philosophy/03.2%3A_What_is_Philosophy",
+      "https://human.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Philosophy-1_%28Lumen%29/05%3A_Unit_4%3A_Metaphysics/05.1%3A_Metaphysics__Overview_and_Coursework"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::Ethics": {
+    "name": "Humanities: ethics",
+    "items": [
+      "Moral reasoning",
+      "Metaethics",
+      "Normative ethics",
+      "Applied ethics",
+      "Consequentialism",
+      "Deontology",
+      "Virtue ethics",
+      "Bioethical principles"
+    ],
+    "sources": [
+      "https://human.libretexts.org/Bookshelves/Philosophy/Introduction_to_Philosophy/Introduction_to_Philosophy_%28OpenStax%29/09%253A_Normative_Moral_Theory/9.01%253A_Requirements_of_a_Normative_Moral_Theory",
+      "https://human.libretexts.org/Bookshelves/Philosophy/Ethics",
+      "https://en.wikipedia.org/wiki/Metaethics",
+      "https://human.libretexts.org/Bookshelves/Philosophy/Introduction_to_Philosophy/An_Introduction_to_Philosophy_%28Payne%29/09%253A_Meta-Ethics/9.01%253A_Applied_Ethics_Normative_Ethics_and_Meta-Ethics",
+      "https://en.wikipedia.org/wiki/Ethics",
+      "https://en.wikipedia.org/wiki/Normative_ethics",
+      "https://en.wikipedia.org/wiki/Beneficence_%28ethics%29",
+      "https://en.wikipedia.org/wiki/Medical_ethics",
+      "https://human.libretexts.org/Courses/Folsom_Lake_College/PHIL_300%3A_Introduction_to_Philosophy_%28Bauer%29/07%3A_Ethics/7.05%3A_Ethics",
+      "https://en.wikipedia.org/wiki/Ethical_terminology",
+      "https://human.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Philosophy-1_%28Lumen%29/05%3A_Unit_4%3A_Metaphysics/05.1%3A_Moral_Philosophy__Concepts_and_Distinctions",
+      "https://human.libretexts.org/Bookshelves/Philosophy/Introduction_to_Philosophy/Introduction_to_Philosophy_%28OpenStax%29/09%3A_Normative_Moral_Theory/9.09%3A_Summary"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::Literature": {
+    "name": "Humanities: literature",
+    "items": [
+      "Literary genres",
+      "Narrative structure",
+      "Theme and meaning",
+      "Literary devices",
+      "Historical context",
+      "Authorial perspective",
+      "Reader interpretation",
+      "Literary theory"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Narrative_poetry",
+      "https://en.wikipedia.org/wiki/Literary_genre",
+      "https://en.wikipedia.org/wiki/Poetry",
+      "https://human.libretexts.org/Courses/East_Los_Angeles_College/Advanced_ESL_Grammar_and_Composition/05%3A_Analysis/5.03%3A_Literary_Analysis",
+      "https://en.wikipedia.org/wiki/Genre",
+      "https://en.wikipedia.org/wiki/Humanities",
+      "https://human.libretexts.org/Courses/Coalinga_College/English_002%3A_Introduction_to_Literature/03%3A_Writing_About_Literature/3.01%3A_The_Literary_Landscape-_Four_Major_Genres",
+      "https://en.wikipedia.org/wiki/Poetics",
+      "https://human.libretexts.org/Bookshelves/Humanities",
+      "https://human.libretexts.org/Workbench/Writing_and_Critical_Thinking_Through_Literature/01%3A_Introduction/1.01%3A_What_is_Literature",
+      "https://human.libretexts.org/Bookshelves/Literature_and_Literacy/Literacy_and_Critical_Thinking/Writing_and_Critical_Thinking_Through_Literature_%28Ringo_and_Kashyap%29/01%3A_Introduction/1.01%3A_What_is_Literature",
+      "https://human.libretexts.org/Bookshelves/Literature_and_Literacy/Literacy_and_Critical_Thinking/Literacy_for_College_Success_%28Schmidt_and_Winter%29/03%3A_Discover_Explore_and_Reflect_on_a_Text/3.05%3A_Analysis_of_Literature-_a_Primer_of_Literary_Devices"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::ArtsAndCulture": {
+    "name": "Humanities: arts & culture",
+    "items": [
+      "Human expression",
+      "Cultural context",
+      "Symbolic meaning",
+      "Social institutions",
+      "Artistic media",
+      "Language and communication",
+      "Cultural change",
+      "Interpretive methods"
+    ],
+    "sources": [
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Cultural_Anthropology/Cultural_Anthropology_%28Evans%29/01%253A_What_is_Anthropology/1.01%253A_Anthropology",
+      "https://human.libretexts.org/Bookshelves/Humanities",
+      "https://human.libretexts.org/Bookshelves/Art/Art_Introduction_and_Fundamentals/Introduction_to_Art_Concepts_%28Lumen%29/03%3A_Context_and_Perspective/3.05%3A_Art_in_the_Twenty-First_Century",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Introductory_Anthropology/Introduction_to_Anthropology_%28OpenStax%29/16%3A_Art_Music_and_Sport/16.02%3A_Anthropology_of_the_Arts",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Cultural_Anthropology",
+      "https://human.libretexts.org/Bookshelves/Humanities/Introduction_to_Humanities_2e_%28Larsen%29/01%3A_Chapters/1.09%3A_The_Arts",
+      "https://human.libretexts.org/Courses/Coalinga_College/The_Human_Story%3A_An_Introduction_to_the_Humanities/01%3A_Introduction_to_the_Humanities/1.02%3A_Defining_the_Humanities",
+      "https://human.libretexts.org/Courses/Coalinga_College/The_Human_Story%253A_An_Introduction_to_the_Humanities/01%253A_Introduction_to_the_Humanities/1.02%253A_Defining_the_Humanities",
+      "https://human.libretexts.org/Bookshelves/Humanities/Introduction_to_Humanities_1e_%28Larsen%29/01%3A_Chapters/1.07%3A_The_Arts",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Introductory_Anthropology/Introduction_to_Anthropology_%28OpenStax%29/16%3A_Art_Music_and_Sport/16.07%3A_Summary",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Cultural_Anthropology/Cultural_Anthropology_%28Saneda%29/01%3A_Anthropology_and_Culture/1.01%3A_What_is_Anthropology",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Cultural_Anthropology/Perspectives_-_An_Open_Invitation_to_Cultural_Anthropology_2e_%28Brown_McIlwraith_and_Gonzalez%29/01%3A_Part_1/1.01%3A_Introduction_to_Anthropology"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::History": {
+    "name": "Humanities: history",
+    "items": [
+      "Historical interpretation",
+      "Primary sources",
+      "Source criticism",
+      "Human cultures",
+      "Civilization formation",
+      "Social change",
+      "Cultural transmission",
+      "Historiography"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/History_of_Humanities",
+      "https://human.libretexts.org/Bookshelves/History/World_History/Book%3A_Western_Civilization_-_A_Concise_History_I_%28Brooks%29/01%3A_The_Origins_of_Civilization",
+      "https://en.wikipedia.org/wiki/History",
+      "https://human.libretexts.org/Bookshelves/Humanities",
+      "https://human.libretexts.org/Bookshelves/History",
+      "https://human.libretexts.org/Bookshelves/History/Historical_Studies/How_History_is_Made%253A_A_Students_Guide_to_Reading_Writing_and_Thinking_in_the_Discipline_%28Cole_et_al.%29/01%253A_Part_1_-_Thinking_Historically/1.01%253A_What_is_History",
+      "https://human.libretexts.org/Bookshelves/History/National_History/U.S._History_%28OpenStax%29",
+      "https://en.wikipedia.org/wiki/Outline_of_the_humanities",
+      "https://human.libretexts.org/Bookshelves/Art/Art_Appreciation/A_World_Perspective_of_Art_Appreciation_%28Gustlin_and_Gustlin%29_1.0/06%3A_The_Sophisticated_Art_of_Cultures_%28200_CE__1400_CE%29",
+      "https://en.wikipedia.org/wiki/Humanities",
+      "https://human.libretexts.org/Courses/University_of_Hawaii_Maui_College/History_151%3A_World_History_to_1500_%28University_of_Hawaii_Maui_College%29/02%3A_Early_Middle_Eastern_and_Northeast_African_Civilizations/2.03%3A_Introduction_-_Defining_Civilization",
+      "https://human.libretexts.org/Bookshelves/Art/Art_Introduction_and_Fundamentals/Introduction_to_Art_Concepts_%28Lumen%29/05%3A_Art_History_%28Prehistory_to_Rococo%29/5.08%3A_Ancient_Near_East-_Cradle_of_Civilization"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::Anthropology": {
+    "name": "Social sciences: anthropology",
+    "items": [
+      "Holistic human study",
+      "Culture and meaning",
+      "Ethnographic fieldwork",
+      "Cultural relativism",
+      "Kinship systems",
+      "Social institutions",
+      "Human evolution",
+      "Language and symbolism"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Anthropology",
+      "https://en.wikipedia.org/wiki/Ethnography",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Introductory_Anthropology/Introduction_to_Anthropology_%28OpenStax%29/11%3A_Forming_Family_through_Kinship/11.02%3A_What_Is_Kinship",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Introductory_Anthropology/Introduction_to_Anthropology_%28OpenStax%29/11%253A_Forming_Family_through_Kinship/11.04%253A_Reckoning_Kinship_across_Cultures",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Cultural_Anthropology",
+      "https://en.wikipedia.org/wiki/Social_Bonding_and_Nurture_Kinship",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Cultural_Anthropology/Cultural_Anthropology_%28Evans%29/03%3A_Anthropological_Theory/3.01%3A_Social_Evolution_of_Anthropological_Theory",
+      "https://en.wikipedia.org/wiki/Cultural_anthropology",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Introductory_Anthropology/Introduction_to_Anthropology_%28OpenStax%29/11%3A_Forming_Family_through_Kinship/11.07%3A_Summary",
+      "https://socialsci.libretexts.org/Courses/Moraine_Park_Technical_College/Being_Human%3A_An_Introduction_to_Four-field_Anthropology",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Introductory_Anthropology/Introduction_to_Anthropology%3A_A_Four_Field_Approach/02%3A_Biological_Anthropology/2.01%3A_Evolution_and_Human_Adaptation",
+      "https://socialsci.libretexts.org/Bookshelves/Anthropology/Cultural_Anthropology/Cultural_Anthropology_%28Wikibook%29"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::Economics": {
+    "name": "Social sciences: economics",
+    "items": [
+      "Scarcity and choice",
+      "Opportunity cost",
+      "Supply and demand",
+      "Market equilibrium",
+      "Incentives",
+      "Market failure",
+      "Public policy",
+      "Inequality"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Market_failure",
+      "https://en.wikipedia.org/wiki/Scarcity",
+      "https://en.wikipedia.org/wiki/Economics",
+      "https://en.wikipedia.org/wiki/Shortage",
+      "https://k12.libretexts.org/Bookshelves/Economics/02%3A_Market_Structures_and_Trade/2.10%3A_Market_Failures",
+      "https://socialsci.libretexts.org/Bookshelves/Economics/Introductory_Comprehensive_Economics/Economics_-_Theory_Through_Applications/31%3A_Toolkit/31.10%3A_Supply_and_Demand",
+      "https://socialsci.libretexts.org/Bookshelves/Economics/Introductory_Comprehensive_Economics/Principles_of_Economics_%28LibreTexts%29/01%253A_Economics%253A_The_Study_of_Choice/1.1%253A_Defining_Economics",
+      "https://socialsci.libretexts.org/Bookshelves/Economics/Introductory_Comprehensive_Economics/Principles_of_Economics_%28LibreTexts%29",
+      "https://socialsci.libretexts.org/Bookshelves/Economics",
+      "https://en.wikipedia.org/wiki/Market_%28economics%29",
+      "https://en.wikipedia.org/wiki/Supply_and_demand",
+      "https://socialsci.libretexts.org/Bookshelves/Economics/Macroeconomics/Principles_of_Macroeconomics_3e_%28OpenStax%29/03%3A_Demand_and_Supply/3.02%3A_Demand_Supply_and_Equilibrium_in_Markets_for_Goods_and_Services"
+    ],
+    "citations": []
+  },
+  "MCAT::CARS::PoliticalScience": {
+    "name": "Social sciences: political science",
+    "items": [
+      "Power and governance",
+      "Authority and legitimacy",
+      "Political institutions",
+      "State and sovereignty",
+      "Political behavior",
+      "Public policy",
+      "Comparative politics",
+      "International relations"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Political_science",
+      "https://socialsci.libretexts.org/Workbench/Introduction_to_Political_Science_%28OpenStax%29/13%3A_Governing_Regimes/13.02%3A_Contemporary_Government_Regimes-_Power_Legitimacy_and_Authority",
+      "https://en.wikipedia.org/wiki/Social_science",
+      "https://socialsci.libretexts.org/Courses/Solano_Community_College/SOC_002%3A_Social_Issues_and_Problems/15%3A_Government/15.01%3A_Politics%2C_Power%2C_and_Authority",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Sociology_%28Boundless%29/15%253A_Government/15.01%253A_Politics_Power_and_Authority/15.1C%253A_Authority",
+      "https://socialsci.libretexts.org/Workbench/Introduction_to_Political_Science_%28OpenStax%29/13%3A_Governing_Regimes/13.05%3A_Summary",
+      "https://socialsci.libretexts.org/Workbench/Introduction_to_Political_Science_%28OpenStax%29/01%3A_What_Is_Politics_and_What_Is_Political_Science/1.08%3A_Summary",
+      "https://socialsci.libretexts.org/Bookshelves/Political_Science_and_Civics/Democracy_in_Brief/01%3A_Chapters/1.07%3A_Three_Pillars_of_Government",
+      "https://socialsci.libretexts.org/Bookshelves/Political_Science_and_Civics/Introduction_to_Comparative_Government_and_Politics_%28Bozonelos_et_al.%29/03%3A_States_and_Regimes/3.05%3A_Student_Resources",
+      "https://socialsci.libretexts.org/Workbench/Introduction_to_Political_Science_%28OpenStax%29/01%3A_What_Is_Politics_and_What_Is_Political_Science/1.03%3A_Public_Policy_Public_Interest_and_Power",
+      "https://en.wikipedia.org/wiki/Outline_of_political_science",
+      "https://socialsci.libretexts.org/Bookshelves/Political_Science_and_Civics/An_Introduction_to_Politics_%28Sell%29/01%3A_Politics_and_Power/1.01%3A_Do_We_Need_a_Government%3F"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::AminoAcidsAndProteins": {
+    "name": "Amino acids & proteins",
+    "items": [
+      "Amino acid structure",
+      "Side chain properties",
+      "Zwitterions and pI",
+      "Peptide bonds",
+      "Protein primary structure",
+      "Protein folding levels",
+      "Noncovalent interactions",
+      "Protein function"
+    ],
+    "sources": [
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Chemistry_for_Allied_Health_%28Soult%29/13%3A_Amino_Acids_and_Proteins/13.01%3A_Amino_Acids",
+      "https://chem.libretexts.org/Bookshelves/Biological_Chemistry/Supplemental_Modules_%28Biological_Chemistry%29/Proteins/Amino_Acids/Reactions_of_Amino_Acids/Acid-Base_Reactions_of_Amino_Acids",
+      "https://chem.libretexts.org/Bookshelves/Biological_Chemistry/Supplemental_Modules_%28Biological_Chemistry%29/Proteins/Amino_Acids/Properties_of_Amino_Acids/Charged_Nature_of_Amino_Acids",
+      "https://chem.libretexts.org/Bookshelves/Environmental_Chemistry/Toxicology_MSDT/02%3A_Biochemistry_and_Molecular_Genetics/2.01%3A_New_Page",
+      "https://bio.libretexts.org/Workbench/Bio_11A_-_Introduction_to_Biology_I/06%3A_Macromolecules-_Nucleic_Acids_and_Proteins/6.03%3A_Proteins",
+      "https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Organic_Chemistry_%28OpenStax%29/26%3A_Biomolecules-_Amino_Acids_Peptides_and_Proteins/26.01%3A_Structures_of_Amino_Acids",
+      "https://en.wikipedia.org/wiki/Protein_structure",
+      "https://chem.libretexts.org/Courses/Honolulu_Community_College/CHEM_100%3A_Chemistry_and_Society/11%3A_Biochemistry/11.04%3A_Proteins-_Polymers_of_Amino_Acids",
+      "https://chem.libretexts.org/Courses/University_of_Arkansas_Little_Rock/CHEM_4320_5320%3A_Biochemistry_1/01%3A_Amino_Acids/1.3%3A_Properties_of_Amino_Acids/1.3.1._Charged_Nature_of_Amino_Acid",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_2e_%28OpenStax%29/01%3A_Unit_I-_The_Chemistry_of_Life/1.03%3A_Biological_Macromolecules/1.3.05%3A_Proteins",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_1e_%28OpenStax%29/1%3A_The_Chemistry_of_Life/3%3A_Biological_Macromolecules/3.4%3A_Proteins",
+      "https://chem.libretexts.org/Workbench/Chemistry_LHS_Bridge/18%3A_Proteins/18.01%3A_Amino_Acids/18.1.03%3A_Reactions_of_Amino_Acids/18.1.3.02%3A_Acid-Base_Reactions_of_Amino_Acids"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::Enzymes": {
+    "name": "Enzyme structure & kinetics",
+    "items": [
+      "Active site",
+      "Transition state",
+      "Enzyme substrate complex",
+      "Michaelis Menten kinetics",
+      "Km and Vmax",
+      "Enzyme inhibition",
+      "Allosteric regulation",
+      "Cofactors and coenzymes"
+    ],
+    "sources": [
+      "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Fundamentals_of_General_Organic_and_Biological_Chemistry_%28LibreTexts%29/19%253A_Enzymes_and_Vitamins/19.07%253A_Enzyme_Regulation-_Allosteric_Control_and_Feedback_Inhibition",
+      "https://med.libretexts.org/Bookshelves/Basic_Science/Cell_Biology_Genetics_and_Biochemistry_for_Pre-Clinical_Students/01%3A_Biochemistry_basics/1.02%3A_Enzyme_kinetics",
+      "https://chem.libretexts.org/Courses/Knox_College/Chem_322%3A_Physical_Chemisty_II/04%3A_Enzyme_Kinetics/4.06%3A_Allosteric_Interactions",
+      "https://chem.libretexts.org/Bookshelves/Biological_Chemistry/Supplemental_Modules_%28Biological_Chemistry%29/Enzymes/Enzymatic_Kinetics/Michaelis-Menten_Kinetics",
+      "https://med.libretexts.org/Bookshelves/Basic_Science/Cell_Biology_Genetics_and_Biochemistry_for_Pre-Clinical_Students/01%253A_Biochemistry_basics/1.02%253A_Enzyme_kinetics",
+      "https://en.wikipedia.org/wiki/Allosteric_regulation",
+      "https://chem.libretexts.org/Courses/CSU_Chico/CSU_Chico%3A_CHEM_451_-_Biochemistry_I/CHEM_451_Test/08%3A_Transport_and_Kinetics/8.5%3A_More_Complicated_Enzymes/D4._Allosteric_Enzymes",
+      "https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Physical_Chemistry_for_the_Biosciences_%28LibreTexts%29/10%253A_Enzyme_Kinetics",
+      "https://bio.libretexts.org/Bookshelves/Cell_and_Molecular_Biology/Cells_-_Molecules_and_Mechanisms_%28Wong%29/03%3A_Bioenergetics_-_Thermodynamics_and_Enzymes/3.03%3A_Enzyme_Kinetics",
+      "https://chem.libretexts.org/Courses/University_of_California_Davis/Chem_107B%253A_Physical_Chemistry_for_Life_Scientists/Chapters/3%253A_Enzyme_Kinetics/3.2%253A_The_Equations_of_Enzyme_Kinetics",
+      "https://en.wikipedia.org/wiki/Active_site",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Book%3A_Structure_and_Reactivity_in_Organic_Biological_and_Inorganic_Chemistry_%28Schaller%29/IV%3A__Reactivity_in_Organic_Biological_and_Inorganic_Chemistry_2/02%3A_Mathematical_Tools_in_Reaction_Kinetics/2.05%3A_Enzyme_Kinetics_and_Inhibition"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::Carbohydrates": {
+    "name": "Carbohydrates",
+    "items": [
+      "Saccharide classification",
+      "Monosaccharide structure",
+      "Stereochemistry",
+      "Glycosidic bonds",
+      "Dehydration and hydrolysis",
+      "Energy storage polysaccharides",
+      "Structural polysaccharides",
+      "Carbohydrate metabolism"
+    ],
+    "sources": [
+      "https://chem.libretexts.org/Workbench/SC_149%3A_Cosmetic_Chemistry/09%3A_Basic_Biochemistry/9.02%3A_Carbohydrates",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_%28Boundless%29/23%3A_Nutrition_and_Metabolism/23.2%3A_Carbohydrates/23.2A%3A_Carbohydrate_Molecules",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_1e_%28OpenStax%29/1%3A_The_Chemistry_of_Life/3%3A_Biological_Macromolecules/3.2%3A_Carbohydrates",
+      "https://chem.libretexts.org/Courses/can/CHEM_232_-_Organic_Chemistry_II_%28Puenzo%29/11%3A_Biomolecules_-_Carbohydrates/11.01%3A_Classification_of_Carbohydrates",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28OpenStax%29/07%3A_Microbial_Biochemistry/7.02%3A_Carbohydrates",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_1e_%28OpenStax%29/Unit_1%3A_Levels_of_Organization/02%3A_The_Chemical_Level_of_Organization/2.05%3A_Organic_Compounds_Essential_to_Human_Functioning",
+      "https://chem.libretexts.org/Courses/can/CHEM_232_-_Organic_Chemistry_II_%28Puenzo%29/11%3A_Biomolecules-_Carbohydrates/11.01%3A_Classification_of_Carbohydrates",
+      "https://chem.libretexts.org/Textbook_Maps/Organic_Chemistry/Map%3A_Organic_Chemistry_%28Vollhardt_and_Schore%29/24%3A_Carbohydrates%3A_Polyfunctional_Compounds_in_Nature/24.01%3A_Names__and__Structures_of_Carbohydrates",
+      "https://chem.libretexts.org/Courses/Pasadena_City_College/Chem_2A%3A_General_Organic_and_Biological_Chemistry_%28Ku%29/14%3A_Biomolecules-_Building_Blocks_of_Life/14.02%3A_Carbohydrates_-_Energy_Storage_and_Structure_Molecules/14.2.01%3A_Carbohydrate_Molecules",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28Boundless%29/02%3A_Chemistry/2.05%3A_Organic_Compounds/2.5.01%3A_Carbohydrate_Molecules",
+      "https://en.wikipedia.org/wiki/Carbohydrate",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Principles_of_Biology/01%3A_Chapter_1/03%3A_Biological_Molecules/3.01%3A_Carbohydrates"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::LipidsAndMembranes": {
+    "name": "Lipids & membranes",
+    "items": [
+      "Amphipathic lipids",
+      "Phospholipid bilayers",
+      "Hydrophobic effect",
+      "Fluid mosaic model",
+      "Membrane fluidity",
+      "Selective permeability",
+      "Membrane proteins",
+      "Lipid signaling"
+    ],
+    "sources": [
+      "https://chem.libretexts.org/Bookshelves/Biological_Chemistry/Supplemental_Modules_%28Biological_Chemistry%29/Lipids/Applications_of_Lipids/Lipid_Bilayer_Membranes",
+      "https://en.wikipedia.org/wiki/Lipid_bilayer",
+      "https://bio.libretexts.org/Bookshelves/Cell_and_Molecular_Biology/Fundamentals_of_Cell_Biology_%28Dalton_and_Young%29/02%3A_Biological_Membranes/2.01%3A_The_Chemical_Features_of_Biological_Membranes",
+      "https://med.libretexts.org/Bookshelves/Basic_Science/Cell_Biology_Genetics_and_Biochemistry_for_Pre-Clinical_Students/16%3A_Plasma_Membrane/16.01%3A_Components_and_structure",
+      "https://en.wikipedia.org/wiki/Membrane_lipid",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/05%3A_Structure_and_Function_of_Plasma_Membranes/5.02%3A_Components_and_Structure_-_Fluid_Mosaic_Model",
+      "https://bio.libretexts.org/Bookshelves/Biochemistry/Book%3A_Biochemistry_Free_and_Easy_%28Ahern_and_Rajagopal%29/03%3A_Structure__Function/3.06%3A_Lipids_and_Membranes",
+      "https://bio.libretexts.org/Courses/University_of_California_Davis/BIS_105%3A__Biomolecules_and_Metabolism_%28Murphy%29/Lipids_and_Membranes",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Principles_of_Biology/01%3A_Chapter_1/06%3A_The_Cell_Membrane_and_Transport/6.01%3A_The_Plasma_Membrane",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28OpenStax%29/07%3A_Microbial_Biochemistry/7.03%3A_Lipids",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Principles_of_Biology/01%3A_Chapter_1/03%3A_Biological_Molecules/3.02%3A_Lipids",
+      "https://bio.libretexts.org/Bookshelves/Human_Biology/Book%3A_Human_Biology_%28Grewal_and_Wakim%29/5%3A_Cells/5.04%3A_Plasma_Membrane"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::NucleicAcids": {
+    "name": "Nucleic acids",
+    "items": [
+      "Genetic information flow",
+      "DNA versus RNA",
+      "Nucleotide building blocks",
+      "Sugar-phosphate backbone",
+      "Complementary base pairing",
+      "Antiparallel double helix",
+      "RNA functional roles",
+      "Genome organization"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Nucleic_acid_structure",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/03%3A_Biological_Macromolecules/3.14%3A_Nucleic_Acids_-__Types_of_RNA",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_1e_%28OpenStax%29/1%3A_The_Chemistry_of_Life/3%3A_Biological_Macromolecules/3.5%3A_Nucleic_Acids",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_2e_%28OpenStax%29/01%3A_Unit_I-_The_Chemistry_of_Life/1.03%3A_Biological_Macromolecules/1.3.06%3A_Nucleic_Acids",
+      "https://bio.libretexts.org/Under_Construction/Purgatory/Core_%28Britt%27s_page%29/Nucleic_Acids%2A%23",
+      "https://med.libretexts.org/Courses/Virginia_Tech/Foundations_of_Organic_Chemistry/14%3A_Nucleic_Acids/14.02%3A_Nucleic_Acid_Structure",
+      "https://bio.libretexts.org/Bookshelves/Biochemistry/Fundamentals_of_Biochemistry_%28Jakubowski_and_Flatt%29/01%253A_Unit_I-_Structure_and_Catalysis/08%253A_Nucleotides_and_Nucleic_Acids/8.01%253A_Nucleic_Acids_-_Structure_and_Function",
+      "https://en.wikipedia.org/wiki/Nucleic_acid",
+      "https://bio.libretexts.org/Courses/West_Los_Angeles_College/Biotechnology/02%3A_The_Molecules_of_Life/2.07%3A_Nucleic_Acids",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/01%3A_Introduction_to_Biology/1.13%3A_Nucleic_Acids",
+      "https://chem.libretexts.org/Bookshelves/General_Chemistry/Book%3A_Structure_and_Reactivity_in_Organic_Biological_and_Inorganic_Chemistry_%28Schaller%29/I%3A__Chemical_Structure_and_Properties/08%3A_Introduction_to_Biomolecules/8.03%3A_Nucleic_Acids",
+      "https://chem.libretexts.org/Courses/Brevard_College/LNC_216_CHE/07%3A_Polymers/7.10%3A_Nucleic_Acids-_Parts_Structure_and_Function"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::DNAReplication": {
+    "name": "DNA replication & repair",
+    "items": [
+      "Semiconservative replication",
+      "Replication origins",
+      "Replication forks",
+      "Leading and lagging strands",
+      "DNA polymerase proofreading",
+      "Mismatch repair",
+      "Excision repair",
+      "Double-strand break repair"
+    ],
+    "sources": [
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28Boundless%29/07%3A_Microbial_Genetics/7.10%3A_Mutation/7.10A%3A_DNA_Repair",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/14%3A_DNA_Structure_and_Function/14.04%3A_DNA_Repair/14.4A%3A_DNA_Repair",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Principles_of_Biology/02%3A_Chapter_2/13%3A_DNA_Replication/13.03%3A_DNA_Repair",
+      "https://bio.libretexts.org/Under_Construction/Cell_and_Molecular_Biology_%28Bergtrom%29/09%3A_Details_of_DNA_Replication_and_DNA_Repair/9.07%3A_DNA_Repair_Mechanisms",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Concepts_in_Biology_%28OpenStax%29/09%3A_Molecular_Biology/9.02%3A_DNA_Replication",
+      "https://bio.libretexts.org/Bookshelves/Cell_and_Molecular_Biology/Book%3A_Basic_Cell_and_Molecular_Biology_%28Bergtrom%29/09%3A_Details_of_DNA_Replication_and_Repair",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_1e_%28OpenStax%29/3%3A_Genetics/14%3A_DNA_Structure_and_Function/14.6%3A_DNA_Repair",
+      "https://med.libretexts.org/Bookshelves/Basic_Science/Cell_Biology_Genetics_and_Biochemistry_for_Pre-Clinical_Students/10%3A_Genes_genomes_and_DNA/10.03%3A_DNA_replication",
+      "https://bio.libretexts.org/Workbench/Bio_11A_-_Introduction_to_Biology_I/17%3A_DNA_Replication/17.05%3A_DNA_Repair",
+      "https://bio.libretexts.org/Bookshelves/Cell_and_Molecular_Biology/Basic_Cell_and_Molecular_Biology_%28Bergtrom%29/09%253A_Details_of_DNA_Replication_and_Repair/9.03%253A_DNA_Repair",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Biology_%28Kimball%29/05%3A_DNA/5.13%3A_DNA_Repair",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28Boundless%29/07%3A_Microbial_Genetics/7.03%3A_DNA_Replication"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::GeneExpression": {
+    "name": "Transcription & translation",
+    "items": [
+      "Central dogma",
+      "Gene expression",
+      "DNA template",
+      "RNA polymerase",
+      "mRNA processing",
+      "Genetic code",
+      "Ribosome translation",
+      "Protein folding"
+    ],
+    "sources": [
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/04%3A_Molecular_Biology/4.05%3A_Transcription_of_DNA_to_RNA",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/04%253A_Molecular_Biology/4.05%253A_Transcription_of_DNA_to_RNA",
+      "https://k12.libretexts.org/Bookshelves/Science_and_Technology/Biology/04%3A_Molecular_Biology/4.09%3A_Transcription",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Concepts_in_Biology_%28OpenStax%29/09%3A_Molecular_Biology/9.04%3A_Translation",
+      "https://bio.libretexts.org/Learning_Objects/Worksheets/Biology_Tutorials/Transcription",
+      "https://bio.libretexts.org/Workbench/An_Interactive_Introduction_to_Organismal_and_Molecular_Biology_2nd_Ed._%28Bierema%29/03%253A_Molecular_Biology/03.04%253A_Protein_Synthesis_I%253A_Transcription",
+      "https://en.wikipedia.org/wiki/Translation_%28biology%29",
+      "https://en.wikipedia.org/wiki/Biosynthesis",
+      "https://med.libretexts.org/Bookshelves/Basic_Science/Cell_Biology_Genetics_and_Biochemistry_for_Pre-Clinical_Students/11%3A_Transcription_and_Translation/11.01%3A_Transcription",
+      "https://en.wikipedia.org/wiki/Transcription-translation_coupling",
+      "https://bio.libretexts.org/Bookshelves/Human_Biology/Human_Biology_%28Wakim_and_Grewal%29/06%253A_DNA_and_Protein_Synthesis/6.04%253A_Protein_Synthesis",
+      "https://bio.libretexts.org/Bookshelves/Human_Biology/Human_Biology_%28Wakim_and_Grewal%29/06%3A_DNA_and_Protein_Synthesis/6.04%3A_Protein_Synthesis?category_name=sexual-health&order=DESC&orderby=post_date&tag=xmedia-recode-h-264-settings15-88ed7a"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::Genetics": {
+    "name": "Genetics & inheritance",
+    "items": [
+      "Genes and alleles",
+      "Genotype and phenotype",
+      "Mendelian inheritance",
+      "Dominance patterns",
+      "Segregation and assortment",
+      "Chromosomal inheritance",
+      "Linkage and recombination",
+      "Pedigree analysis"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Mendelian_inheritance",
+      "https://med.libretexts.org/Bookshelves/Basic_Science/Cell_Biology_Genetics_and_Biochemistry_for_Pre-Clinical_Students/14%3A_Linkage_studies_pedigrees_and_population_genetics/14.01%3A_Mendelian_inheritance",
+      "https://bio.libretexts.org/Workbench/Principles_of_the_Human_Body/10%3A_Inheritance/10.04%3A_Simple_Inheritance",
+      "https://k12.libretexts.org/Bookshelves/Science_and_Technology/Biology/03%3A_Genetics/3.02%3A_Mendelian_Inheritance",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/03%3A_Genetics/3.11%3A_Mendelian_Inheritance_in_Humans",
+      "https://bio.libretexts.org/Workbench/Principles_of_the_Human_Body/10%3A_Inheritance/10.03%3A_Genetics_of_Inheritance",
+      "https://en.wikipedia.org/wiki/Genetic_linkage",
+      "https://med.libretexts.org/Bookshelves/Basic_Science/Cell_Biology_Genetics_and_Biochemistry_for_Pre-Clinical_Students/14%253A_Linkage_studies_pedigrees_and_population_genetics/14.01%253A_Mendelian_inheritance",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Book%3A_Introductory_Biology_%28CK-12%29/3%3A_Genetics/3._11%3A_Mendelian_Inheritance_in_Humans",
+      "https://en.wikipedia.org/wiki/Genetics",
+      "https://bio.libretexts.org/Learning_Objects/Worksheets/Biology_Tutorials/Genetics",
+      "https://bio.libretexts.org/Courses/Canada_College/Biol_011%3A_Human_Biology/08%3A_Inheritance"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::Bioenergetics": {
+    "name": "Bioenergetics",
+    "items": [
+      "Energy flow",
+      "Thermodynamic laws",
+      "Free energy",
+      "Metabolic pathways",
+      "ATP coupling",
+      "Enzyme catalysis",
+      "Cellular respiration",
+      "Chemiosmosis"
+    ],
+    "sources": [
+      "https://bio.libretexts.org/Bookshelves/Cell_and_Molecular_Biology/Cells_-_Molecules_and_Mechanisms_%28Wong%29/03%3A_Bioenergetics_-_Thermodynamics_and_Enzymes",
+      "https://bio.libretexts.org/Workbench/Bio_11A_-_Introduction_to_Biology_I/11%3A_Metabolism/11.02%3A_Energy_and_Metabolic_Pathways",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Map%253A_Raven_Biology_12th_Edition/07%253A_How_Cells_Harvest_Energy/7.01%253A_Overview_of_Respiration/7.1.3%253A_ATP_in_Metabolism",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/07%3A_Cellular_Respiration/7.03%3A_Energy_in_Living_Systems_-_ATP_in_Metabolism",
+      "https://chem.libretexts.org/Workbench/Pick_Your_Poison%3A_Introduction_to_Materials_Toxicology/37%3A_Geochemistry_%28Lower%29/37.04%3A_The_Biosphere/37.4.01%3A_Chemistry_and_Energetics_of_the_Life_Process",
+      "https://bio.libretexts.org/Courses/Los_Angeles_Harbor_College/Biology_3_Lecture_%28Escandon%29/04%3A_Energy_and_Metabolism/4.01%3A_How_Cells_Obtain_Energy/4.1.01%3A_Energy_and_Metabolism",
+      "https://bio.libretexts.org/Courses/Lumen_Learning/Biology_for_Non-Majors_I_%28Lumen%29/06%3A_Metabolic_Pathways/6.02%3A_Energy_and_Metabolism",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/06%3A_Metabolism/6.09%3A_ATP_-_Adenosine_Triphosphate",
+      "https://en.wikipedia.org/wiki/Bioenergetics",
+      "https://bio.libretexts.org/Courses/Lumen_Learning/Biology_for_Non-Majors_I_%28Lumen%29/06%3A_Metabolic_Pathways/6.03%3A_ATP_in_Living_Systems",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_1e_%28OpenStax%29/2%3A_The_Cell/06%3A_Metabolism/6.4%3A_ATP%3A_Adenosine_Triphosphate",
+      "https://bio.libretexts.org/Courses/Wheaton_College_Massachusetts/Principles_of_Biochemistry/06%3A_Energetics_and_metabolism/6.03%3A_Energy_in_Metabolism"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::CarbohydrateMetabolism": {
+    "name": "Carbohydrate metabolism",
+    "items": [
+      "Glycolysis",
+      "Gluconeogenesis",
+      "Glycogen metabolism",
+      "Pentose phosphate pathway",
+      "Citric acid cycle",
+      "Oxidative phosphorylation",
+      "Anaerobic fermentation",
+      "Hormonal regulation"
+    ],
+    "sources": [
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_1e_%28OpenStax%29/Unit_5%253A_Energy_Maintenance_and_Environmental_Exchange/24%253A_Metabolism_and_Nutrition/24.02%253A_Carbohydrate_Metabolism",
+      "https://med.libretexts.org/Bookshelves/Nutrition/Intermediate_Nutrition_%28Lindshield%29/06%3A_Macronutrient_and_Alcohol_Metabolism/6.02%3A_Carbohydrate_Metabolism",
+      "https://chem.libretexts.org/Bookshelves/Biological_Chemistry/Supplemental_Modules_%28Biological_Chemistry%29/Metabolism/Anabolism/Gluconeogenesis",
+      "https://chem.libretexts.org/Courses/Fullerton_College/Introductory_Biochemistry/14%3A_Carbohydrate_Metabolism/14.02%3A_Carbohydrate_Metabolism_Details/14.2.01%3A_Metabolism_-_Sugars",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_1e_%28OpenStax%29/Unit_5%3A_Energy_Maintenance_and_Environmental_Exchange/24%3A_Metabolism_and_Nutrition/24.02%3A_Carbohydrate_Metabolism",
+      "https://chem.libretexts.org/Courses/Brevard_College/CHE_301_Biochemistry/08%3A_Metabolism_of_carbohydrates/8.09%3A_Gluconeogenesis-_Reaction_and_regulation",
+      "https://med.libretexts.org/Courses/Roosevelt_University/Advanced_Anatomy_and_Physiology/05%3A_Energy_Maintenance_and_Environmental_Exchange/5.03%3A_Metabolism_and_Nutrition/5.3.03%3A_Carbohydrate_Metabolism",
+      "https://med.libretexts.org/Courses/Kansas_State_University/FNDH_400%3A_Human_Nutrition_%28Lindshield%29/06%3A_Macronutrient_and_Alcohol_Metabolism/6.02%3A_Carbohydrate_Metabolism",
+      "https://en.wikipedia.org/wiki/Carbohydrate_metabolism",
+      "https://chem.libretexts.org/Courses/Fullerton_College/Introductory_Biochemistry/14%3A_Carbohydrate_Metabolism",
+      "https://chem.libretexts.org/Courses/Brevard_College/CHE_301_Biochemistry/08%253A_Metabolism_of_carbohydrates/8.08%253A_Carbohydrate_Storage_and_Breakdown",
+      "https://bio.libretexts.org/Bookshelves/Cell_and_Molecular_Biology/Basic_Cell_and_Molecular_Biology_%28Bergtrom%29/06%3A_Glycolysis_the_Krebs_Cycle_and_the_Atkins_Diet/6.04%3A_Gluconeogenesis"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::CellBiology": {
+    "name": "Cell biology & organelles",
+    "items": [
+      "Cell compartmentalization",
+      "Membrane-bound organelles",
+      "Nucleus and genome",
+      "Ribosomes and translation",
+      "Endomembrane trafficking",
+      "Energy conversion",
+      "Cytoskeletal organization",
+      "Cell specialization"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Cell_%28biology%29",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/04%253A_Cell_Structure/4.06%253A_Eukaryotic_Cells_-_Characteristics_of_Eukaryotic_Cells",
+      "https://bio.libretexts.org/Courses/Skyline_College/BIOL_130%3A_Human_Biology/03%3A_Cells/3.06%3A_Cell_Organelles",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/04%3A_Cell_Structure/4.06%3A_Eukaryotic_Cells_-_Characteristics_of_Eukaryotic_Cells",
+      "https://en.wikipedia.org/wiki/Organelle",
+      "https://bio.libretexts.org/Courses/Canada_College/Biol_011%3A_Human_Biology/05%3A_Cells/5.06%3A_Cell_Organelles",
+      "https://chem.libretexts.org/Courses/Brevard_College/CHE_301_Biochemistry/01%3A_Intro_to_Biochem/1.01%3A_Basic_Biology",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/02%3A_Cell_Biology/2.10%3A_Other_Cell_Organelles",
+      "https://bio.libretexts.org/Courses/Lumen_Learning/Biology_for_Non-Majors_I_%28Lumen%29/04%253A_Cellular_Structure/4.04%253A_Organelles",
+      "https://bio.libretexts.org/Courses/Ohio_State_University/Microbiology_Lab_SP25/01%3A_Lab_1/1.05%3A_Eukaryotic_Cells",
+      "https://bio.libretexts.org/Courses/Lumen_Learning/Biology_for_Non_Majors_I_%28Lumen%29/05%3A_Cellular_Structure/5.07%3A_Introduction_to_Organelles",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Concepts_in_Biology_%28OpenStax%29/03%3A_Cell_Structure_and_Function/3.03%3A_Eukaryotic_Cells"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::Microbiology": {
+    "name": "Microbiology: prokaryotes & viruses",
+    "items": [
+      "Cellular organization",
+      "Bacteria and archaea",
+      "Acellular viruses",
+      "Viral structure",
+      "Host specificity",
+      "Viral replication",
+      "Horizontal gene transfer",
+      "Pathogenesis and immunity"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Prokaryote",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28Kaiser%29/Unit_1%3A_Introduction_to_Microbiology_and_Prokaryotic_Cell_Anatomy/1%3A_Fundamentals_of_Microbiology/1.2%3A_Cellular_Organization_-_Prokaryotic_and_Eukaryotic_Cells",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/07%253A_Prokaryotes_and_Viruses/7.07%253A_Virus_Characteristics",
+      "https://k12.libretexts.org/Bookshelves/Science_and_Technology/Biology/07%3A_Prokaryotes_and_Viruses/7.16%3A_Viruses",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28OpenStax%29/06%3A_Acellular_Pathogens/6.01%3A_Viruses",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28OpenStax%29/06%253A_Acellular_Pathogens/6.01%253A_Viruses",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/07%3A_Prokaryotes_and_Viruses/7.07%3A_Virus_Characteristics",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/02%3A_Cell_Biology/2.04%3A_Viruses",
+      "https://k12.libretexts.org/Bookshelves/Science_and_Technology/Biology/07%253A_Prokaryotes_and_Viruses",
+      "https://en.wikipedia.org/wiki/Archaeal_virus",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28Kaiser%29/Unit_4%3A_Eukaryotic_Microorganisms_and_Viruses/10%3A_Viruses",
+      "https://bio.libretexts.org/Bookshelves/Microbiology/Microbiology_%28Kaiser%29"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::NervousAndEndocrine": {
+    "name": "Nervous & endocrine systems",
+    "items": [
+      "neural communication",
+      "hormonal signaling",
+      "homeostatic regulation",
+      "CNS and PNS",
+      "autonomic control",
+      "hypothalamic integration",
+      "feedback loops",
+      "stress responses"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Nervous_system",
+      "https://en.wikipedia.org/wiki/Endocrine_system",
+      "https://med.libretexts.org/Courses/Las_Positas_College/BIO_50%3A_Anatomy_and_Physiology_%28Zingg%29/08%3A_Endocrine_System",
+      "https://med.libretexts.org/Courses/Las_Positas_College/BIO_50%3A_Anatomy_and_Physiology_%28Zingg%29/08%3A_Endocrine_System/8.01%3A_Overview_of_the_Endocrine_System",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_%28Boundless%29/15%3A_Endocrine_System/15.1%3A_Overview_of_the_Endocrine_System/15.1A%3A_Overview_of_the_Endocrine_System",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_%28OERI%29/15%3A_Endocrine_System/15.02%3A_An_Overview_of_the_Endocrine_System",
+      "https://med.libretexts.org/Courses/Las_Positas_College/BIO_50%253A_Anatomy_and_Physiology_%28Zingg%29/08%253A_Endocrine_System/8.01%253A_Overview_of_the_Endocrine_System",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_1e_%28OpenStax%29/Unit_3%3A_Regulation_Integration_and_Control/17%3A_The_Endocrine_System/17.01%3A_An_Overview_of_the_Endocrine_System",
+      "https://bio.libretexts.org/Workbench/Principles_of_the_Human_Body/19%3A_Endocrine_System/19.02%3A_Introduction_to_the_Endocrine_System",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_%28Lange_et_al.%29/15%253A_Endocrine_System/15.02%253A_An_Overview_of_the_Endocrine_System",
+      "https://bio.libretexts.org/Courses/Lumen_Learning/Anatomy_and_Physiology_II_%28Lumen%29/03%3A_Module_1-_The_Endocrine_System/3.03%3A_An_Overview_of_the_Endocrine_System",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_%28OERI%29/15%253A_Endocrine_System"
+    ],
+    "citations": []
+  },
+  "MCAT::BioBiochem::OrganSystems": {
+    "name": "Organ systems physiology",
+    "items": [
+      "Homeostasis",
+      "Organ system integration",
+      "Nervous regulation",
+      "Endocrine regulation",
+      "Cardiovascular transport",
+      "Gas exchange",
+      "Fluid balance",
+      "Nutrient processing"
+    ],
+    "sources": [
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_%28CK-12%29/13%253A_Human_Biology/13.03%253A_Homeostasis",
+      "https://bio.libretexts.org/Workbench/Principles_of_the_Human_Body/02%3A_Introduction_to_the_Human_Body/2.04%3A_Human_Organs_and_Organ_Systems",
+      "https://bio.libretexts.org/Workbench/Human_Physiology%3A_A_Students_Open_Path_to_Understanding_the_Body/01%3A_Introduction_to_Human_Physiology/1.01%3A_1.1_What_Is_Physiology",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_%28Boundless%29/1%253A_Introduction_to_Anatomy_and_Physiology/1.2%253A_Life/1.2C%253A_Levels_of_Organization",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_Laboratory_Manual/01%3A_Overview_and_the_Microscope/1.03%3A_Human_Body_Cavities_and_Organ_Systems",
+      "https://bio.libretexts.org/Workbench/Human_Physiology%3A_A_Students_Open_Path_to_Understanding_the_Body/20%3A_Fluid_Electrolyte_and_Acid-Base_Balance/20.01%3A_20.1_Fluid_and_Homeostasis",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_and_Physiology_Preparatory_Course_%28Liachovitzky%29/05%3A_Higher_Levels_of_Complexity-_Organs_and_Systems/5.01%3A_Organs_and_Systems_of_the_Human_Organism",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_1e_%28OpenStax%29/Unit_3%3A_Regulation_Integration_and_Control/17%3A_The_Endocrine_System/17.01%3A_An_Overview_of_the_Endocrine_System",
+      "https://bio.libretexts.org/Workbench/The_Biology_of_Women/02%3A_Introduction_to_the_Human_Body/2.04%3A_Human_Organs_and_Organ_Systems",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Human_Anatomy_%28Lange_et_al.%29/15%253A_Endocrine_System/15.02%253A_An_Overview_of_the_Endocrine_System",
+      "https://bio.libretexts.org/Courses/Lumen_Learning/Biology_for_Non_Majors_II_%28Lumen%29/16%3A_Module_13-_Overview_of_Body_Systems/16.04%3A_Maintaining_Homeostasis",
+      "https://chem.libretexts.org/Workbench/SC_149%3A_Cosmetic_Chemistry/10%3A_Principles_of_Toxicology/10.08%3A_Basic_Physiology/10.8.03%3A_Organs_and_Organ_Systems"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::SensationAndPerception": {
+    "name": "Sensation & perception",
+    "items": [
+      "Sensation versus perception",
+      "Sensory transduction",
+      "Sensory pathways",
+      "Psychophysics",
+      "Sensory thresholds",
+      "Signal detection",
+      "Sensory adaptation",
+      "Perceptual organization"
+    ],
+    "sources": [
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/36%3A_Sensory_Systems/36.02%3A_Sensory_Processes_-_Transduction_and_Perception",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_%28Boundless%29/12%3A_Peripheral_Nervous_System/12.1%3A_Sensation/12.1B%3A_Sensation_to_Perception",
+      "https://en.wikipedia.org/wiki/Psychophysics",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/36%253A_Sensory_Systems/36.02%253A_Sensory_Processes_-_Transduction_and_Perception",
+      "https://bio.libretexts.org/Courses/Lumen_Learning/Biology_for_Majors_II_%28Lumen%29/20%3A_Module_17-_Sensory_Systems/20.04%3A_Sensation",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/05%3A_Sensation_and_Perception/5.02%3A_Sensation_versus_Perception",
+      "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_1e_%28OpenStax%29/Unit_3%3A_Regulation_Integration_and_Control/14%3A_The_Somatic_Nervous_System/14.01%3A_Sensory_Perception",
+      "https://en.wikipedia.org/wiki/Perception",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/05%3A_Sensation_and_Perception/5.E%3A_Sensation_and_Perception_%28Exercises%29",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_2e_%28OpenStax%29/05%3A_Sensation_and_Perception/5.02%3A_Sensation_versus_Perception",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_1e_%28OpenStax%29/7%3A_Animal_Structure_and_Function/36%3A_Sensory_Systems/36.1%3A_Sensory_Processes",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_2e_%28OpenStax%29/07%3A_Unit_VII-_Animal_Structure_and_Function/7.04%3A_Sensory_Systems/7.4.02%3A_Sensory_Processes"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::LearningAndConditioning": {
+    "name": "Learning & conditioning",
+    "items": [
+      "Associative learning",
+      "Classical conditioning",
+      "Operant conditioning",
+      "Observational learning",
+      "Innate behaviors",
+      "Stimulus associations",
+      "Behavior consequences",
+      "Cognitive learning"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Observational_learning",
+      "https://en.wikipedia.org/wiki/Classical_conditioning",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_2e_%28OpenStax%29/06%253A_Learning/Summary",
+      "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/General_Biology_%28Boundless%29/45%3A_Population_and_Community_Ecology/45.07%3A_Learned_Animal_Behavior/45.7B%3A_Conditioned_Behavior",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/06%3A_Learning/6.02%3A_What_Is_Learning",
+      "https://en.wikipedia.org/wiki/Operant_conditioning",
+      "https://en.wikipedia.org/wiki/Learning",
+      "https://socialsci.libretexts.org/Courses/Rio_Hondo/Introduction_to_Psychology_2020/03%3A_Learning/3.01%3A_Learning_by_Insight_and_Observation",
+      "https://socialsci.libretexts.org/Workbench/Introductory_Psychology/08%3A_Learning/8.03%3A_Classical_Conditioning",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Psychology_%28Noba%29/Chapter_5%253A_Learning_and_Memory/5.1%253A_Conditioning_and_Learning",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Psychology_%28Lumen%29/11%3A_Learning/11.03%3A_Introduction_to_Classical_Conditioning",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Psychology_as_a_Biological_Science_%28Noba%29/04%3A_Learning_and_Memory/4.03%3A_Conditioning_and_Learning"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::MemoryAndCognition": {
+    "name": "Memory & cognition",
+    "items": [
+      "Information processing",
+      "Memory stages",
+      "Encoding storage retrieval",
+      "Working memory",
+      "Long-term memory",
+      "Implicit explicit memory",
+      "Forgetting and distortion",
+      "Thinking and problem solving"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Memory_%26_Cognition",
+      "https://en.wikipedia.org/wiki/Cognition",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28Jorden_A._Cummings_and_Lee_Sanders%29/08%3A_Remembering_and_Judging/8.06%3A_Summary_Key_Terms_Self-Test",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28LibreTexts%29/08%253A_Remembering_and_Judging/8.01%253A_Memories_as_Types_and_Stages",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Map%3A_Discover_Psychology_-_A_Brief_Introductory_Text_%28Noba%29/08%3A_MEMORY/8.01%3A_Memory_%28Encoding_Storage_Retrieval%29",
+      "https://en.wikipedia.org/wiki/Cognitive_psychology",
+      "https://math.libretexts.org/Courses/Las_Positas_College/Math_Concurrent_Support/07%3A_Studying_Memory_and_Test_Taking/7.02%3A_Memory",
+      "https://socialsci.libretexts.org/Workbench/Introductory_Psychology/07%3A_Memory",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/08%253A_Memory/8.02%253A_How_Memory_Functions",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Culture_and_Community/Culture_and_Psychology_%28Worthy_Lavigne_and_Romero%29/05%3A_Culture_and_Cognition/5.06%3A_Memory",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_2e_%28OpenStax%29/08%3A_Memory/8.02%3A_How_Memory_Functions",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/08%3A_Memory"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::Consciousness": {
+    "name": "Consciousness & states",
+    "items": [
+      "Conscious awareness",
+      "Levels of consciousness",
+      "Biological rhythms",
+      "Sleep stages",
+      "Dreaming",
+      "Sleep disorders",
+      "Psychoactive drugs",
+      "Hypnosis and meditation"
+    ],
+    "sources": [
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/04%3A_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/04%3A_States_of_Consciousness/4.07%3A_Other_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Courses/City_Colleges_of_Chicago/Introduction_to_Psychology-PSYC201/04%3A_States_of_Consciousness/4.07%3A_Other_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28Jorden_A._Cummings_and_Lee_Sanders%29/07%3A_States_of_Consciousness/7.02%3A_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_2e_%28OpenStax%29/04%3A_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Psychology_%28Lumen%29/07%3A_States_of_Consciousness/7.01%3A_Why_It_Matters-_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Map%3A_Discover_Psychology_-_A_Brief_Introductory_Text_%28Noba%29/06%3A_CONSCIOUSNESS/6.01%3A_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Psychology_%28Lumen%29/07%3A_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Courses/Saint_Mary-of-the-Woods_College/PS_111_General_Psychology_SMWC/03%3A_States_of_Consciousness/3.04%3A_Other_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Courses/City_Colleges_of_Chicago/Introduction_to_Psychology-PSYC201/04%3A_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Psychology_%28Lumen%29/07%3A_States_of_Consciousness/7.12%3A_Introduction_to_Drugs_and_Other_States_of_Consciousness",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28LibreTexts%29/05%3A_States_of_Consciousness"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::MotivationAndEmotion": {
+    "name": "Motivation & emotion",
+    "items": [
+      "Behavioral drives",
+      "Intrinsic motivation",
+      "Extrinsic motivation",
+      "Homeostasis",
+      "Hierarchy of needs",
+      "Physiological arousal",
+      "Cognitive appraisal",
+      "Emotion theories"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Motivation_and_Emotion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28LibreTexts%29/10%3A_Emotions_and_Motivations/10.S%3A_Emotions_and_Motivations_%28Summary%29",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28LibreTexts%29/10%3A_Emotions_and_Motivations/10.04%3A_The_Experience_of_Emotion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/10%3A_Emotion_and_Motivation/10.02%3A_Motivation",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28Jorden_A._Cummings_and_Lee_Sanders%29/11%253A_Emotions_and_Motivations/11.02%253A_The_Experience_of_Emotion",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Psychology_%28Lumen%29/15%3A_Emotion_and_Motivation/15.14%3A_Introduction_to_Emotion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/10%3A_Emotion_and_Motivation",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Psychology_%28Noba%29/Chapter_4%3A_Emotions_and_Motivation/4.2%3A_Functions_of_Emotions",
+      "https://socialsci.libretexts.org/Courses/Saint_Mary-of-the-Woods_College/PS_111_General_Psychology_SMWC/10%3A_Motivation_and_Emotion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_2e_%28OpenStax%29/10%253A_Emotion_and_Motivation",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28LibreTexts%29/10%253A_Emotions_and_Motivations",
+      "https://socialsci.libretexts.org/Courses/City_Colleges_of_Chicago/Introduction_to_Psychology-PSYC201/08%3A_Emotion_and_Motivation"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::Personality": {
+    "name": "Personality",
+    "items": [
+      "Personality definition",
+      "Trait perspectives",
+      "Five-factor model",
+      "Psychodynamic perspectives",
+      "Humanistic perspectives",
+      "Social cognitive perspectives",
+      "Personality development",
+      "Personality assessment"
+    ],
+    "sources": [
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Psychology_%28Lumen%29/04%3A_Psychological_Foundations/4.13%3A_The_Social_and_Personality_Psychology_Domain",
+      "https://en.wikipedia.org/wiki/Personality_psychology",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Psychology_as_a_Biological_Science_%28Noba%29/08%3A_Personality/8.01%3A_Personality_Traits",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/11%3A_Personality/11.08%3A_Trait_Theorists",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28Jorden_A._Cummings_and_Lee_Sanders%29/16%3A_Personality/16.02%3A_Personality_Traits",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/General_Psychology_for_Honors_Students_%28Votaw%29/02%3A_Contemporary_Psychology/2.06%3A_Personality_Psychology",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Psychological_Disorders/Fundamentals_of_Psychological_Disorders_3e_%28Bridley_and_Daffin%29/01%3A_Part_I._Setting_the_Stage/02%3A_Models_of_Abnormal_Psychology/2.03%3A_Psychological_Perspectives",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28LibreTexts%29/11%3A_Personality/11.02%3A_The_Origins_of_Personality",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/01%3A_Introduction_to_Psychology/1.04%3A_Contemporary_Psychology",
+      "https://socialsci.libretexts.org/Courses/Rio_Hondo/Introduction_to_Psychology_2020/10%253A_Personality/10.01%253A_Personality_and_Behavior-_Approaches_and_Measurement",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/11%3A_Personality/11.02%3A_What_Is_Personality",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Psychology_%28Noba%29/Chapter_3%253A_Personality/3.09%253A_The_Psychodynamic_Perspective"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::PsychologicalDisorders": {
+    "name": "Psychological disorders",
+    "items": [
+      "Diagnostic frameworks",
+      "Distress and impairment",
+      "Biopsychosocial causes",
+      "Anxiety disorders",
+      "Mood disorders",
+      "Psychotic disorders",
+      "Personality disorders",
+      "Somatic and dissociative disorders"
+    ],
+    "sources": [
+      "https://med.libretexts.org/Workbench/HP_200_Physical_Well-Being/05%3A_Psychological_Health/5.05%3A_Mental_Health_Disorders",
+      "https://med.libretexts.org/Bookshelves/Health_and_Fitness/Introduction_to_Health_2e_%28Falcone%29/06%3A__Emotional_and_Mental_Health/6.03%3A_Mental_Health_Disorders",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Psychological_Disorders/Fundamentals_of_Psychological_Disorders_3e_%28Bridley_and_Daffin%29/05%253A_Part_V._Mental_Disorders__Block_4/13%253A_Personality_Disorders/13.01%253A_Personality_Disorders_-_Clinical_Presentation",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Developmental_Psychology/The_Psychology_of_Exceptional_Children_%28Zaleski%29/05%3A_Students_with_Emotional_and_Behavioral_Disorders/5.01%3A_Definitions_of_Emotional_and_Behavioral_Disorders",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Psychological_Disorders/Abnormal_Psychology_2e_%28Lumen%29/12%3A_Personality_Disorders/12.06%3A_Schizotypal_Personality_Disorder",
+      "https://med.libretexts.org/Workbench/Introduction_to_Health_%28OER%29_by_kfalcone_2nd_Edition/01%3A_Chapters/1.06%3A_Emotional_and_Mental_Health",
+      "https://en.wikipedia.org/wiki/Classification_of_mental_disorders",
+      "https://med.libretexts.org/Courses/Southwestern_College/Introduction_to_Health_OER_Textbook/02%3A_Psychological_Health/2.16%3A_2.23_Anxiety_Disorders",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Psychological_Disorders/Abnormal_Psychology_2e_%28Lumen%29/12%3A_Personality_Disorders",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Map%3A_Discover_Psychology_-_A_Brief_Introductory_Text_%28Noba%29/12%3A_PSYCHOLOGICAL_DISORDERS",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_2e_%28OpenStax%29/15%3A__Psychological_Disorders",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Psychological_Disorders/Abnormal_Psychology_2e_%28Lumen%29/12%3A_Personality_Disorders/12.04%3A_Paranoid_Personality_Disorder"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::AttitudesAndBehaviorChange": {
+    "name": "Attitudes & behavior change",
+    "items": [
+      "Attitude components",
+      "Attitude strength",
+      "Attitude behavior link",
+      "Persuasive communication",
+      "Elaboration routes",
+      "Cognitive dissonance",
+      "Self perception",
+      "Resistance to persuasion"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Attitude_change",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology_1e_International_Edition/04%253A_Attitudes_Behavior_and_Persuasion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology/05%3A_Attitudes_Behavior_and_Persuasion/5.02%3A_Changing_Attitudes_Through_Persuasion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology_1e_International_Edition/04%3A_Attitudes_Behavior_and_Persuasion/4.04%3A_Thinking_Like_a_Social_Psychologist_about_Attitudes_Behavior_and_Persuasion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Book%3A_Social_Psychology/04%3A_Attitudes%2C_Behavior%2C_and_Persuasion/4.4%3A_Thinking_Like_a_Social_Psychologist_about_Attitudes%2C_Behavior%2C_and_Persuasion",
+      "https://socialsci.libretexts.org/Courses/Madera_Community_College/PSYC-5%253A_Social_Psychology/05%253A_Attitudes_Behavior_and_Persuasion",
+      "https://socialsci.libretexts.org/Courses/Madera_Community_College/PSYC-5%3A_Social_Psychology/05%3A_Attitudes_Behavior_and_Persuasion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology_1e_International_Edition/04%3A_Attitudes_Behavior_and_Persuasion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/12%3A_Social_Psychology/12.04%3A_Attitudes_and_Persuasion",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology/01%3A_Introducing_Social_Psychology/1.02%3A_Affect_Behavior_and_Cognition",
+      "https://en.wikipedia.org/wiki/Cognitive_dissonance",
+      "https://socialsci.libretexts.org/Courses/Collin_College/SOCI_1306%3A_Social_Problems/08%3A_Persuasion_Influence_and_Conformity"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::SocialInfluence": {
+    "name": "Social influence & behavior",
+    "items": [
+      "Social influence",
+      "Social norms",
+      "Conformity",
+      "Compliance",
+      "Obedience",
+      "Persuasion",
+      "Social roles",
+      "Group behavior"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Social_psychology",
+      "https://en.wikipedia.org/wiki/Social_influence",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology/01%3A_Introducing_Social_Psychology/1.05%3A_Defining_Social_Psychology-_History_and_Principles",
+      "https://en.wikipedia.org/wiki/Normative_social_influence",
+      "https://socialsci.libretexts.org/Courses/Coalinga_College/Personal_Psychology__%28C-ID_PSY_115_Psychology_of_Personal_and_Social_Adjustment%29/06%3A_Social_Psychology/6.04%3A_Social_Situations_and_Social_Influence",
+      "https://en.wikipedia.org/wiki/Conformity",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Book%3A_Introduction_to_Psychology_%28Lumen%29/13%3A_Social_Psychology/13.05%3A_Social_Norms_and_Scripts",
+      "https://socialsci.libretexts.org/Under_Construction/Purgatory/Book%3A_Social_Psychology/01%3A_Introducing_Social_Psychology/1.02%3A_Defining_Social_Psychology_-_History_and_Principles",
+      "https://en.wikipedia.org/wiki/Social_psychology_%28sociology%29",
+      "https://en.wikipedia.org/wiki/Role",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology_1e_International_Edition/06%3A_Influencing_and_Conforming/6.01%3A_The_Many_Varieties_of_Conformity",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introductory_Psychology_1e_%28OpenStax%29/12%3A_Social_Psychology/12.03%3A_Self-presentation"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::SelfIdentity": {
+    "name": "Self-identity",
+    "items": [
+      "Self-concept",
+      "Self-esteem",
+      "Self-efficacy",
+      "Self-image",
+      "Social identity",
+      "Identity formation",
+      "Culture and identity",
+      "Looking-glass self"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Social_identity_theory",
+      "https://en.wikipedia.org/wiki/Self-concept",
+      "https://en.wikipedia.org/wiki/Self_and_Identity",
+      "https://en.wikipedia.org/wiki/Psychology_of_self_and_identity",
+      "https://en.wikipedia.org/wiki/Identity_formation",
+      "https://en.wikipedia.org/wiki/Identity_%28social_science%29",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Adolescent_Psychology_%28Arduini-VanHoose%29/08%3A_Identity_Development/8.01%3A_Identity_Formation",
+      "https://socialsci.libretexts.org/Courses/Coalinga_College/Personal_Psychology__%28C-ID_PSY_115_Psychology_of_Personal_and_Social_Adjustment%29/02%3A_The_Self/2.02%3A_Self_and_Identity",
+      "https://socialsci.libretexts.org/Courses/Santa_Ana_College/Psychology_of_Adjustment/05%3A_The_Self/5.02%3A_Self_and_Identity",
+      "https://socialsci.libretexts.org/Bookshelves/Human_Development/Lifespan_Development_%28Lumen%29/07%3A_Adolescence/7.11%3A_Identity_Formation",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology_1e_International_Edition/03%3A_The_Self/3.01%3A_The_Cognitive_Self-_The_Self-Concept",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Adolescent_Psychology_%28Arduini-VanHoose%29/08%3A_Identity_Development/8.02%3A_Identity_Development_Theory"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::SocialCognition": {
+    "name": "Social cognition & attribution",
+    "items": [
+      "Social information processing",
+      "Impression formation",
+      "Social schemas",
+      "Attribution theory",
+      "Internal versus external",
+      "Person-situation interaction",
+      "Attribution biases",
+      "Cultural context"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Attribution_%28psychology%29",
+      "https://en.wikipedia.org/wiki/Social_perception",
+      "https://en.wikipedia.org/wiki/Social_psychology",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology/01%3A_Introducing_Social_Psychology/1.02%3A_Affect_Behavior_and_Cognition",
+      "https://socialsci.libretexts.org/Sandboxes/a072766d-16cb-4dbc-9dd2-2f3c784c59e6/An_Introduction_to_Social_Psychology/01%3A_Chapters/1.01%3A_The_Science_of_Social_Psychology",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Culture_and_Community/Culture_and_Psychology_%28Worthy_Lavigne_and_Romero%29/05%3A_Culture_and_Cognition/5.05%3A_Attributions",
+      "https://en.wikipedia.org/wiki/Social_cognition",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Social_Psychology_and_Personality/Principles_of_Social_Psychology/02%3A_Social_Learning_and_Social_Cognition",
+      "https://socialsci.libretexts.org/Under_Construction/Purgatory/Book%3A_Social_Psychology/01%3A_Introducing_Social_Psychology/1.03%3A_Affect%2C_Behavior%2C_and_Cognition",
+      "https://socialsci.libretexts.org/Bookshelves/Psychology/Introductory_Psychology/Introduction_to_Psychology_%28LibreTexts%29/14%3A_Psychology_in_Our_Social_Lives/14.01%3A_Social_Cognition-_Making_Sense_of_Ourselves_and_Others",
+      "https://socialsci.libretexts.org/Workbench/Introductory_Psychology/12%3A_Social_Psychology/12.02%3A_What_Is_Social_Psychology",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Book%3A_Principles_of_Social_Psychology_%28Lumen%29/06%3A_5._Perceiving_Others/06.3%3A_Inferring_Dispositions_Using_Causal_Attribution"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::SocialStructure": {
+    "name": "Social structure & institutions",
+    "items": [
+      "Social structure",
+      "Social institutions",
+      "Social stratification",
+      "Social roles",
+      "Status hierarchies",
+      "Norms and values",
+      "Socialization agents",
+      "Institutional change"
+    ],
+    "sources": [
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Sociology_%28Boundless%29/05%253A_Social_Interaction/5.03%253A_Elements_of_Social_Interaction/5.3G%253A_Social_Institutions",
+      "https://en.wikipedia.org/wiki/Social_structure",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Cultural_Sociology_and_Social_Problems/Changing_Society_%28Krouskop_Cushing_Puttman_and_Temple%29/02%3A_The_Study_of_Social_Change/2.03%3A_The_Structure_and_Organization_of_Society",
+      "https://en.wikipedia.org/wiki/Sociological_institutionalism",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Introduction_to_Sociology%3A_Understanding_and_Changing_the_Social_World/01%3A_Sociology_and_the_Sociological_Perspective/1.02%3A_Sociology_as_a_Social_Science",
+      "https://en.wikipedia.org/wiki/Sociology",
+      "https://espanol.libretexts.org/Bookshelves/Ciencias_Sociales/Ciencias_Sociales/Sociologia/Introducci%C3%B3n_a_la_Sociolog%C3%ADa/Libro%3A_Sociolog%C3%ADa_%28Boundless%29/05%3A_Interacci%C3%B3n_social/5.03%3A_Elementos_de_Interacci%C3%B3n_Social/5.3G%3A_Instituciones_sociales",
+      "https://en.wikipedia.org/wiki/Institution",
+      "https://k12.libretexts.org/Under_Construction/Stalled_Project_%28Not_under_Active_Development%29/Sociology/04%3A_Social_Structure/4.01%3A_Building_Blocks_of_Social_Structure",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Sociology_%28Boundless%29/01%3A_Sociology/1.03%3A_Theoretical_Perspectives_in_Sociology/1.3B%3A_The_Functionalist_Perspective",
+      "https://en.wikipedia.org/wiki/Social_system",
+      "https://socialsci.libretexts.org/Courses/Cosumnes_River_College/SOC_300%3A_Introduction_to_Sociology_%28Ninh/01%3A_Understand_how_social_forces_influence_people./1.03%3A_Social_Structure_and_Social_Interaction/1.3.02%3A_Social_Structure-_The_Building_Blocks_of_Social_Life"
+    ],
+    "citations": []
+  },
+  "MCAT::PsychSoc::SocialStratification": {
+    "name": "Social stratification & inequality",
+    "items": [
+      "Social hierarchy",
+      "Socioeconomic status",
+      "Social class",
+      "Unequal resources",
+      "Power and prestige",
+      "Social mobility",
+      "Global stratification",
+      "Institutional inequality"
+    ],
+    "sources": [
+      "https://en.wikipedia.org/wiki/Social_stratification",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Introduction_to_Sociology_%28Lumen%29/10%253A_Module_7-_Stratification_and_Inequality/10.03%253A_Social_Stratification_Social_Inequality_and_Global_Stratification",
+      "https://socialsci.libretexts.org/Workbench/SOC_101_Introduction_to_Sociology/08%3A_Social_Stratification_in_the_United_States",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Introductory_Sociology_1e_%28OpenStax%29/09%253A_Social_Stratification_in_the_United_States/9.02%253A_What_Is_Social_Stratification",
+      "https://socialsci.libretexts.org/Courses/Lumen_Learning/Introduction_to_Sociology_%28Lumen%29/10%3A_Module_7-_Stratification_and_Inequality/10.03%3A_Social_Stratification_Social_Inequality_and_Global_Stratification",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Sociology_%28Boundless%29/08%253A_Global_Stratification_and_Inequality/8.02%253A_Global_Stratification/8.2A%253A_Global_Stratification_and_Inequality",
+      "https://en.wikipedia.org/wiki/Social_inequality",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Sociology_%28Boundless%29/07%253A_Deviance_Social_Control_and_Crime/7.05%253A_The_Conflict_Perspective_on_Deviance/7.5C%253A_Power_and_Inequality",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Introductory_Sociology_3e_%28OpenStax%29/09%3A_Social_Stratification_in_the_United_States/9.02%3A_What_Is_Social_Stratification",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Introductory_Sociology_3e_%28OpenStax%29/09%3A_Social_Stratification_in_the_United_States",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Sociology_%28Boundless%29/09%3A_Stratification_Inequality_and_Social_Class_in_the_U.S./9.02%3A_Social_Class_in_the_U.S./9.2A%3A_Social_Class_in_the_U.S.",
+      "https://socialsci.libretexts.org/Bookshelves/Sociology/Introduction_to_Sociology/Sociology_%28Boundless%29/01%3A_Sociology/1.04%3A_The_Sociological_Approach/1.4D%3A_The_Significance_of_Social_Inequality"
+    ],
+    "citations": []
+  }
+}

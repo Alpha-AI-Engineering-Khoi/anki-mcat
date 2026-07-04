@@ -1453,29 +1453,41 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat = QMenu("MCAT", self)
         m.menuTools.addMenu(self.menu_mcat)
 
+        # AI on/off switch (persisted). Off -> every MCAT AI feature falls back to
+        # its deterministic offline path immediately (no restart): the spec's
+        # "still gives a score with AI off" demo, one click away.
+        import aqt.mcat_ai as _mcat_ai
+        self.action_mcat_ai = QAction("Use AI", self)
+        self.action_mcat_ai.setCheckable(True)
+        self.action_mcat_ai.setMenuRole(QAction.MenuRole.NoRole)
+        self.action_mcat_ai.setChecked(_mcat_ai.apply_persisted_ai_setting(self))
+        self.menu_mcat.addAction(self.action_mcat_ai)
+        qconnect(self.action_mcat_ai.toggled, self.on_mcat_ai_toggle)
+        self.menu_mcat.addSeparator()
+
         # Today is the front door: "what do I do right now?" — so it leads.
-        self.action_mcat_today = QAction("Today...", self)
+        self.action_mcat_today = QAction("Today", self)
         self.action_mcat_today.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_today)
         qconnect(self.action_mcat_today.triggered, self.on_mcat_today)
 
-        self.action_mcat_readiness = QAction("Readiness...", self)
+        self.action_mcat_readiness = QAction("Readiness", self)
         self.action_mcat_readiness.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_readiness)
         qconnect(self.action_mcat_readiness.triggered, self.on_mcat_readiness)
 
-        self.action_mcat_coverage = QAction("Coverage...", self)
+        self.action_mcat_coverage = QAction("Coverage", self)
         self.action_mcat_coverage.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_coverage)
         qconnect(self.action_mcat_coverage.triggered, self.on_mcat_coverage)
 
-        self.action_mcat_weak = QAction("Focus Weak Topics...", self)
+        self.action_mcat_weak = QAction("Focus Weak Topics", self)
         self.action_mcat_weak.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_weak)
         qconnect(self.action_mcat_weak.triggered, self.on_mcat_weak_topics)
 
         self.action_mcat_recall_focus = QAction(
-            "Recall: interleaved Focus session...", self
+            "Recall: interleaved Focus session", self
         )
         self.action_mcat_recall_focus.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_recall_focus)
@@ -1488,24 +1500,31 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat.addAction(self.action_mcat_recall_cap)
         qconnect(self.action_mcat_recall_cap.triggered, self.on_mcat_recall_cap)
 
-        self.action_mcat_encode = QAction("Encode (Prime \u00b7 Connect \u00b7 Build)...", self)
+        self.action_mcat_encode = QAction("Encode", self)
         self.action_mcat_encode.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_encode)
         qconnect(self.action_mcat_encode.triggered, self.on_mcat_encode)
 
-        self.action_mcat_paraphrase = QAction("Paraphrase check...", self)
+        self.action_mcat_aicards = QAction(
+            "Generate flashcards", self
+        )
+        self.action_mcat_aicards.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_aicards)
+        qconnect(self.action_mcat_aicards.triggered, self.on_mcat_aicards)
+
+        self.action_mcat_paraphrase = QAction("Performance test", self)
         self.action_mcat_paraphrase.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_paraphrase)
         qconnect(self.action_mcat_paraphrase.triggered, self.on_mcat_paraphrase)
 
-        self.action_mcat_ablation = QAction("Study-feature ablation...", self)
+        self.action_mcat_ablation = QAction("Study-feature ablation", self)
         self.action_mcat_ablation.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_ablation)
         qconnect(self.action_mcat_ablation.triggered, self.on_mcat_ablation)
 
         self.menu_mcat.addSeparator()
 
-        self.action_mcat_library = QAction("Library...", self)
+        self.action_mcat_library = QAction("Library", self)
         self.action_mcat_library.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_library)
         qconnect(self.action_mcat_library.triggered, self.on_mcat_library)
@@ -1559,6 +1578,16 @@ title="{}" {}>{}</button>""".format(
         self.toolbarWeb.hide_if_allowed()
         self.bottomWeb.hide_if_allowed()
 
+    def on_mcat_ai_toggle(self, checked: bool) -> None:
+        import aqt.mcat_ai
+        from aqt.utils import tooltip
+
+        aqt.mcat_ai.set_ai_enabled(checked, self)
+        tooltip(
+            "MCAT AI: " + ("ON" if checked
+                           else "OFF \u2014 offline fallbacks everywhere"),
+            parent=self)
+
     def on_mcat_today(self) -> None:
         import aqt.mcat_today
 
@@ -1598,6 +1627,11 @@ title="{}" {}>{}</button>""".format(
         import aqt.mcat_encode
 
         aqt.mcat_encode.show(self)
+
+    def on_mcat_aicards(self) -> None:
+        import aqt.mcat_aicards
+
+        aqt.mcat_aicards.show(self)
 
     def on_mcat_paraphrase(self) -> None:
         import aqt.mcat_paraphrase

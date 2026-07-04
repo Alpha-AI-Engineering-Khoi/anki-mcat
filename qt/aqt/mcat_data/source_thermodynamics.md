@@ -1,0 +1,40 @@
+<!--
+Bundled MCAT source document (Chem/Phys :: Thermodynamics).
+Real content paraphrased from cited open sources for an internal, non-production study tool.
+Each non-heading paragraph is a span (S1, S2, ... in order); see mcat_ai.load_source.
+topic: MCAT::ChemPhys::Thermodynamics
+sources:
+- Thermodynamics, https://en.wikipedia.org/wiki/Thermodynamics, CC BY-SA 4.0
+- Laws of thermodynamics, https://en.wikipedia.org/wiki/Laws_of_thermodynamics, CC BY-SA 4.0
+- Enthalpy, https://en.wikipedia.org/wiki/Enthalpy, CC BY-SA 4.0
+- Entropy, https://en.wikipedia.org/wiki/Entropy, CC BY-SA 4.0
+- Gibbs free energy, https://en.wikipedia.org/wiki/Gibbs_free_energy, CC BY-SA 4.0
+- Heat capacity, https://en.wikipedia.org/wiki/Heat_capacity, CC BY-SA 4.0
+- Introductory Chemistry (LibreTexts), 3.11: Temperature Changes - Heat Capacity, https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry_(LibreTexts)/03%3A_Matter_and_Energy/3.11%3A_Temperature_Changes_-_Heat_Capacity, CC BY-NC-SA 4.0
+-->
+
+# Thermodynamics
+
+Thermodynamics is the branch of physics that deals with heat, work, and temperature and their relation to energy, entropy, and the physical properties of matter. The behavior of these quantities is governed by four laws that give a quantitative description using measurable macroscopic quantities, which can also be explained in terms of a system's microscopic constituents through statistical mechanics. Historically the field grew out of efforts to improve the efficiency of early steam engines, and it now applies broadly across physical chemistry, biochemistry, and engineering.
+
+A central concept is the thermodynamic system, a precisely defined region of the universe under study; everything else is called the surroundings. A system is separated from its surroundings by a boundary, which may be real or imaginary and which governs whether energy as heat or work, and matter, may cross it. Systems are classified by what can cross that boundary: an isolated system exchanges neither matter nor energy, a closed system can exchange energy but not matter, and an open system can exchange both.
+
+When a system is at equilibrium under a fixed set of conditions it is in a definite thermodynamic state, described by state variables that depend only on the current state and not on the path by which the system arrived there. A property that is a mathematical function of such variables is a state function; internal energy, enthalpy, and entropy are all state functions. Because a state function returns to its starting value over any complete cycle, its change between two states is independent of the route taken between them.
+
+The zeroth law of thermodynamics states that if two systems are each in thermal equilibrium with a third system, then they are in thermal equilibrium with each other. This makes thermal equilibrium an equivalence relation and provides the basis for defining temperature as an empirical property. The law is tacitly assumed in every measurement of temperature and justifies the construction of practical thermometers.
+
+The first law of thermodynamics is the principle of conservation of energy adapted to thermodynamic processes: energy can be transformed from one form to another but can be neither created nor destroyed. For a process without transfer of matter it is written ΔU = q - w, meaning the change in a system's internal energy equals the heat supplied to the system minus the work done by the system on its surroundings. Because internal energy is a state function, a given change in it can be produced by any combination of heat and work; a consequence is that a perpetual motion machine of the first kind, which would output work with no energy input, is impossible.
+
+Enthalpy, symbol H, is defined as the sum of a system's internal energy and the product of its pressure and volume, H = U + pV, and it is a state function that is especially convenient for processes at constant pressure. When a system is held at constant pressure and does no work other than expansion, the change in enthalpy equals the heat exchanged with the surroundings, which is why enthalpy change is the standard measure of the heat of a reaction. For an exothermic process, which releases heat, ΔH is negative because the products have lower enthalpy than the reactants; for an endothermic process, which absorbs heat, ΔH is positive.
+
+The second law of thermodynamics introduces entropy, symbol S, and states that in a natural (spontaneous) process the total entropy of the interacting systems never decreases. A common statement of the law is that heat does not spontaneously pass from a colder body to a hotter one, so an isolated system left to itself evolves toward thermodynamic equilibrium, the state of maximum entropy. The second law therefore fixes the direction of spontaneous change and expresses the general irreversibility of real natural processes.
+
+Entropy can also be understood microscopically as a measure of the number of microscopic arrangements, or microstates, that are consistent with a system's observable macroscopic state. A macrostate with more accessible microstates has higher entropy, which is why higher entropy is often described as greater disorder or a greater dispersal of energy. Boltzmann expressed this statistically, relating entropy to the natural logarithm of the number of microstates, so that the equilibrium state is favored because it corresponds to the largest number of microstates and is thus the most probable.
+
+The Gibbs free energy, symbol G, is a thermodynamic potential defined as G = H - TS that provides the condition for whether a reaction can occur spontaneously at constant temperature and pressure. Its change is given by ΔG = ΔH - TΔS, combining the enthalpy change and the temperature-weighted entropy change into a single criterion. A process is spontaneous, or exergonic, when ΔG < 0, is nonspontaneous when ΔG is positive, and is at equilibrium when ΔG = 0; an otherwise nonspontaneous reaction can still be driven by coupling it to another reaction whose ΔG is sufficiently negative that the combined change is negative.
+
+Because ΔG = ΔH - TΔS, temperature sets how strongly the entropy term contributes, so Gibbs free energy can be viewed as weighing the competing enthalpic and entropic driving forces of a process. When ΔH and ΔS have the same sign, the sign of ΔG depends on temperature: a reaction that increases entropy becomes more favorable as temperature rises because the TΔS term grows in magnitude, whereas for a reaction that decreases entropy a higher temperature works against spontaneity. This is why some reactions are spontaneous only above, or only below, a particular temperature.
+
+Heat is a transfer of energy between a system and its surroundings, distinct from energy transferred as work or as matter, and by the second law it flows spontaneously from a hotter body to a colder one until they reach the same temperature. The heat capacity of an object is the amount of heat that must be supplied to produce a unit change in its temperature; it is an extensive property, depending on both the amount and the type of substance. The corresponding intensive property is the specific heat capacity, the heat capacity per unit mass, defined as the energy required to raise the temperature of one gram of a substance by one degree, and water is notable for having an unusually high specific heat.
+
+Thermodynamics predicts whether a process is feasible, meaning whether it can occur spontaneously, but it does not by itself say how fast the process will go. A classic illustration is the conversion of diamond to graphite, which has a negative Gibbs free energy change and so is thermodynamically favorable at ordinary temperature and pressure, yet proceeds so slowly that it is never observed because of its very high activation energy. The rate of a process is instead the domain of chemical kinetics, so a thermodynamically favorable reaction is not necessarily a fast one.

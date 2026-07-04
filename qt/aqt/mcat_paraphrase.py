@@ -190,7 +190,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         return
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle(f"Paraphrase check \u2014 {deck}")
+    dialog.setWindowTitle(f"Performance test \u2014 {deck}")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
 

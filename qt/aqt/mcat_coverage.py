@@ -2,9 +2,10 @@
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
 """Desktop MCAT Coverage map — per-section / per-topic coverage of the AAMC
-outline for the currently selected deck, with an abstain banner below the
-give-up line. Mirrors the iOS CoverageView; all logic is the shared, tested
-`mcat_models`. Computes off the UI thread."""
+outline across a learner-chosen SET of decks (picked via the inline checklist;
+coverage combines them), with an abstain banner below the give-up line. Mirrors
+the iOS CoverageView; all logic is the shared, tested `mcat_models`. Computes off
+the UI thread."""
 
 from __future__ import annotations
 
@@ -13,18 +14,14 @@ from aqt import mcat_ui as ui
 
 
 def show(mw) -> None:  # type: ignore[no-untyped-def]
-    from aqt.operations import QueryOp
-    from aqt.utils import showWarning
-
-    deck = mw.col.decks.current()["name"]
-
-    QueryOp(
-        parent=mw,
-        op=lambda col: m.gather_coverage(col, deck),
-        success=lambda rep: ui.show_html(mw, "MCAT Coverage", _render(deck, rep)),
-    ).with_progress("Mapping coverage…").failure(
-        lambda e: showWarning(f"Could not load coverage: {e}", parent=mw)
-    ).run_in_background()
+    decks = m.scorable_decks(mw.col)
+    ui.deck_scoped_panel(
+        mw,
+        "MCAT Coverage",
+        decks,
+        compute=lambda col, sel: m.gather_coverage(col, sel),
+        render=_render,
+    )
 
 
 def _color(fraction: float) -> str:
@@ -35,10 +32,13 @@ def _color(fraction: float) -> str:
     return ui.BAD
 
 
-def _render(deck: str, cov: "m.CoverageReport") -> str:
+def _render(selected: list[str], cov: "m.CoverageReport") -> str:
+    n = len(selected)
+    scope = f"Across {n} deck{'s' if n != 1 else ''}: <b>{ui.esc(', '.join(selected))}</b>."
     parts = [
-        f"<h2>MCAT Coverage — {ui.esc(deck)}</h2>",
-        f"<p style='color:{ui.MUTED}'>A topic counts as covered once it has at least one "
+        "<h2>MCAT Coverage</h2>",
+        f"<p style='color:{ui.MUTED}'>{scope} "
+        "A topic counts as covered once it has at least one "
         "card. Coverage is one input to the scores — not a score itself.</p>",
     ]
     if not cov.meets_coverage_threshold:

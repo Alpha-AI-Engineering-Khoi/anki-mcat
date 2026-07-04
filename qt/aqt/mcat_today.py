@@ -266,13 +266,14 @@ def _snapshot_text(assessment) -> str:
     )
 
 
-def _snapshot_html(deck: str, assessment) -> str:
+def _snapshot_html(assessment) -> str:
     """A compact readiness snapshot for the Ready button (reuses mcat_ui + the
-    shared score model — the full breakdown lives in mcat_readiness)."""
+    shared score model — the full breakdown lives in mcat_readiness). Scored
+    whole-collection (all MCAT cards), matching the Readiness dashboard."""
     from aqt import mcat_models as m  # noqa: PLC0415
     from aqt import mcat_ui as ui  # noqa: PLC0415
 
-    head = f"<h2>Ready snapshot \u2014 {ui.esc(deck)}</h2>"
+    head = "<h2>Ready snapshot \u2014 all MCAT cards</h2>"
     if not assessment.is_scored:
         return (
             head
@@ -321,7 +322,6 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     col = mw.col
     today = _today_str()
     cal = ensure_started(col)
-    deck = col.decks.current()["name"]
 
     holder: dict = {"assessment": None}
     ready_shown = {"v": False}
@@ -402,18 +402,18 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         ready_shown["v"] = True
         cached = holder.get("assessment")
         if cached is not None:
-            ui.show_html(mw, "Ready snapshot", _snapshot_html(deck, cached))
+            ui.show_html(mw, "Ready snapshot", _snapshot_html(cached))
             refresh()
             return
 
         def on_ok(assessment) -> None:
             holder["assessment"] = assessment
-            ui.show_html(mw, "Ready snapshot", _snapshot_html(deck, assessment))
+            ui.show_html(mw, "Ready snapshot", _snapshot_html(assessment))
             if alive["v"]:
                 snapshot.setText(_snapshot_text(assessment))
                 refresh()
 
-        QueryOp(parent=mw, op=lambda c: m.assess(c, deck), success=on_ok).with_progress(
+        QueryOp(parent=mw, op=lambda c: m.assess(c), success=on_ok).with_progress(
             "Scoring\u2026"
         ).failure(
             lambda e: showWarning(f"Could not compute readiness: {e}", parent=mw)
@@ -523,7 +523,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
             snapshot.setText(_snapshot_text(assessment))
 
     # Compute the inline snapshot in the background so opening stays snappy.
-    QueryOp(parent=mw, op=lambda c: m.assess(c, deck), success=on_assessed).failure(
+    QueryOp(parent=mw, op=lambda c: m.assess(c), success=on_assessed).failure(
         lambda _e: None
     ).run_in_background()
 

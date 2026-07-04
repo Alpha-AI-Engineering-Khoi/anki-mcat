@@ -10,7 +10,7 @@ the factual verdict to --live -- it never claims an offline factual accuracy. It
   1. drafts cards from the bundled source, and also runs a simpler baseline;
   2. screens every card with Card Check (structural offline; factual with --live);
   3. checks that Draft beats the baseline on correct-useful rate;
-  4. with --live, measures the judge against the human-labeled set (accuracy +
+  4. with --live, measures the judge against the reference-labeled set (accuracy +
      the safety metric: leaked-wrong rate) so we never trust the judge blind;
   5. scans the source for leakage of the gold/test items (7e);
   6. applies a cutoff declared BEFORE looking and blocks failures.
@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -47,6 +48,14 @@ LEAKAGE_JACCARD = 0.85         # whole-span near-copy (a whole span ~= a gold it
 # captures. Tuned just above the real source's max legitimate item overlap
 # (~0.95) so the clean source reports 0 while a pasted-in near-dup is caught.
 LEAKAGE_CONTAINMENT = 0.97
+
+# --- deterministic quality battery (7f "bad teaching" bucket, measured with NO
+# AI judge, so it is fully reproducible: same cards -> same numbers on any
+# machine). A good card is short, one-idea, non-duplicate, grounded, non-trivial.
+CONCISE_BACK_WORDS = 25   # an atomic answer should be short
+DUP_JACCARD = 0.6         # two cards this similar count as duplicates
+_VOWELS = re.compile(r"[aeiouy]+")
+_WORD_RE = re.compile(r"[A-Za-z0-9']+")
 
 
 def _load_jsonl(name: str) -> list[dict]:
@@ -124,6 +133,72 @@ def _dup_vs_gold(drafted: list[dict], gold: list[dict]) -> list[dict]:
     return flagged
 
 
+def _syllables(word: str) -> int:
+    w = word.lower()
+    count = len(_VOWELS.findall(w))
+    if w.endswith("e") and count > 1:
+        count -= 1
+    return max(1, count)
+
+
+def _flesch_reading_ease(text: str) -> float:
+    """Flesch Reading Ease (higher = easier). Pure formula, no AI: deterministic
+    and reproducible. Syllables approximated by vowel groups."""
+    words = _WORD_RE.findall(text)
+    sents = [s for s in re.split(r"[.!?]+", text) if s.strip()] or [text]
+    if not words:
+        return 0.0
+    syl = sum(_syllables(w) for w in words)
+    score = 206.835 - 1.015 * (len(words) / len(sents)) - 84.6 * (syl / len(words))
+    # Clamp: cloze "_____" fragments aren't prose and can push the raw score to
+    # nonsensical extremes; keep it in a sane band for display.
+    return max(-50.0, min(121.0, score))
+
+
+def quality_metrics(cards: list[dict]) -> dict:
+    """Deterministic (no-AI) card-quality battery. Same cards -> same numbers, so
+    it is fully re-runnable. Complements the factual judge: it measures whether a
+    card is short, one-idea, non-duplicate, grounded, and non-trivial."""
+    n = len(cards)
+    if not n:
+        return {"n": 0}
+    back_wc = [len(_WORD_RE.findall(c.get("back", ""))) for c in cards]
+
+    def _atomic(c: dict) -> bool:
+        b = (c.get("back", "") or "").strip()
+        return (b.count(".") <= 1 and b.count(",") <= 2
+                and b.lower().count(" and ") <= 1)
+
+    def _nontrivial(c: dict) -> bool:
+        fset = {w.lower() for w in _WORD_RE.findall(c.get("front", ""))}
+        new = [w for w in _WORD_RE.findall(c.get("back", ""))
+               if w.lower() not in fset and len(w) >= 4]
+        return bool(new)
+
+    dup = 0
+    for i, ci in enumerate(cards):
+        for cj in cards[i + 1:]:
+            if mcat_ai.jaccard(ci.get("front", ""),
+                               cj.get("front", "")) >= DUP_JACCARD:
+                dup += 1
+                break
+
+    grounded = sum(1 for c in cards
+                   if c.get("source_span") or c.get("source_url"))
+    all_text = " ".join(
+        (c.get("front", "") + " " + c.get("back", "")) for c in cards)
+    return {
+        "n": n,
+        "median_back_words": sorted(back_wc)[n // 2],
+        "concise_rate": round(sum(w <= CONCISE_BACK_WORDS for w in back_wc) / n, 3),
+        "atomic_rate": round(sum(_atomic(c) for c in cards) / n, 3),
+        "dup_rate": round(dup / n, 3),
+        "grounded_rate": round(grounded / n, 3),
+        "nontrivial_rate": round(sum(_nontrivial(c) for c in cards) / n, 3),
+        "flesch": round(_flesch_reading_ease(all_text), 1),
+    }
+
+
 def run(live: bool = False) -> dict:
     topic, spans = mcat_ai.load_source()
     src = mcat_ai.source_text(spans)
@@ -141,6 +216,8 @@ def run(live: bool = False) -> dict:
     leaks = _source_leakage(spans, gold)
     dups = _dup_vs_gold(drafted, gold)
 
+    draft_qm = quality_metrics(drafted)
+    base_qm = quality_metrics(baseline)
     beats_baseline = draft_q > base_q
     # Factual judging happens ONLY with the live LLM judge. Offline, Card Check
     # is a STRUCTURAL screen (mcat_cardcheck.offline_judge), so its accuracy /
@@ -170,6 +247,8 @@ def run(live: bool = False) -> dict:
         "draft": draft_counts, "draft_quality": round(draft_q, 3),
         "baseline": base_counts, "baseline_quality": round(base_q, 3),
         "beats_baseline": beats_baseline,
+        "draft_quality_metrics": draft_qm,
+        "baseline_quality_metrics": base_qm,
         "calibration": cal,
         "leakage_flagged": len(leaks),
         "dup_vs_gold": len(dups),
@@ -202,13 +281,20 @@ def _print(r: dict) -> None:
            else "  (structural/format quality; factual comparison needs --live)"))
     c = r["calibration"]
     if factual:
-        print(f"\nJudge vs human labels (n={c['n']}): accuracy={c['accuracy']}, "
+        print(f"\nJudge vs reference labels (n={c['n']}): accuracy={c['accuracy']}, "
               f"leaked-wrong rate={c['leaked_wrong_rate']}, "
               f"precision(correct-useful)={c['precision_correct_useful']}")
     else:
         print("\nJudge (offline): STRUCTURAL screen only \u2014 NOT a factual check. "
               "Keyword/regex can't verify truth, so no factual accuracy/leaked-wrong "
               "is claimed offline. Run with --live for the real LLM judge.")
+    dqm, bqm = r["draft_quality_metrics"], r["baseline_quality_metrics"]
+    print("\nDeterministic quality (no AI judge \u2014 reproducible):")
+    print(f"  {'metric':<14}{'Draft':>9}{'Baseline':>11}")
+    for key, label in (("concise_rate", "concise"), ("atomic_rate", "atomic"),
+                       ("nontrivial_rate", "non-trivial"), ("dup_rate", "duplicate"),
+                       ("grounded_rate", "grounded"), ("flesch", "readability")):
+        print(f"  {label:<14}{dqm.get(key, 0):>9}{bqm.get(key, 0):>11}")
     print(f"Leakage (7e) source vs gold/test items: {r['leakage_flagged']} "
           f"(whole-span jaccard>={LEAKAGE_JACCARD} OR sentence containment>="
           f"{LEAKAGE_CONTAINMENT}); drafted duplicating a gold "
@@ -258,8 +344,21 @@ def _self_test() -> None:
     caught = _source_leakage(dirty, [item])
     assert caught and caught[0]["span"] == "sentence", \
         "embedded near-dup must now be caught at the sentence level"
+    # deterministic quality battery: reproducible, rewards short atomic cards.
+    dupd = quality_metrics([
+        {"front": "What is X?", "back": "A short answer.", "source_span": "S1"},
+        {"front": "What is X?", "back": "A short answer.", "source_span": "S1"},
+    ])
+    assert dupd["dup_rate"] == 0.5 and dupd["grounded_rate"] == 1.0, dupd
+    assert quality_metrics([])["n"] == 0
+    good = quality_metrics([{"front": "What is Km?",
+                             "back": "The substrate concentration at half Vmax.",
+                             "source_span": "S1"}])
+    assert good["concise_rate"] == 1.0 and good["atomic_rate"] == 1.0, good
+
     print("mcat_eval self-test OK: sentence-level containment catches an embedded "
-          "near-dup that whole-span Jaccard misses; real source reports 0.")
+          "near-dup that whole-span Jaccard misses; real source reports 0; "
+          "deterministic quality battery computes.")
 
 
 if __name__ == "__main__":

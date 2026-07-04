@@ -95,3 +95,138 @@ def show_html(mw, title: str, body_html: str, width: int = 580, height: int = 60
 
     dialog.resize(width, height)
     dialog.exec()
+
+
+def deck_scoped_panel(  # type: ignore[no-untyped-def]
+    mw, title, deck_names, compute, render, width: int = 640, height: int = 660
+) -> None:
+    """A modal with an inline checklist of decks and a content area that
+    recomputes whenever the selection changes.
+
+    Nothing is checked initially — the learner picks which decks to score, and the
+    result combines them. Kept dependency-free of the caller's logic:
+
+    - ``deck_names``: selectable deck names (checkboxes, none checked initially).
+    - ``compute(col, selected)`` -> result   (runs off the UI thread via QueryOp).
+    - ``render(selected, result)`` -> str    (HTML body for the content area).
+    """
+    from aqt.operations import QueryOp
+    from aqt.qt import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFrame,
+        QLabel,
+        QScrollArea,
+        QTextBrowser,
+        QVBoxLayout,
+        QWidget,
+        qconnect,
+    )
+    from aqt.utils import disable_help_button, showWarning
+
+    dialog = QDialog(mw)
+    dialog.setWindowTitle(title)
+    disable_help_button(dialog)
+    mw.garbage_collect_on_dialog_finish(dialog)
+
+    layout = QVBoxLayout(dialog)
+    heading = QLabel("Scoring decks — tick one or more; the score combines them.")
+    heading.setWordWrap(True)
+    layout.addWidget(heading)
+
+    host = QWidget()
+    host_layout = QVBoxLayout(host)
+    host_layout.setContentsMargins(4, 4, 4, 4)
+    host_layout.setSpacing(2)
+
+    # A "Select all" convenience at the top of the checklist. It starts UNCHECKED
+    # — nothing is selected by default; it's a shortcut, not the default state —
+    # and only ticks/clears the decks below. Shown only when there are decks.
+    select_all = QCheckBox("Select all")
+    checks: list[tuple[object, str]] = []
+    if deck_names:
+        host_layout.addWidget(select_all)
+    for name in deck_names:
+        # "&" is a Qt mnemonic marker; double it for display and keep the real name.
+        cb = QCheckBox(name.replace("&", "&&"))
+        host_layout.addWidget(cb)
+        checks.append((cb, name))
+    host_layout.addStretch(1)
+
+    scroll = QScrollArea()
+    scroll.setWidgetResizable(True)
+    scroll.setWidget(host)
+    scroll.setMinimumHeight(96)
+    scroll.setMaximumHeight(170)
+    scroll.setFrameShape(QFrame.Shape.StyledPanel)
+    layout.addWidget(scroll)
+
+    browser = QTextBrowser()
+    browser.setOpenExternalLinks(True)
+    prompt = (
+        f"<div style='font-size:13px; color:{MUTED}'>Tick one or more decks above "
+        "to compute your scores.</div>"
+    )
+    browser.setHtml(prompt)
+    layout.addWidget(browser, 1)
+
+    if not deck_names:
+        browser.setHtml(
+            f"<div style='font-size:13px; color:{MUTED}'>No decks to score yet. "
+            "Import or create a deck first.</div>"
+        )
+
+    def selected() -> list[str]:
+        return [name for cb, name in checks if cb.isChecked()]
+
+    def on_done(sel: list[str], result: object) -> None:
+        browser.setHtml(f"<div style='font-size:13px; line-height:1.4'>{render(sel, result)}</div>")
+
+    def recompute() -> None:
+        sel = selected()
+        if not sel:
+            browser.setHtml(prompt)
+            return
+        browser.setHtml(f"<div style='font-size:13px; color:{MUTED}'>Scoring…</div>")
+        QueryOp(
+            parent=dialog, op=lambda col: compute(col, sel),
+            success=lambda result: on_done(sel, result),
+        ).failure(lambda e: showWarning(f"Could not compute: {e}", parent=dialog)).run_in_background()
+
+    # "Select all" wiring. A guard so programmatically ticking the deck boxes
+    # from "Select all" doesn't fire N recomputes (or recurse) — we suppress the
+    # per-deck handler during the sweep and recompute exactly once. "Select all"
+    # itself is driven by `clicked` (user-only, unlike `toggled`), so syncing its
+    # tick from the deck boxes can never re-fire it.
+    syncing = {"on": False}
+
+    def sync_select_all() -> None:
+        all_checked = bool(checks) and all(cb.isChecked() for cb, _ in checks)
+        select_all.setChecked(all_checked)
+
+    def on_select_all_clicked(checked: bool) -> None:
+        syncing["on"] = True
+        try:
+            for cb, _name in checks:
+                cb.setChecked(checked)
+        finally:
+            syncing["on"] = False
+        recompute()
+
+    def on_deck_toggled(_checked: bool) -> None:
+        if syncing["on"]:
+            return
+        sync_select_all()
+        recompute()
+
+    qconnect(select_all.clicked, on_select_all_clicked)
+    for cb, _name in checks:
+        qconnect(cb.toggled, on_deck_toggled)
+
+    buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+    qconnect(buttons.rejected, dialog.reject)
+    layout.addWidget(buttons)
+
+    dialog.resize(width, height)
+    dialog.exec()

@@ -83,15 +83,57 @@ def download_deck(storage_path: str) -> str:
     return tmp
 
 
-def import_apkg(col, path: str):  # type: ignore[no-untyped-def]
-    """Import a downloaded .apkg with scheduling (carries FSRS state + history)."""
+def import_apkg(col, path: str, deck_name: str | None = None):  # type: ignore[no-untyped-def]
+    """Import a downloaded .apkg with scheduling, name the imported deck after the
+    Library catalog title (so the Library is the single source of truth for the
+    deck's name — the .apkg's own embedded name can differ), then enable FSRS
+    collection-wide so the Readiness Memory score (mean FSRS retrievability) can
+    populate as the imported cards are reviewed. Idempotent: only flips FSRS on if
+    it's off."""
     from anki.collection import ImportAnkiPackageRequest
 
+    before = {d["name"] for d in col.decks.all()}
     presets = col._backend.get_import_anki_package_presets()
     presets.with_scheduling = True
-    return col.import_anki_package(
+    result = col.import_anki_package(
         ImportAnkiPackageRequest(package_path=path, options=presets)
     )
+    if deck_name:
+        _rename_imported_deck(col, before, deck_name)
+    # FSRS is a collection-wide setting (the Deck Options toggle writes this same
+    # config key); turning it on here means Memory works without the learner
+    # hunting through Deck Options.
+    if not col.get_config("fsrs", False):
+        col.set_config("fsrs", True)
+    return result
+
+
+def _rename_imported_deck(col, before_names, deck_name: str) -> None:  # type: ignore[no-untyped-def]
+    """Rename the single new top-level deck the import created to `deck_name`.
+
+    Uses a before/after name diff so it works regardless of the .apkg's embedded
+    deck name. No-op if the import created zero or several new top-level decks (an
+    ambiguous case we won't guess at) or the name already matches. `decks.rename`
+    reparents any subdecks under the new name."""
+    new_tops = [
+        d for d in col.decks.all()
+        if d["name"] not in before_names and "::" not in d["name"] and d["name"] != "Default"
+    ]
+    if len(new_tops) != 1 or new_tops[0]["name"] == deck_name:
+        return
+    col.decks.rename(new_tops[0], deck_name)
+
+
+@dataclass
+class _BatchImportResult:
+    """Return value of the batch-import background op.
+
+    CollectionOp passes this to the success callback (which reads ``count`` for
+    the summary tooltip) and afterwards reads ``.changes`` to refresh the UI and
+    undo state, so we carry the last import's changes alongside the count."""
+
+    count: int
+    changes: object
 
 
 def show(mw) -> None:  # type: ignore[no-untyped-def]
@@ -116,12 +158,15 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     layout = QVBoxLayout(dialog)
     layout.addWidget(
         QLabel(
-            "Curated MCAT decks. Pick one and import it — scheduling is included, "
-            "so your readiness score and weak-topics show right away."
+            "Curated MCAT decks. Pick one or more and import them — scheduling is "
+            "included, so your readiness score and weak-topics show right away."
         )
     )
 
     listw = QListWidget()
+    # Multi-select: pick several decks (Cmd/Ctrl- or Shift-click) and import them
+    # all in one action.
+    listw.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
     layout.addWidget(listw)
 
     detail = QLabel("")
@@ -133,7 +178,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
 
     buttons = QDialogButtonBox()
     import_btn = buttons.addButton(
-        "Download & Import", QDialogButtonBox.ButtonRole.ActionRole
+        "Import", QDialogButtonBox.ButtonRole.ActionRole
     )
     refresh_btn = buttons.addButton("Refresh", QDialogButtonBox.ButtonRole.ActionRole)
     close_btn = buttons.addButton(QDialogButtonBox.StandardButton.Close)
@@ -142,16 +187,22 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
 
     decks: list[LibraryDeck] = []
 
-    def selected() -> LibraryDeck | None:
-        row = listw.currentRow()
-        return decks[row] if 0 <= row < len(decks) else None
+    def selected_decks() -> list[LibraryDeck]:
+        rows = sorted(idx.row() for idx in listw.selectedIndexes())
+        return [decks[r] for r in rows if 0 <= r < len(decks)]
 
     def on_select() -> None:
-        d = selected()
-        import_btn.setEnabled(d is not None and bool(d.storage_path))
-        if d:
+        sel = selected_decks()
+        importable = [d for d in sel if d.storage_path]
+        import_btn.setEnabled(bool(importable))
+        if len(sel) == 1:
+            d = sel[0]
             secs = ", ".join(d.sections) if d.sections else "—"
             detail.setText(f"{d.description}\n\n{d.card_count} cards · {secs}")
+        elif len(sel) > 1:
+            detail.setText(f"{len(sel)} decks selected")
+        elif not decks:
+            detail.setText("The Library is empty.")
         else:
             detail.setText("")
 
@@ -163,8 +214,6 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
             QListWidgetItem(f"{d.title}  ({d.card_count} cards)", listw)
         if decks:
             listw.setCurrentRow(0)
-        else:
-            detail.setText("The Library is empty.")
         on_select()
 
     def on_err(err: Exception) -> None:
@@ -175,43 +224,57 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
             parent=dialog, op=lambda _: fetch_decks(), success=populate
         ).with_progress("Loading MCAT Library…").failure(on_err).run_in_background()
 
-    def do_import() -> None:
-        d = selected()
-        if not d or not d.storage_path:
+    def import_decks(to_import: list[LibraryDeck]) -> None:
+        # Only decks that actually have a downloadable file can be imported.
+        to_import = [d for d in to_import if d.storage_path]
+        if not to_import:
             return
         import_btn.setEnabled(False)
 
-        def after_download(tmp: str) -> None:
-            def op(col):  # type: ignore[no-untyped-def]
+        def op(col):  # type: ignore[no-untyped-def]
+            # Download + import each selected deck on the background thread (safe,
+            # off the UI thread). Each import_apkg renames the imported deck to
+            # the catalog title and enables FSRS. We hand back a count for the
+            # tooltip plus the last import's `.changes` for CollectionOp.
+            count = 0
+            last = None
+            for d in to_import:
+                tmp = download_deck(d.storage_path)
                 try:
-                    return import_apkg(col, tmp)
+                    last = import_apkg(col, tmp, d.title)
                 finally:
                     try:
                         os.unlink(tmp)
                     except OSError:
                         pass
+                count += 1
+            return _BatchImportResult(count=count, changes=last.changes)
 
-            def imported(_log) -> None:  # type: ignore[no-untyped-def]
-                tooltip(
-                    f"Imported “{d.title}”. Select the deck, then Tools › MCAT Readiness.",
-                    parent=mw,
-                )
-                dialog.accept()
+        def imported(result: _BatchImportResult) -> None:
+            noun = "deck" if result.count == 1 else "decks"
+            tooltip(
+                f"Imported {result.count} {noun} and enabled FSRS. Select a deck, "
+                "then Tools › MCAT › Readiness.",
+                parent=mw,
+            )
+            dialog.accept()
 
-            CollectionOp(parent=dialog, op=op).success(imported).failure(
-                lambda e: (import_btn.setEnabled(True), on_err(e))
-            ).run_in_background()
-
-        QueryOp(
-            parent=dialog,
-            op=lambda _: download_deck(d.storage_path),
-            success=after_download,
-        ).with_progress(f"Downloading {d.title}…").failure(
+        CollectionOp(parent=dialog, op=op).success(imported).failure(
             lambda e: (import_btn.setEnabled(True), on_err(e))
         ).run_in_background()
 
-    qconnect(listw.currentRowChanged, lambda _r: on_select())
-    qconnect(listw.itemDoubleClicked, lambda _i: do_import())
+    def do_import() -> None:
+        import_decks(selected_decks())
+
+    def do_import_item(item) -> None:  # type: ignore[no-untyped-def]
+        # Double-click always imports just that one deck, regardless of the
+        # wider multi-selection.
+        row = listw.row(item)
+        if 0 <= row < len(decks):
+            import_decks([decks[row]])
+
+    qconnect(listw.itemSelectionChanged, on_select)
+    qconnect(listw.itemDoubleClicked, do_import_item)
     qconnect(import_btn.clicked, do_import)
     qconnect(refresh_btn.clicked, load)
     qconnect(close_btn.clicked, dialog.reject)

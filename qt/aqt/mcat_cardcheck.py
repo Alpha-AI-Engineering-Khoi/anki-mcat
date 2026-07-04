@@ -178,9 +178,9 @@ def classify(card: dict, src_text: str, gold: list[dict],
 
 def calibrate(labeled: list[dict], src_text: str, gold: list[dict],
               live: bool | None = None, spans: list[dict] | None = None) -> dict:
-    """Measure the judge against human labels. The safety metric is the
-    leaked-wrong rate: cards the judge PASSES as correct-useful that humans
-    marked wrong."""
+    """Measure the judge against the reference labels. The safety metric is the
+    leaked-wrong rate: cards the judge PASSES as correct-useful that the
+    reference set marked wrong."""
     n = len(labeled)
     correct = 0
     passed = 0            # judge said correct-useful

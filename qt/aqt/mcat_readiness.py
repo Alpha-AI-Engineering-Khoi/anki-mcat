@@ -3,11 +3,12 @@
 
 """Desktop MCAT Readiness dashboard — the three honest scores.
 
-Shows Memory / Performance / Readiness for the currently selected deck, each as
-a range with the full honesty read-out; or, below the give-up line, NO scores —
-just what's missing and the best next thing. Mirrors the iOS
-ReadinessDashboardView. All scoring math lives in the shared, unit-tested
-`mcat_models`; this file only gathers (off the UI thread) and renders.
+Shows Memory / Performance / Readiness across a learner-chosen SET of decks
+(picked via the inline checklist; the score combines them) — each as a range with
+the full honesty read-out; or, below the give-up line, NO scores — just what's
+missing and the best next thing. Mirrors the iOS ReadinessDashboardView. All
+scoring math lives in the shared, unit-tested `mcat_models`; this file only
+gathers (off the UI thread) and renders.
 """
 
 from __future__ import annotations
@@ -17,24 +18,29 @@ from aqt import mcat_ui as ui
 
 
 def show(mw) -> None:  # type: ignore[no-untyped-def]
-    from aqt.operations import QueryOp
-    from aqt.utils import showWarning
-
-    deck = mw.col.decks.current()["name"]
-
-    QueryOp(
-        parent=mw,
-        op=lambda col: m.assess(col, deck),
-        success=lambda a: ui.show_html(mw, "MCAT Readiness", _render(deck, a)),
-    ).with_progress("Scoring…").failure(
-        lambda e: showWarning(f"Could not compute readiness: {e}", parent=mw)
-    ).run_in_background()
+    decks = m.scorable_decks(mw.col)
+    ui.deck_scoped_panel(
+        mw,
+        "MCAT Readiness",
+        decks,
+        compute=lambda col, sel: m.assess(col, sel),
+        render=_render,
+    )
 
 
-def _render(deck: str, a: "m.ReadinessAssessment") -> str:
+def _scope_line(selected: list[str]) -> str:
+    n = len(selected)
+    return (
+        f"Across {n} deck{'s' if n != 1 else ''}: "
+        f"<b>{ui.esc(', '.join(selected))}</b>."
+    )
+
+
+def _render(selected: list[str], a: "m.ReadinessAssessment") -> str:
     head = (
-        f"<h2>Readiness — {ui.esc(deck)}</h2>"
-        f"<p style='color:{ui.MUTED}'>Three separate scores, each a range. {ui.esc(m.GIVE_UP_RULE)}</p>"
+        "<h2>Readiness</h2>"
+        f"<p style='color:{ui.MUTED}'>{_scope_line(selected)} "
+        f"Three separate scores, each a range. {ui.esc(m.GIVE_UP_RULE)}</p>"
     )
     body = _scored(a) if a.is_scored else _abstain(a)
     return head + body + _coverage_summary(a.coverage) + _best_and_readout(a)

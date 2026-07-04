@@ -37,7 +37,7 @@ def _spans_for(topic: "prog.Topic") -> list[dict]:
     """Source spans for this topic, or [] when the bundled source is a different
     topic (only Enzymes ships a source today)."""
     try:
-        src_topic, spans = ai.load_source()
+        src_topic, spans = ai.load_source(topic_tag=topic.tag)
     except Exception:
         return []
     return spans if src_topic == topic.tag else []
@@ -74,7 +74,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     topics = prog.all_topics()
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle("Encode: Prime \u2192 Connect \u2192 Build")
+    dialog.setWindowTitle("Encode: Prime \u2192 Build")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
 
@@ -82,44 +82,40 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     layout.addWidget(
         QLabel(
             "Encode before you drill: prime the topic for the big picture, "
-            "connect it to yourself, then build the map."
+            "then build the map."
         )
     )
 
     combo = QComboBox()
+    # macOS shows a non-scrolling native popup for long lists; force a normal
+    # scrollable list view (with a scrollbar) so all 50 topics are reachable.
+    combo.setMaxVisibleItems(20)
+    combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
     for t in topics:
         combo.addItem(f"{t.section} \u00b7 {t.name}", t.slug)
     layout.addWidget(combo)
 
-    status = QLabel("")
-    status.setEnabled(False)  # native secondary text (adapts to light/dark)
-    layout.addWidget(status)
-
     prime_btn = QPushButton("\u2460 Prime\u2026")
-    connect_btn = QPushButton("\u2461 Connect\u2026")
-    build_btn = QPushButton("\u2462 Build\u2026")
+    build_btn = QPushButton("\u2461 Build\u2026")
     row = QHBoxLayout()
-    for b in (prime_btn, connect_btn, build_btn):
+    for b in (prime_btn, build_btn):
+        # keep both neutral/gray — don't let Prime become the blue default button
+        b.setAutoDefault(False)
+        b.setDefault(False)
         row.addWidget(b)
     layout.addLayout(row)
 
     def current_topic() -> "prog.Topic":
         return topics[max(0, combo.currentIndex())]
 
-    def refresh() -> None:
-        status.setText(_status_text(prog.get_record(mw.col, current_topic())))
-
-    qconnect(combo.currentIndexChanged, lambda _i: refresh())
-    qconnect(prime_btn.clicked, lambda: (_prime_dialog(mw, current_topic()), refresh()))
-    qconnect(connect_btn.clicked, lambda: (_connect_dialog(mw, current_topic()), refresh()))
-    qconnect(build_btn.clicked, lambda: (_build_dialog(mw, current_topic()), refresh()))
+    qconnect(prime_btn.clicked, lambda: _prime_dialog(mw, current_topic()))
+    qconnect(build_btn.clicked, lambda: _build_dialog(mw, current_topic()))
 
     buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
     qconnect(buttons.rejected, dialog.reject)
     layout.addWidget(buttons)
 
     dialog.resize(540, 240)
-    refresh()
     dialog.exec()
 
 
@@ -138,21 +134,24 @@ def open_for(mw, topic: "prog.Topic", stage: str | None = None) -> None:  # type
 
 
 def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-def]
+    import html as _html
+
+    from aqt.operations import QueryOp
     from aqt.qt import (
-        QCheckBox,
         QDialog,
         QDialogButtonBox,
         QLabel,
         QListWidget,
         QPlainTextEdit,
+        QTextBrowser,
         QVBoxLayout,
         qconnect,
     )
     from aqt.utils import disable_help_button, tooltip
 
     spans = _spans_for(topic)
-    scope = ai.scope_list(spans, topic.name)
     rec = prog.get_record(mw.col, topic)
+    holder: dict = {"items": []}
 
     dialog = QDialog(mw)
     dialog.setWindowTitle(f"Prime: {topic.name}")
@@ -163,29 +162,23 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     layout.addWidget(
         QLabel("Skim the whole topic for the big picture. Do NOT memorize details yet.")
     )
-    layout.addWidget(QLabel("Scope / skim \u2014 the big ideas:"))
+    layout.addWidget(QLabel("Scope / skim \u2014 the big ideas (click one):"))
     scope_list = QListWidget()
-    for s in scope:
-        scope_list.addItem("\u2022 " + s)
+    scope_list.addItem("Generating scope + explanations\u2026")
     layout.addWidget(scope_list)
 
-    checks = [
-        QCheckBox("I have the big picture"),
-        QCheckBox("I covered the whole topic"),
-        QCheckBox("I did NOT memorize details"),
-        QCheckBox("I can write 1\u20132 hypotheses"),
-    ]
-    for c in checks:
-        layout.addWidget(c)
+    explain_box = QTextBrowser()
+    explain_box.setOpenExternalLinks(True)
+    explain_box.setMinimumHeight(140)
+    explain_box.setHtml(
+        "<i>Click an idea above to read a short, sourced explanation.</i>")
+    layout.addWidget(explain_box)
 
     layout.addWidget(QLabel("Your 1\u20132 hypotheses:"))
     hypotheses = QPlainTextEdit(rec.get("hypotheses", ""))
-    hypotheses.setPlaceholderText("e.g. Enzymes lower activation energy without shifting equilibrium\u2026")
+    hypotheses.setPlaceholderText(
+        "e.g. Enzymes lower activation energy without shifting equilibrium\u2026")
     layout.addWidget(hypotheses)
-
-    if rec.get("primed"):
-        for c in checks:
-            c.setChecked(True)
 
     buttons = QDialogButtonBox()
     mark_btn = buttons.addButton("Mark primed", QDialogButtonBox.ButtonRole.ActionRole)
@@ -193,24 +186,52 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     layout.addWidget(buttons)
 
     def revalidate() -> None:
-        ready = all(c.isChecked() for c in checks) and bool(
-            hypotheses.toPlainText().strip()
-        )
-        mark_btn.setEnabled(ready)
+        mark_btn.setEnabled(bool(hypotheses.toPlainText().strip()))
 
     def do_mark() -> None:
         prog.mark_primed(mw.col, topic, hypotheses.toPlainText().strip())
         tooltip(f"Primed \u201c{topic.name}\u201d.", parent=mw)
         dialog.accept()
 
-    for c in checks:
-        qconnect(c.stateChanged, lambda _s: revalidate())
     qconnect(hypotheses.textChanged, revalidate)
     qconnect(mark_btn.clicked, do_mark)
     qconnect(buttons.rejected, dialog.reject)
 
+    def _fill(items: list) -> None:
+        holder["items"] = items or []
+        scope_list.clear()
+        if not holder["items"]:
+            scope_list.addItem("(no scope returned \u2014 reopen to retry)")
+            return
+        for it in holder["items"]:
+            scope_list.addItem("\u2022 " + it.get("term", ""))
+
+    # ONE background run generates every idea + its explanation + source.
+    QueryOp(parent=mw, op=lambda _col: ai.scope_explained(spans, topic.name),
+            success=_fill).run_in_background()
+
+    def _on_select(row: int) -> None:
+        items = holder["items"]
+        if row < 0 or row >= len(items):
+            return
+        it = items[row]
+        html = (f"<b>{_html.escape(it.get('term', ''))}</b><br>"
+                f"{_html.escape(it.get('explanation') or '(no explanation available)')}")
+        srcs = [s for s in (it.get("sources") or []) if s.get("url")]
+        if srcs:
+            rows = []
+            for i, s in enumerate(srcs, 1):
+                title = s.get("title") or s["url"]
+                rows.append(f"<span style='color:#888'>Source {i}: "
+                            f"<a href='{_html.escape(s['url'])}'>"
+                            f"{_html.escape(title)}</a></span>")
+            html += "<br><br>" + "<br>".join(rows)
+        explain_box.setHtml(html)
+
+    qconnect(scope_list.currentRowChanged, _on_select)
+
     revalidate()
-    dialog.resize(540, 600)
+    dialog.resize(560, 640)
     dialog.exec()
 
 
@@ -245,7 +266,9 @@ def _connect_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped
 
     edits: list = []
     for i, template in enumerate(_CONNECT_TEMPLATES):
-        keyword = keywords[i % len(keywords)]
+        # Strip trailing punctuation so a keyword can't produce "…cofactors.?"
+        # when slotted into a question template.
+        keyword = keywords[i % len(keywords)].rstrip(" .;:,?!")
         if i < len(saved) and (saved[i] or "").strip():
             seed = saved[i]
         else:

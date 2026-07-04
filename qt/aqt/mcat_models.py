@@ -26,6 +26,18 @@ from dataclasses import dataclass, field
 TAG_ROOT = "MCAT"
 TOPIC_PREFIX = "MCAT::"
 
+# Readiness / Coverage score the UNION of a user-chosen SET of decks (the deck
+# picker on each screen), or the whole collection when nothing is passed (`None`,
+# used by the Today snapshot). Filtered/interleaved decks are never offered in the
+# picker — their cards live in a home deck, and `deck:"Parent"` already covers
+# subdecks.
+#
+# The one deck excluded from the whole-collection (`None`) default is the
+# scored-*demo* deck, whose FSRS history is simulated (seeded to demonstrate the
+# scored state) — it must never inflate a real number. Kept in sync with the iOS
+# `MCATReadinessDemoDeck.deckName`.
+READINESS_DEMO_DECK = "MCAT Readiness Demo"
+
 # The MCAT content-outline taxonomy: (section_token, display_name, full_name,
 # [(topic_token, topic_display_name)]). A representative subset of the AAMC
 # outline — 50 topics across the four sections — kept in exact sync with the iOS
@@ -464,24 +476,88 @@ def _quote(value: str) -> str:
     return '"' + value.replace('"', '\\"') + '"'
 
 
-def gather_coverage(col, deck: str | None) -> CoverageReport:  # type: ignore[no-untyped-def]
-    """Per-topic coverage via the same card search the browser uses."""
+def _mcat_scope(exclude_deck: str | None = READINESS_DEMO_DECK) -> str:
+    """Search matching every MCAT-tagged card in the whole collection.
+
+    `(tag:MCAT OR tag:MCAT::*)` — the tag tree across all decks — with the
+    simulated scored-demo deck dropped so it can't inflate the real number."""
+    clause = f"(tag:{TAG_ROOT} OR tag:{TAG_ROOT}::*)"
+    if exclude_deck:
+        clause += f" -deck:{_quote(exclude_deck)}"
+    return clause
+
+
+def _deck_clause(decks: list[str]) -> str:
+    """`(deck:"A" OR deck:"B" ...)` for a non-empty deck-name selection.
+
+    `deck:"X"` in Anki search matches deck X and its subdecks, so a picked deck
+    also counts anything filed beneath it."""
+    return "(" + " OR ".join(f"deck:{_quote(d)}" for d in decks) + ")"
+
+
+def scorable_decks(col) -> list[str]:  # type: ignore[no-untyped-def]
+    """Top-level, non-filtered, non-empty deck names offered in the score picker.
+
+    Sorted case-insensitively. Excluded: filtered/interleaved decks (their cards
+    live in a home deck) and decks that hold no cards — e.g. the empty built-in
+    "Default" deck, which would only clutter the picker with something that can
+    never contribute a score. Only top-level decks are offered, since
+    `deck:"Parent"` already sweeps in any subdecks, so a deck's card count
+    includes its subdecks' cards."""
+    names = [
+        d["name"] for d in col.decks.all()
+        if not d.get("dyn")
+        and "::" not in d["name"]
+        and col.decks.card_count(d["id"], include_subdecks=True) > 0
+    ]
+    return sorted(names, key=str.lower)
+
+
+def gather_coverage(  # type: ignore[no-untyped-def]
+    col, decks: list[str] | None = None, exclude_deck: str | None = READINESS_DEMO_DECK
+) -> CoverageReport:
+    """Per-topic coverage via the same card search the browser uses.
+
+    - ``decks=None``: whole collection (every MCAT-tagged card across all decks,
+      minus the simulated demo deck) — the legacy default (Today snapshot).
+    - ``decks=[...]``: the UNION of those decks' MCAT-tagged cards (the deck-picker
+      path). An empty list means nothing is selected, so every topic reads 0."""
+    deck_clause = _deck_clause(decks) if decks else None
     sections: list[SectionCoverage] = []
     for token, name, _full, topics in OUTLINE:
         topic_cov: list[CoverageTopic] = []
         for topic_token, topic_name in topics:
             tag = f"{TAG_ROOT}::{token}::{topic_token}"
-            clause = f"(tag:{tag} OR tag:{tag}::*)"
-            query = f"deck:{_quote(deck)} AND {clause}" if deck else clause
-            count = len(col.find_cards(query))
+            tag_clause = f"(tag:{tag} OR tag:{tag}::*)"
+            if decks is None:
+                query = tag_clause
+                if exclude_deck:
+                    query += f" -deck:{_quote(exclude_deck)}"
+                count = len(col.find_cards(query))
+            elif not decks:
+                count = 0
+            else:
+                count = len(col.find_cards(f"{deck_clause} AND {tag_clause}"))
             topic_cov.append(CoverageTopic(section=name, name=topic_name, tag=tag, card_count=count))
         sections.append(SectionCoverage(section=name, topics=topic_cov))
     return CoverageReport(sections=sections)
 
 
-def gather_evidence(col, deck: str) -> tuple[list[float], int, int]:  # type: ignore[no-untyped-def]
-    """Real FSRS retrievabilities + graded-review total across studied cards."""
-    ids = col.find_cards(f"deck:{_quote(deck)} -is:new")
+def gather_evidence(  # type: ignore[no-untyped-def]
+    col, decks: list[str] | None = None, exclude_deck: str | None = READINESS_DEMO_DECK
+) -> tuple[list[float], int, int]:
+    """Real FSRS retrievabilities + graded-review total across studied cards.
+
+    ``decks=None`` → whole collection (all MCAT-tagged, non-new cards, minus the
+    demo deck). ``decks=[...]`` → the union of those decks' MCAT-tagged studied
+    cards; an empty list scores nothing."""
+    if decks is None:
+        query = f"{_mcat_scope(exclude_deck)} -is:new"
+    elif not decks:
+        return [], 0, 0
+    else:
+        query = f"{_deck_clause(decks)} AND (tag:{TAG_ROOT} OR tag:{TAG_ROOT}::*) -is:new"
+    ids = col.find_cards(query)
     retrievabilities: list[float] = []
     graded = 0
     for cid in ids:
@@ -492,12 +568,17 @@ def gather_evidence(col, deck: str) -> tuple[list[float], int, int]:  # type: ig
     return retrievabilities, graded, len(ids)
 
 
-def weakest_studied_topic(col, deck: str) -> str | None:  # type: ignore[no-untyped-def]
-    """The weakest MCAT section (by points-at-stake) among the deck's due cards."""
+def weakest_studied_topic(col, decks: list[str] | None = None) -> str | None:  # type: ignore[no-untyped-def]
+    """Weakest MCAT section (by points-at-stake) among the due cards.
+
+    When exactly one deck is selected we scope the points-at-stake queue to it;
+    otherwise we leave the current deck untouched (best-effort hint — the
+    best-next-thing falls back to the coverage gap when unavailable)."""
     try:
-        did = col.decks.id(deck)
-        if did is not None:
-            col.decks.set_current(did)
+        if decks and len(decks) == 1:
+            did = col.decks.id(decks[0])
+            if did is not None:
+                col.decks.set_current(did)
         queue = col._backend.get_points_at_stake_queue(
             topic_tag_prefix=TOPIC_PREFIX, weight_by_topic_size=False
         )
@@ -527,15 +608,19 @@ def _gather_paraphrase(col):  # type: ignore[no-untyped-def]  # -> (ScoreRange |
         return None, 0
 
 
-def assess(col, deck: str) -> ReadinessAssessment:  # type: ignore[no-untyped-def]
-    """Full deck-scoped assessment: coverage + evidence + best-next-thing.
+def assess(col, decks: list[str] | None = None) -> ReadinessAssessment:  # type: ignore[no-untyped-def]
+    """Full assessment over a set of decks: coverage + evidence + best-next-thing.
+
+    ``decks=None`` scores the whole collection (all MCAT-tagged cards, minus the
+    demo deck) — used by the Today snapshot. ``decks=[...]`` scores the UNION of
+    the selected decks (the deck-picker path); an empty list abstains.
 
     Performance is driven by measured paraphrase accuracy when the learner has
     answered enough reworded questions (>= mcat_paraphrase.MIN_PARAPHRASE_ATTEMPTS);
     otherwise it stays the provisional blend."""
-    coverage = gather_coverage(col, deck)
-    retrievabilities, graded, studied = gather_evidence(col, deck)
-    weakest = weakest_studied_topic(col, deck)
+    coverage = gather_coverage(col, decks)
+    retrievabilities, graded, studied = gather_evidence(col, decks)
+    weakest = weakest_studied_topic(col, decks)
     measured, attempts = _gather_paraphrase(col)
     return make_assessment(
         coverage, retrievabilities, graded, studied, weakest,
@@ -546,6 +631,47 @@ def assess(col, deck: str) -> ReadinessAssessment:  # type: ignore[no-untyped-de
 def _self_test() -> None:
     assert len(OUTLINE) == 4
     assert sum(len(t) for _a, _b, _c, t in OUTLINE) == 50, "expected 50 outline topics"
+
+    # Whole-collection scope: all MCAT-tagged cards, minus the simulated demo deck.
+    scope = _mcat_scope()
+    assert scope == f'(tag:{TAG_ROOT} OR tag:{TAG_ROOT}::*) -deck:"{READINESS_DEMO_DECK}"', scope
+    assert _mcat_scope(None) == f"(tag:{TAG_ROOT} OR tag:{TAG_ROOT}::*)"
+
+    # Deck-union clause for the deck picker.
+    assert _deck_clause(["A"]) == '(deck:"A")', _deck_clause(["A"])
+    assert _deck_clause(["A", "B"]) == '(deck:"A" OR deck:"B")', _deck_clause(["A", "B"])
+
+    # scorable_decks: only non-filtered, TOP-LEVEL decks that actually hold a
+    # card are offered, case-insensitively sorted. The empty built-in "Default"
+    # (and any empty deck) is dropped, while filtered decks and subdecks stay
+    # excluded. A parent whose cards live only in subdecks still counts, since
+    # card_count includes subdecks.
+    class _FakeDecks:
+        def __init__(self, decks, counts):
+            self._decks, self._counts = decks, counts
+
+        def all(self):
+            return self._decks
+
+        def card_count(self, did, include_subdecks):  # noqa: ARG002 (mirrors the real API)
+            return self._counts.get(did, 0)
+
+    class _FakeCol:
+        def __init__(self, decks, counts):
+            self.decks = _FakeDecks(decks, counts)
+
+    fake = _FakeCol(
+        [
+            {"id": 1, "name": "Default", "dyn": 0},        # empty built-in -> dropped
+            {"id": 2, "name": "Zoology", "dyn": 0},        # has cards -> kept
+            {"id": 3, "name": "biology", "dyn": 0},        # parent, cards in subdeck -> kept
+            {"id": 4, "name": "biology::cells", "dyn": 0},  # subdeck -> excluded
+            {"id": 5, "name": "Filtered", "dyn": 1},       # filtered -> excluded
+            {"id": 6, "name": "Empty", "dyn": 0},          # 0 cards -> dropped
+        ],
+        {1: 0, 2: 5, 3: 12, 4: 12, 5: 0, 6: 0},
+    )
+    assert scorable_decks(fake) == ["biology", "Zoology"], scorable_decks(fake)
 
     # Abstain: no data.
     empty = CoverageReport(sections=[SectionCoverage(s, [CoverageTopic(s, "x", "MCAT::x", 0)]) for s in ["a"]])
