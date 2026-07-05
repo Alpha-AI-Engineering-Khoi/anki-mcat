@@ -3,7 +3,7 @@
 
 """MCAT challenge 8: test a study feature by ablation.
 
-The study feature under test is our **encode workflow** (Scaffold -> Synapse; see ``mcat_encode`` / ``mcat_program``). This module is the *harness*: it
+The study feature under test is our **encode workflow** (Scaffold -> Mindmap; see ``mcat_encode`` / ``mcat_program``). This module is the *harness*: it
 defines the three builds, stores per-build study minutes + a held-out quiz, and
 ranks them by the pre-registered primary metric so the comparison can be run.
 
@@ -64,7 +64,7 @@ PREREG_DOC = "docs/mcat/ablation-preregistration.md"
 PRIMARY_METRIC = "held-out paraphrase accuracy per study minute"
 PREREG_ORDER: tuple[str, str, str] = ("C", "B", "A")
 HYPOTHESIS = (
-    "Studying a topic with the full Scaffold \u2192 Synapse workflow "
+    "Studying a topic with the full Scaffold \u2192 Mindmap workflow "
     "produces higher accuracy on held-out, paraphrased, exam-style questions per "
     "equal minute of study than flashcards alone or plain Anki."
 )
@@ -84,7 +84,7 @@ class Build:
     id: str  # "A" / "B" / "C"
     name: str  # short label
     focus: bool  # Focus (points-at-stake) ordering on?
-    encode: bool  # encode workflow (Scaffold->Synapse) on?
+    encode: bool  # encode workflow (Scaffold->Mindmap) on?
     description: str  # what is on/off
     isolates: str  # what comparing this build controls for
 
@@ -111,7 +111,7 @@ BUILDS: dict[str, Build] = {
         name="full",
         focus=True,
         encode=True,
-        description="our app: Focus ON + encode workflow (Scaffold \u2192 Synapse) ON",
+        description="our app: Focus ON + encode workflow (Scaffold \u2192 Mindmap) ON",
         isolates="the whole method",
     ),
 }
@@ -134,7 +134,7 @@ def _require_build(build_id: str) -> None:
 
 # --- active build (the dev ablation switch) ----------------------------------
 # Which build the app is currently running as. None -> normal app (everything
-# on). A/B/C -> that build's mode: the encode workflow (Scaffold->Synapse)
+# on). A/B/C -> that build's mode: the encode workflow (Scaffold->Mindmap)
 # is gated to BUILDS[id].encode, so a solo tester genuinely experiences the
 # ablated vs full study loop. Study time can then be attributed to the build.
 
@@ -430,7 +430,7 @@ def _print(r: dict) -> None:
             "*** SIMULATED harness check \u2014 the real result accrues over the "
             "weekend; faking it is an automatic fail per the spec. ***"
         )
-    print("Feature under test: encode workflow (Scaffold \u2192 Synapse)")
+    print("Feature under test: encode workflow (Scaffold \u2192 Mindmap)")
     print(f"Pre-registered ({PREREG_DOC}): {HYPOTHESIS}")
     print(
         f"Primary metric: {PRIMARY_METRIC}. Pre-registered order: "
@@ -490,7 +490,7 @@ def _render_html(r: dict) -> str:
     res = r["results"]
     demo = bool(r.get("demo"))
     parts: list[str] = [
-        "<h2>Study-feature ablation \u2014 encode workflow (Scaffold \u2192 Synapse)</h2>",
+        "<h2>Study-feature ablation \u2014 encode workflow (Scaffold \u2192 Mindmap)</h2>",
     ]
     parts.append(
         f"<p style='color:{ui.MUTED}'>Read-only. "

@@ -1,13 +1,13 @@
 # Copyright: Ankitects Pty Ltd and contributors
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
-"""Desktop MCAT "encode front-half": Scaffold -> Synapse.
+"""Desktop MCAT "encode front-half": Scaffold -> Mindmap.
 
 Interactive panels that teach encoding *before* drilling:
 
 - Scaffold: skim the whole topic for the big picture, commit hypotheses, mark the
   topic scaffolded (a synced per-topic flag).
-- Synapse: lay concepts on a canvas and draw labeled relationships between them
+- Mindmap: lay concepts on a canvas and draw labeled relationships between them
   (the higher-order encoding map; the canvas lives in ``mcat_synapse``), with a
   live, non-blocking 2-4 linter.
 
@@ -42,7 +42,7 @@ def _encode_gated(mw) -> bool:  # type: ignore[no-untyped-def]
     if ab.encode_enabled(mw.col):
         return False
     showInfo(
-        "The encode workflow (Scaffold \u2192 Synapse) is OFF in this ablation build. "
+        "The encode workflow (Scaffold \u2192 Mindmap) is OFF in this ablation build. "
         "Switch to Normal or build C in Tools \u2192 MCAT \u2192 Dev tools to use it.",
         parent=mw,
     )
@@ -50,7 +50,7 @@ def _encode_gated(mw) -> bool:  # type: ignore[no-untyped-def]
 
 
 def show(mw) -> None:  # type: ignore[no-untyped-def]
-    """The launcher: pick a topic, then open Scaffold / Synapse."""
+    """The launcher: pick a topic, then open Scaffold / Mindmap."""
     if _encode_gated(mw):
         return
     from aqt.qt import (
@@ -68,14 +68,14 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     topics = prog.all_topics()
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle("Encode: Scaffold \u2192 Synapse")
+    dialog.setWindowTitle("Encode: Scaffold \u2192 Mindmap")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
 
     layout = QVBoxLayout(dialog)
     layout.addWidget(
         QLabel(
-            "Encode before you drill: Scaffold the big picture, then map it in Synapse."
+            "Encode before you drill: Scaffold the big picture, then map it in Mindmap."
         )
     )
 
@@ -89,7 +89,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     layout.addWidget(combo)
 
     prime_btn = QPushButton("\u2460 Scaffold\u2026")
-    build_btn = QPushButton("\u2461 Synapse\u2026")
+    build_btn = QPushButton("\u2461 Mindmap\u2026")
     row = QHBoxLayout()
     for b in (prime_btn, build_btn):
         # keep both neutral/gray — don't let Scaffold become the blue default button
@@ -114,7 +114,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
 
 def open_for(mw, topic: "prog.Topic", stage: str | None = None) -> None:  # type: ignore[no-untyped-def]
     """Open one encode stage for a preselected topic (entry point for the Today
-    panel). ``stage`` is "prime" (Scaffold) or "build" (Synapse); anything else
+    panel). ``stage`` is "prime" (Scaffold) or "build" (Mindmap); anything else
     falls back to the topic-picker launcher. Keeps ``show(mw)`` standalone."""
     if _encode_gated(mw):
         return
@@ -235,7 +235,7 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
 
 
 def _build_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-def]
-    """Synapse: the higher-order encoding map.
+    """Mindmap: the higher-order encoding map.
 
     An interactive node-graph canvas (vis-network in an AnkiWebView) where the
     learner lays out concepts and draws *named* relationships between them; AI
@@ -250,7 +250,7 @@ def _build_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     spans = _spans_for(topic)
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle(f"Synapse: {topic.name}")
+    dialog.setWindowTitle(f"Mindmap: {topic.name}")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
 

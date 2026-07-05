@@ -201,7 +201,7 @@ def _render(data: dict) -> str:
     # 5. Study-feature ablation
     P.append(f"<h2>5. Study-feature ablation {_badge(abl['matches'])}</h2>")
     P.append(
-        "<p>Feature under test: the <b>encode workflow</b> (Scaffold &rarr; Synapse). "
+        "<p>Feature under test: the <b>encode workflow</b> (Scaffold &rarr; Mindmap). "
         "Three builds, equal study time, one held-out quiz. Primary metric fixed "
         "before results: accuracy per study minute, predicted order C &gt; B &gt; A.</p>"
     )

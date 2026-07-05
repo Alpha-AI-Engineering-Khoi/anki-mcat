@@ -1609,7 +1609,7 @@ title="{}" {}>{}</button>""".format(
 
     def on_mcat_aicards(self) -> None:
         # Gap-catcher flashcards unlock in week 4 (the recall phase): the program
-        # front-loads encoding (Scaffold -> Synapse), then generates cards for the
+        # front-loads encoding (Scaffold -> Mindmap), then generates cards for the
         # gaps at the end, so drilling doesn't pre-empt understanding.
         from aqt import mcat_today as _t
 
@@ -1622,7 +1622,7 @@ title="{}" {}>{}</button>""".format(
 
             showInfo(
                 "Gap-catcher flashcards unlock in week 4 (the recall phase). The "
-                "program front-loads encoding (Scaffold \u2192 Synapse), then drills the gaps "
+                "program front-loads encoding (Scaffold \u2192 Mindmap), then drills the gaps "
                 "in your concept maps at the end \u2014 so cards reinforce understanding "
                 "instead of replacing it.\n\n(Tools \u203a MCAT \u203a Dev tools \u203a jump to a "
                 "recall day to preview.)",
@@ -1672,9 +1672,9 @@ title="{}" {}>{}</button>""".format(
 
         def _open() -> None:
             # Deferred to the main event loop: opening a modal (and, from the Today
-            # board, a nested Synapse webview) *synchronously inside this webview
+            # board, a nested Mindmap webview) *synchronously inside this webview
             # message handler* leaves the nested webview blank. Running it on the
-            # next tick roots the modal stack in the main loop, so Synapse paints.
+            # next tick roots the modal stack in the main loop, so Mindmap paints.
             try:
                 if verb == "diagnostic":
                     import aqt.mcat_diagnostic

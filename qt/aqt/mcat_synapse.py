@@ -1,7 +1,7 @@
 # Copyright: Ankitects Pty Ltd and contributors
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
-"""Desktop MCAT "Synapse" canvas: the higher-order encoding map.
+"""Desktop MCAT "Mindmap" canvas: the higher-order encoding map.
 
 An interactive node-graph editor (vis-network) hosted in an ``AnkiWebView``.
 The learner lays out concepts and draws *named* relationships between them; AI
@@ -34,7 +34,7 @@ _WEB = pathlib.Path(__file__).with_name("mcat_web")
 # (vendored vis-network + synapse.js) are appended in ``build_view``.
 _MARKUP = """
 <div id="bar">
-  <span class="brand">Synapse</span>
+  <span class="brand">Mindmap</span>
   <button id="bAdd">+ Concept</button>
   <button id="bLink">Draw arrow</button>
   <button id="bDel">Delete</button>
@@ -119,7 +119,7 @@ def _auto_to_map(m: dict) -> dict:
 
 
 def build_view(mw, topic, spans, parent=None):  # type: ignore[no-untyped-def]
-    """Build the Synapse ``AnkiWebView`` for ``topic``.
+    """Build the Mindmap ``AnkiWebView`` for ``topic``.
 
     Returns ``(view, cleanup)``; call ``cleanup()`` when the host dialog closes
     so late AI callbacks don't touch a torn-down page."""

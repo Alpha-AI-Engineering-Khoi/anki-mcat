@@ -567,7 +567,7 @@ def concept_candidates(
     return _terms(spans, limit=10) or [topic_name]
 
 
-# --- Synapse map AI --------------------------------------------------------
+# --- Mindmap AI --------------------------------------------------------
 # Higher-order support for the concept map. AI only *proposes*: the learner
 # still draws and names relationships. propose_arrows / autobuild are grounded
 # in the SOURCE and degrade to honest empties offline (never fabricate links

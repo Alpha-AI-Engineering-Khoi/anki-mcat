@@ -46,7 +46,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     layout = QVBoxLayout(dialog)
     layout.addWidget(QLabel(
         "Week-4 gap-catcher: the AI drafts atomic, source-cited cards focused on "
-        "the concepts you mapped in Synapse but couldn't connect (the gaps). "
+        "the concepts you mapped in Mindmap but couldn't connect (the gaps). "
         "Review the sources, then keep the ones you want."
     ))
 
@@ -100,11 +100,11 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         gaps = topic_gaps(current_topic())
         if gaps:
             shown = ", ".join(gaps[:8]) + ("\u2026" if len(gaps) > 8 else "")
-            gaps_label.setText(f"Gaps in your Synapse map ({len(gaps)}): {shown}")
+            gaps_label.setText(f"Gaps in your Mindmap map ({len(gaps)}): {shown}")
         else:
             gaps_label.setText(
-                "No saved Synapse map for this topic \u2014 cards will cover it broadly. "
-                "Build a map in Synapse first to target the gaps."
+                "No saved Mindmap map for this topic \u2014 cards will cover it broadly. "
+                "Build a map in Mindmap first to target the gaps."
             )
 
     qconnect(combo.currentIndexChanged, lambda _i: refresh_gaps())

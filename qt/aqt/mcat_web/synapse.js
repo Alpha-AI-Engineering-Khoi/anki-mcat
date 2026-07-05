@@ -1,5 +1,5 @@
 "use strict";
-// MCAT Speedrun — Synapse canvas logic. Runs inside AnkiWebView; talks to Python
+// MCAT Speedrun — Mindmap canvas logic. Runs inside AnkiWebView; talks to Python
 // via Anki's pycmd bridge ("synapse:<verb>[:<json>]") and receives pushes through
 // the window.* callbacks below (called by mcat_synapse.py via view.eval).
 // Data model matches mcat_program.py: concepts=[{id,parent,label}], links=[{src,dst,label}].
@@ -219,7 +219,7 @@ document.getElementById("chatClose").onclick = () => document.getElementById("ch
 function addChat(who, text) {
   const log = document.getElementById("chatLog");
   const d = document.createElement("div"); d.className = "msg";
-  d.innerHTML = `<div class="${who}">${who === "me" ? "You" : "Synapse"}</div><div class="${who === "ai" ? "ai" : ""}">${(text || "").replace(/</g, "&lt;")}</div>`;
+  d.innerHTML = `<div class="${who}">${who === "me" ? "You" : "Mindmap"}</div><div class="${who === "ai" ? "ai" : ""}">${(text || "").replace(/</g, "&lt;")}</div>`;
   log.appendChild(d); log.scrollTop = log.scrollHeight;
 }
 function sendChat() {

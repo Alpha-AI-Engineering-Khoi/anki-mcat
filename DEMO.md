@@ -5,7 +5,7 @@ change, three honest scores, and re-runnable proof. This is the filming script f
 the demo, mapped to the PRD's required contents (review session, Rust change,
 phone→desktop sync, the three scores with ranges, AI features, test results).
 
-It also covers the **learning-science method** — Scaffold → Synapse → Recall → Ready —
+It also covers the **learning-science method** — Scaffold → Mindmap → Recall → Ready —
 with a 30-day program, an honest diagnostic projection, dev-tool time-travel, and
 the ablation harness that tests whether the method actually works. Lead with that
 method section for the Sunday story, then use the numbered sections as technical
@@ -45,7 +45,7 @@ Sync target is the same for both apps: `https://anki-mcat-sync.fly.dev/`
 (desktop: Preferences → Syncing; iOS: Settings → Custom sync server). Both must be
 logged into the same account for cross-device sync.
 
-## The learning-science method — Scaffold → Synapse → Recall → Ready
+## The learning-science method — Scaffold → Mindmap → Recall → Ready
 
 The core bet: **encode before you drill**. Rather than grinding flashcards from day
 one, the program front-loads understanding, then drills and scores honestly. A
@@ -56,7 +56,7 @@ one, the program front-loads understanding, then drills and scores honestly. A
 Show the home board: **Day N of 28 · phase**, today's topic, and the **30-day
 calendar** — each day colored by phase (Encode / Recall / Consolidate), today
 ringed. Tap any day to preview its plan. The stage buttons are the day's tasks:
-**Scaffold → Synapse → Recall → Ready**.
+**Scaffold → Mindmap → Recall → Ready**.
 
 ### B. Diagnostic → honest projection (Tools ▸ MCAT ▸ Diagnostic)
 
@@ -65,11 +65,11 @@ readiness range** on 472–528 and a **projected exam-day range + confidence** �
 never a bare number, and it **abstains** below 10 answers. Aggressive plan, honest
 number (the rubric's auto-fail line).
 
-### C. Scaffold → Synapse — the encode front-half (Tools ▸ MCAT ▸ Encode)
+### C. Scaffold → Mindmap — the encode front-half (Tools ▸ MCAT ▸ Encode)
 
 - **Scaffold**: skim the topic for the big picture (AI surfaces scope; you commit
   hypotheses).
-- **Synapse** (the concept map): drop concepts and draw **labeled arrows**, or let
+- **Mindmap** (the concept map): drop concepts and draw **labeled arrows**, or let
   AI help — **AI: seed concepts**, **AI: propose arrows**, **AI: auto-build** the
   whole map. Then **Chat**: "connect Speed and Velocity as scalar vs vector" and it
   adds the labeled arrow. You own the relationships; AI only proposes.
