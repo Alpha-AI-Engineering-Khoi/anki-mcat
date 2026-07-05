@@ -475,6 +475,7 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
         QInputDialog,
         QLabel,
         QPushButton,
+        Qt,
         QVBoxLayout,
         qconnect,
     )
@@ -540,6 +541,9 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
         hint.setEnabled(False)
         button = QPushButton(button_text)
         button.setFixedWidth(150)
+        # Blue = the default button (current stage); suppress the keyboard-focus
+        # ring so it isn't a double highlight (the blue fill is enough).
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         grid.addWidget(marker, index, 0)
         grid.addWidget(name, index, 1)
         grid.addWidget(hint, index, 2)
