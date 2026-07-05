@@ -215,6 +215,29 @@ def lint_concepts(concepts: list[dict], links: list[dict]) -> list[str]:
     return warnings
 
 
+def gap_concepts(concepts: list[dict], links: list[dict]) -> list[str]:
+    """The 'gaps' in a concept map: concepts the learner placed but never
+    integrated \u2014 unlinked (no edge in or out) or lone one-in/one-out
+    pass-throughs. These are exactly what the week-4 gap-catcher flashcards
+    target: the ideas you couldn't connect are the ones worth drilling."""
+    indeg: dict = {c["id"]: 0 for c in concepts}
+    outdeg: dict = {c["id"]: 0 for c in concepts}
+    for link in links:
+        if link.get("src") in outdeg:
+            outdeg[link["src"]] += 1
+        if link.get("dst") in indeg:
+            indeg[link["dst"]] += 1
+    gaps: list[str] = []
+    for c in concepts:
+        label = (c.get("label") or "").strip()
+        if not label:
+            continue
+        i, o = indeg.get(c["id"], 0), outdeg.get(c["id"], 0)
+        if (i + o) == 0 or (i == 1 and o == 1):
+            gaps.append(label)
+    return gaps
+
+
 def _self_test() -> None:
     # Linter: a node with >4 children is flagged to group into sub-chunks.
     over = [{"id": 0, "parent": None, "label": "Backbone"}] + [

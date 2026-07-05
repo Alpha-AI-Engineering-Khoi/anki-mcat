@@ -45,8 +45,9 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
 
     layout = QVBoxLayout(dialog)
     layout.addWidget(QLabel(
-        "The AI drafts atomic cards for this topic, each traced to a cited "
-        "source. Review the sources, then keep the ones you want."
+        "Week-4 gap-catcher: the AI drafts atomic, source-cited cards focused on "
+        "the concepts you mapped in Synapse but couldn't connect (the gaps). "
+        "Review the sources, then keep the ones you want."
     ))
 
     combo = QComboBox()
@@ -55,6 +56,25 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     for t in topics:
         combo.addItem(f"{t.section} \u00b7 {t.name}", t.slug)
     layout.addWidget(combo)
+
+    # Default to the program's current-day topic (the natural gap-catcher target).
+    from aqt import mcat_today as _today
+    try:
+        _cal = _today.ensure_started(mw.col)
+        _cur = _today.topic_for_day(
+            _today.effective_day_index(
+                _cal["start_date"], _today._today_str(), _today.get_day_override(mw.col)
+            ),
+            topics,
+        )
+        combo.setCurrentIndex(next((i for i, t in enumerate(topics) if t.slug == _cur.slug), 0))
+    except Exception:
+        pass
+
+    gaps_label = QLabel("")
+    gaps_label.setWordWrap(True)
+    gaps_label.setEnabled(False)
+    layout.addWidget(gaps_label)
 
     gen_btn = QPushButton("Generate cards")
     layout.addWidget(gen_btn)
@@ -72,6 +92,24 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     def current_topic() -> "prog.Topic":
         return topics[max(0, combo.currentIndex())]
 
+    def topic_gaps(topic) -> list[str]:
+        rec = prog.get_record(mw.col, topic)
+        return prog.gap_concepts(rec.get("concepts", []), rec.get("links", []))
+
+    def refresh_gaps() -> None:
+        gaps = topic_gaps(current_topic())
+        if gaps:
+            shown = ", ".join(gaps[:8]) + ("\u2026" if len(gaps) > 8 else "")
+            gaps_label.setText(f"Gaps in your Synapse map ({len(gaps)}): {shown}")
+        else:
+            gaps_label.setText(
+                "No saved Synapse map for this topic \u2014 cards will cover it broadly. "
+                "Build a map in Synapse first to target the gaps."
+            )
+
+    qconnect(combo.currentIndexChanged, lambda _i: refresh_gaps())
+    refresh_gaps()
+
     def on_generate() -> None:
         if not ws.available():
             showWarning(
@@ -84,8 +122,16 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         cards_list.clear()
         cards_list.addItem("Generating flashcards\u2026")
 
+        gaps = topic_gaps(topic)
+        query = topic.name
+        if gaps:
+            query = (
+                f"{topic.name} \u2014 focus specifically on these concepts the student "
+                f"mapped but could not connect: {', '.join(gaps[:12])}"
+            )
+
         def op(_col):  # type: ignore[no-untyped-def]
-            return ws.draft_cards(topic.name, n=10, reasoning="low")
+            return ws.draft_cards(query, n=10, reasoning="low")
 
         def done(res: dict) -> None:
             state["cards"] = res.get("cards", [])
