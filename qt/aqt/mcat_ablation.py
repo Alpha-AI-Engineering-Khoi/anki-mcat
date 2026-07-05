@@ -3,8 +3,7 @@
 
 """MCAT challenge 8: test a study feature by ablation.
 
-The study feature under test is our **encode workflow** (Prime -> Connect ->
-Build; see ``mcat_encode`` / ``mcat_program``). This module is the *harness*: it
+The study feature under test is our **encode workflow** (Spark -> Synapse; see ``mcat_encode`` / ``mcat_program``). This module is the *harness*: it
 defines the three builds, stores per-build study minutes + a held-out quiz, and
 ranks them by the pre-registered primary metric so the comparison can be run.
 
@@ -65,7 +64,7 @@ PREREG_DOC = "docs/mcat/ablation-preregistration.md"
 PRIMARY_METRIC = "held-out paraphrase accuracy per study minute"
 PREREG_ORDER: tuple[str, str, str] = ("C", "B", "A")
 HYPOTHESIS = (
-    "Studying a topic with the full Prime \u2192 Connect \u2192 Build workflow "
+    "Studying a topic with the full Spark \u2192 Synapse workflow "
     "produces higher accuracy on held-out, paraphrased, exam-style questions per "
     "equal minute of study than flashcards alone or plain Anki."
 )
@@ -85,7 +84,7 @@ class Build:
     id: str  # "A" / "B" / "C"
     name: str  # short label
     focus: bool  # Focus (points-at-stake) ordering on?
-    encode: bool  # encode workflow (Prime->Connect->Build) on?
+    encode: bool  # encode workflow (Spark->Synapse) on?
     description: str  # what is on/off
     isolates: str  # what comparing this build controls for
 
@@ -112,7 +111,7 @@ BUILDS: dict[str, Build] = {
         name="full",
         focus=True,
         encode=True,
-        description="our app: Focus ON + encode workflow (Prime \u2192 Connect \u2192 Build) ON",
+        description="our app: Focus ON + encode workflow (Spark \u2192 Synapse) ON",
         isolates="the whole method",
     ),
 }
@@ -135,7 +134,7 @@ def _require_build(build_id: str) -> None:
 
 # --- active build (the dev ablation switch) ----------------------------------
 # Which build the app is currently running as. None -> normal app (everything
-# on). A/B/C -> that build's mode: the encode workflow (Prime->Connect->Build)
+# on). A/B/C -> that build's mode: the encode workflow (Spark->Synapse)
 # is gated to BUILDS[id].encode, so a solo tester genuinely experiences the
 # ablated vs full study loop. Study time can then be attributed to the build.
 
@@ -431,7 +430,7 @@ def _print(r: dict) -> None:
             "*** SIMULATED harness check \u2014 the real result accrues over the "
             "weekend; faking it is an automatic fail per the spec. ***"
         )
-    print("Feature under test: encode workflow (Prime \u2192 Connect \u2192 Build)")
+    print("Feature under test: encode workflow (Spark \u2192 Synapse)")
     print(f"Pre-registered ({PREREG_DOC}): {HYPOTHESIS}")
     print(
         f"Primary metric: {PRIMARY_METRIC}. Pre-registered order: "
