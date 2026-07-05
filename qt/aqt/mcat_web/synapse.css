@@ -38,6 +38,8 @@ button.ai { color:var(--accent); border-color:#cdd2f2; }
 .chip.sel { background:var(--accent); color:#fff; }
 #relText { width:100%; padding:8px; border:1px solid var(--line); border-radius:7px; margin-bottom:12px; }
 .mbtns { display:flex; justify-content:flex-end; gap:8px; }
+#mDelete { margin-right:auto; color:#c0392b; border-color:#e6b0aa; }
+#mDelete:hover { background:#fdecea; border-color:#c0392b; }
 /* chat */
 #chat { position:absolute; right:0; top:49px; bottom:0; width:320px; background:var(--panel);
         border-left:1px solid var(--line); display:flex; flex-direction:column; z-index:15; }

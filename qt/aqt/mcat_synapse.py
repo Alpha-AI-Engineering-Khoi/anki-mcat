@@ -68,6 +68,7 @@ _MARKUP = """
     </div>
     <input id="relText" placeholder="or type a relationship&hellip;" />
     <div class="mbtns">
+      <button id="mDelete">Delete arrow</button>
       <button id="mCancel">Cancel</button>
       <button id="mOk" class="primary">Add</button>
     </div>

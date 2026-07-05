@@ -137,16 +137,20 @@ function relint() {
     box.innerHTML += `<div>\u201c${c.label}\u201d is a lone one-in/one-out concept \u2014 merge or re-chunk.</div>`; });
 }
 
-/* ---- label modal (chips + free-text) ---- */
-let modalCb = null, chosen = "";
-function openModal(title, cb) {
+/* ---- label modal (chips + free-text; optional prefill + delete) ---- */
+let modalCb = null, modalDelete = null, chosen = "";
+function openModal(title, cb, opts) {
+  opts = opts || {};
   document.getElementById("modalTitle").textContent = title || "Name the relationship";
-  chosen = ""; modalCb = cb;
+  chosen = ""; modalCb = cb; modalDelete = opts.onDelete || null;
   document.querySelectorAll(".chip").forEach((c) => c.classList.remove("sel"));
-  const t = document.getElementById("relText"); t.value = "";
-  document.getElementById("modal").classList.remove("hidden"); t.focus();
+  const t = document.getElementById("relText"); t.value = opts.value || "";
+  const del = document.getElementById("mDelete");
+  if (del) del.style.display = modalDelete ? "" : "none";
+  document.getElementById("mOk").textContent = opts.okText || "Add";
+  document.getElementById("modal").classList.remove("hidden"); t.focus(); t.select();
 }
-function closeModal() { document.getElementById("modal").classList.add("hidden"); modalCb = null; }
+function closeModal() { document.getElementById("modal").classList.add("hidden"); modalCb = null; modalDelete = null; }
 document.querySelectorAll(".chip").forEach((c) => c.onclick = () => {
   document.querySelectorAll(".chip").forEach((x) => x.classList.remove("sel"));
   c.classList.add("sel"); chosen = c.dataset.v; document.getElementById("relText").value = "";
@@ -157,6 +161,7 @@ document.getElementById("mOk").onclick = () => {
   const label = (chosen || document.getElementById("relText").value || "related to").trim();
   const cb = modalCb; closeModal(); if (cb) cb(label);
 };
+document.getElementById("mDelete").onclick = () => { const d = modalDelete; closeModal(); if (d) d(); };
 
 /* ---- node rename ---- */
 function editLabel(id) {
@@ -166,6 +171,27 @@ function editLabel(id) {
 network.on("doubleClick", (p) => {
   if (p.nodes && p.nodes.length) { editLabel(p.nodes[0]); return; }
   if (p.edges && p.edges.length) acceptEdge(p.edges[0]);  // double-click a pending arrow to keep it
+});
+
+/* ---- click an arrow to relabel or delete it ---- */
+function editEdge(id) {
+  const e = edges.get(id); if (!e) return;
+  openModal("Edit the arrow", (label) => {
+    if (label == null) return;               // Cancel
+    edges.update({ id, label: label });
+    relint(); status("Arrow relabeled");
+  }, {
+    value: e.label || "",
+    okText: "Save",
+    onDelete: () => { edges.remove(id); showProposed(); relint(); status("Arrow deleted"); },
+  });
+}
+network.on("click", (p) => {
+  if (p.nodes && p.nodes.length) return;                 // node click — ignore
+  if (!p.edges || !p.edges.length) return;               // empty space — ignore
+  const e = edges.get(p.edges[0]);
+  if (!e || e.pending) return;                           // pending arrows use the accept/discard flow
+  editEdge(p.edges[0]);
 });
 // proposed-arrows review banner
 document.getElementById("pKeep").onclick = () => { pendingEdges().forEach((e) => acceptEdge(e.id)); status("Kept all proposed arrows"); };
