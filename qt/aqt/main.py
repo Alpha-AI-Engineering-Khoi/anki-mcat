@@ -1700,7 +1700,16 @@ title="{}" {}>{}</button>""".format(
                 aqt.mcat_diagnostic.show(self)
             elif verb == "readiness":
                 self.on_mcat_readiness()
-            else:  # "today" or "day:N" -> open the full program board
+            elif verb.startswith(("open:", "day:")):
+                # open the program board at the day picked on the home calendar
+                import aqt.mcat_today
+
+                try:
+                    picked = int(verb.split(":", 1)[1])
+                except (ValueError, IndexError):
+                    picked = None
+                aqt.mcat_today.show(self, day=picked)
+            else:  # "today" -> open the board at the effective day
                 import aqt.mcat_today
 
                 aqt.mcat_today.show(self)

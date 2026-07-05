@@ -359,6 +359,7 @@ border-radius:9px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nu
 color:#1c1c1e;text-decoration:none;background:#e7e8ef;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
 transition:filter .15s ease}
 .mcatp-cell--today{background:var(--mcatp-accent,#4b56d2);color:#fff;box-shadow:none}
+.mcatp-cell--selected{box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 0 0 2px rgba(255,255,255,.92)}
 .mcatp-cell:focus-visible{outline:2px solid #555;outline-offset:1px}
 .mcatp-actions{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
 .mcatp-btn{display:inline-block;padding:7px 12px;border-radius:9px;font-size:12px;font-weight:600;
@@ -383,6 +384,7 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
     main.py. The caller guards against exceptions so this can never break the
     home page."""
     import html as _html  # noqa: PLC0415
+    import json  # noqa: PLC0415
 
     from aqt import mcat_program as prog  # noqa: PLC0415
 
@@ -402,13 +404,14 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         if done
         else f"Day {di + 1} of {horizon}"
     )
+    # Split the topic line into a lead span + a bold name span so day selection can
+    # update them via textContent (no innerHTML injection).
+    lead = "" if done else f"{phase} \u00b7 {topic.section} \u00b7 "
+    name = "" if done else topic.name
     topic_line = (
-        ""
-        if done
-        else (
-            f"<div class='mcatp-topic'>{phase} \u00b7 "
-            f"{_html.escape(topic.section)} \u00b7 <b>{_html.escape(topic.name)}</b></div>"
-        )
+        "<div class='mcatp-topic'>"
+        f"<span id='mcatp-lead'>{_html.escape(lead)}</span>"
+        f"<b id='mcatp-name'>{_html.escape(name)}</b></div>"
     )
 
     cells = []
@@ -417,39 +420,69 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         is_today = (not done) and d == di
         today_cls = " mcatp-cell--today" if is_today else ""
         aria = f"Day {d + 1}, {p}" + (", today" if is_today else "")
+        # Clicking SELECTS the day (client-side); "Open program" opens the selection.
         cells.append(
-            f"<a href=# onclick=\"pycmd('mcat-home:day:{d}');return false\" "
+            f'<a href=# onclick="mcatpPick(this,{d});return false" '
             f'class="mcatp-cell{today_cls}" '
             f"title=\"Day {d + 1} \u00b7 {p}\" aria-label=\"{aria}\">{d + 1}</a>"
         )
     grid = "<div class='mcatp-grid'>" + "".join(cells) + "</div>"
 
-    def _btn(label: str, cmd: str, ghost: bool = False) -> str:
-        cls = "mcatp-btn mcatp-btn--ghost" if ghost else "mcatp-btn"
+    # Per-day data for instant client-side preview when a day is picked.
+    days_data = [
+        {
+            "n": d + 1,
+            "lead": f"{day_plan(d, horizon, topics)['phase']} \u00b7 "
+            f"{day_plan(d, horizon, topics)['topic'].section} \u00b7 ",
+            "name": day_plan(d, horizon, topics)["topic"].name,
+        }
+        for d in range(horizon)
+    ]
+    default_sel = di if not done else horizon - 1
+    script = (
+        "<script>(function(){"
+        f"var DAYS={json.dumps(days_data)};var H={horizon};"
+        f"window.mcatpSel={default_sel};"
+        "window.mcatpPick=function(el,d){"
+        "var c=el.parentNode.getElementsByClassName('mcatp-cell');"
+        "for(var i=0;i<c.length;i++)c[i].classList.remove('mcatp-cell--selected');"
+        "el.classList.add('mcatp-cell--selected');window.mcatpSel=d;var o=DAYS[d];"
+        "var a=document.getElementById('mcatp-day');if(a)a.textContent='Day '+o.n+' of '+H;"
+        "var l=document.getElementById('mcatp-lead');if(l)l.textContent=o.lead;"
+        "var b=document.getElementById('mcatp-name');if(b)b.textContent=o.name;};"
+        "})();</script>"
+    )
+
+    open_btn = (
+        "<a href=# onclick=\"pycmd('mcat-home:open:'+window.mcatpSel);return false\" "
+        "class='mcatp-btn'>Open program \u25b8</a>"
+    )
+
+    def _ghost(label: str, cmd: str) -> str:
         return (
             f"<a href=# onclick=\"pycmd('mcat-home:{cmd}');return false\" "
-            f'class="{cls}">{label}</a>'
+            f'class="mcatp-btn mcatp-btn--ghost">{label}</a>'
         )
 
-    actions = (
-        _btn("Open program \u25b8", "today")
-        + _btn("Diagnostic", "diagnostic", ghost=True)
-        + _btn("Readiness", "readiness", ghost=True)
-    )
+    actions = open_btn + _ghost("Diagnostic", "diagnostic") + _ghost("Readiness", "readiness")
 
     return (
         _HOME_CSS
         + f"<div class='mcatp-wrap' style='--mcatp-accent:{accent}'>"
         + "<div class='mcatp-head'><div class='mcatp-title'>MCAT program</div>"
-        + f"<div class='mcatp-day'>{head_day}</div></div>"
+        + f"<div class='mcatp-day' id='mcatp-day'>{head_day}</div></div>"
         + f"{topic_line}{grid}"
         + f"<div class='mcatp-actions'>{actions}</div></div>"
+        + script
     )
 
 
-def show(mw) -> None:  # type: ignore[no-untyped-def]
+def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
     """The Today front door: today's phase + topic, the five stage buttons, a
-    daily reflection, a progress line, and a compact readiness snapshot."""
+    daily reflection, a progress line, and a compact readiness snapshot.
+
+    ``day`` (0-based, optional) opens the board previewing that program day — the
+    date picked on the home dashboard — instead of the effective "today"."""
     from aqt import mcat_ablation as ab  # noqa: PLC0415
     from aqt import mcat_encode as encode  # noqa: PLC0415
     from aqt import mcat_models as m  # noqa: PLC0415
@@ -477,6 +510,8 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     cal = ensure_started(col)
 
     def eff_di() -> int:
+        if day is not None:
+            return max(0, min(int(day), cal["horizon_days"] - 1))
         return effective_day_index(cal["start_date"], _today_str(), get_day_override(col))
 
     holder: dict = {"assessment": None}
