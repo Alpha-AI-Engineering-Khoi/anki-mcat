@@ -25,6 +25,7 @@ from aqt import mcat_today as today
 
 def show(mw) -> None:  # type: ignore[no-untyped-def]
     from aqt.qt import (
+        QComboBox,
         QDialog,
         QDialogButtonBox,
         QFrame,
@@ -101,6 +102,49 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         brow.addWidget(btn)
     layout.addLayout(brow)
 
+    line2 = QFrame()
+    line2.setFrameShape(QFrame.Shape.HLine)
+    line2.setEnabled(False)
+    layout.addWidget(line2)
+
+    # --- ablation pilot logging (record a study block + held-out quiz per build) ---
+    layout.addWidget(
+        QLabel("<b>Ablation pilot logging</b> \u2014 record a study block's minutes and a "
+               "held-out quiz result to a build, then open the comparison")
+    )
+    log_row = QHBoxLayout()
+    log_row.addWidget(QLabel("Build:"))
+    build_combo = QComboBox()
+    for bid in ab.BUILD_IDS:
+        build_combo.addItem(f"{bid} \u00b7 {ab.BUILDS[bid].name}", bid)
+    log_row.addWidget(build_combo)
+    log_row.addWidget(QLabel("minutes:"))
+    min_spin = QSpinBox()
+    min_spin.setRange(0, 600)
+    min_spin.setValue(25)
+    log_row.addWidget(min_spin)
+    min_btn = QPushButton("Log minutes")
+    log_row.addWidget(min_btn)
+    log_row.addStretch(1)
+    layout.addLayout(log_row)
+
+    quiz_row = QHBoxLayout()
+    quiz_row.addWidget(QLabel("quiz correct:"))
+    correct_spin = QSpinBox()
+    correct_spin.setRange(0, 500)
+    quiz_row.addWidget(correct_spin)
+    quiz_row.addWidget(QLabel("/ attempts:"))
+    attempts_spin = QSpinBox()
+    attempts_spin.setRange(0, 500)
+    attempts_spin.setValue(10)
+    quiz_row.addWidget(attempts_spin)
+    quiz_btn = QPushButton("Log quiz")
+    quiz_row.addWidget(quiz_btn)
+    results_btn = QPushButton("Open results\u2026")
+    quiz_row.addWidget(results_btn)
+    quiz_row.addStretch(1)
+    layout.addLayout(quiz_row)
+
     buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
     qconnect(buttons.rejected, dialog.reject)
     layout.addWidget(buttons)
@@ -137,13 +181,33 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         tooltip(f"Switched to {('build ' + build_id) if build_id else 'Normal'}.", parent=mw)
         refresh()
 
+    def log_minutes() -> None:
+        bid = build_combo.currentData()
+        ab.record_session(col, bid, float(min_spin.value()))
+        tooltip(f"Logged {min_spin.value()} min to build {bid}.", parent=mw)
+
+    def log_quiz() -> None:
+        bid = build_combo.currentData()
+        c, a = correct_spin.value(), attempts_spin.value()
+        if a <= 0 or c > a:
+            tooltip("Need 0 \u2264 correct \u2264 attempts, and attempts > 0.", parent=mw)
+            return
+        ab.record_quiz(col, bid, c, a)
+        tooltip(f"Logged quiz {c}/{a} to build {bid}.", parent=mw)
+
+    def open_results() -> None:
+        ab.show(mw)
+
     qconnect(jump_btn.clicked, do_jump)
     qconnect(reset_btn.clicked, do_reset)
     qconnect(normal_btn.clicked, lambda: set_build(None))
     qconnect(a_btn.clicked, lambda: set_build("A"))
     qconnect(b_btn.clicked, lambda: set_build("B"))
     qconnect(c_btn.clicked, lambda: set_build("C"))
+    qconnect(min_btn.clicked, log_minutes)
+    qconnect(quiz_btn.clicked, log_quiz)
+    qconnect(results_btn.clicked, open_results)
 
     refresh()
-    dialog.resize(600, 320)
+    dialog.resize(620, 420)
     dialog.exec()
