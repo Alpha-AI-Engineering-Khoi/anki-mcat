@@ -55,7 +55,6 @@ _MARKUP = """
   <button id="pKeep" class="primary">Keep all</button>
   <button id="pDiscard">Discard</button>
 </div>
-<div id="hint">Drag concepts to arrange &middot; "Draw arrow" then drag node&rarr;node &middot; double-click to rename.</div>
 
 <div id="modal" class="hidden">
   <div class="card">
