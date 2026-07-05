@@ -511,15 +511,6 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
     subhead.setWordWrap(True)
     layout.addWidget(subhead)
 
-    dev_banner = QLabel("")
-    dev_banner.setWordWrap(True)
-    dev_banner.setStyleSheet(
-        "background:#fff4d6; border:1px solid #f0c96b; border-radius:6px; "
-        "padding:3px 8px; color:#7a5300;"
-    )
-    dev_banner.setVisible(False)
-    layout.addWidget(dev_banner)
-
     plan_line = QLabel("")
     plan_line.setEnabled(False)
     plan_line.setWordWrap(True)
@@ -690,17 +681,6 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
             is_current = s == current
             stage_buttons[s].setDefault(is_current)
             stage_buttons[s].setAutoDefault(is_current)
-
-        override = get_day_override(col)
-        bits = []
-        if override is not None:
-            bits.append(f"DEV \u2014 viewing day {override + 1} of {horizon} (not the real date)")
-        if build:
-            bits.append(
-                f"Build {build}: {ab.BUILDS[build].name} \u00b7 encode {'on' if enc_on else 'off'}"
-            )
-        dev_banner.setText("      ".join(bits))
-        dev_banner.setVisible(bool(bits))
 
         progress.setText(f"Stages done today: {sum(done.values())} / {len(STAGES)}")
 
