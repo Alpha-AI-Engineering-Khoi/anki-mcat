@@ -295,285 +295,42 @@ def _connect_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped
 
 
 def _build_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-def]
-    from aqt.qt import (
-        QComboBox,
-        QDialog,
-        QDialogButtonBox,
-        QGroupBox,
-        QHBoxLayout,
-        QInputDialog,
-        QLabel,
-        QLineEdit,
-        QListWidget,
-        QPushButton,
-        QTreeWidget,
-        QTreeWidgetItem,
-        QVBoxLayout,
-        Qt,
-        qconnect,
-    )
-    from aqt.utils import disable_help_button, showInfo, tooltip
+    """Synapse: the higher-order encoding map.
+
+    An interactive node-graph canvas (vis-network in an AnkiWebView) where the
+    learner lays out concepts and draws *named* relationships between them; AI
+    only proposes (seed / propose arrows / auto-build a whole map to react to)
+    and coaches via chat. Replaces the old outline+links tree editor. All the
+    canvas wiring lives in ``mcat_synapse``; this is just the host dialog."""
+    from aqt.qt import QDialog, QDialogButtonBox, QVBoxLayout, qconnect
+    from aqt.utils import disable_help_button
+
+    from aqt import mcat_synapse as syn
 
     spans = _spans_for(topic)
-    rec = prog.get_record(mw.col, topic)
-    links: list[dict] = [dict(link) for link in rec.get("links", [])]
-    next_id = [0]
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle(f"Build: {topic.name}")
+    dialog.setWindowTitle(f"Synapse: {topic.name}")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
 
     outer = QVBoxLayout(dialog)
-    outer.addWidget(
-        QLabel(
-            "Lay out the backbone \u2192 chunks \u2192 sub-concepts \u2192 details, "
-            "then link them. Warnings are hints, never blocks."
-        )
-    )
+    outer.setContentsMargins(0, 0, 0, 0)
+    outer.setSpacing(0)
 
-    panes = QHBoxLayout()
-    outer.addLayout(panes)
+    view, cleanup = syn.build_view(mw, topic, spans, parent=dialog)
+    outer.addWidget(view, 1)
 
-    # --- concepts pane ---
-    concepts_box = QGroupBox("Concepts (outline)")
-    concepts_layout = QVBoxLayout(concepts_box)
-    tree = QTreeWidget()
-    tree.setHeaderHidden(True)
-    concepts_layout.addWidget(tree)
-    cbtns = QHBoxLayout()
-    add_root_btn = QPushButton("Add root")
-    add_child_btn = QPushButton("Add child")
-    del_btn = QPushButton("Delete")
-    draft_btn = QPushButton("Draft (AI)")
-    for b in (add_root_btn, add_child_btn, del_btn, draft_btn):
-        cbtns.addWidget(b)
-    concepts_layout.addLayout(cbtns)
-    panes.addWidget(concepts_box, 3)
-
-    # --- links pane ---
-    links_box = QGroupBox("Links")
-    links_layout = QVBoxLayout(links_box)
-    links_layout.addWidget(QLabel("Select a source concept, pick a target, name the relationship:"))
-    target_combo = QComboBox()
-    links_layout.addWidget(target_combo)
-    rel_edit = QLineEdit()
-    rel_edit.setPlaceholderText("relationship, e.g. causes / part of / contrast with")
-    links_layout.addWidget(rel_edit)
-    add_link_btn = QPushButton("Add link")
-    links_layout.addWidget(add_link_btn)
-    links_list = QListWidget()
-    links_layout.addWidget(links_list)
-    del_link_btn = QPushButton("Remove selected link")
-    links_layout.addWidget(del_link_btn)
-    panes.addWidget(links_box, 2)
-
-    # --- warnings + overflow ---
-    outer.addWidget(QLabel("Warnings (2\u20134 linter):"))
-    warn_list = QListWidget()
-    warn_list.setMaximumHeight(90)
-    outer.addWidget(warn_list)
-
-    buttons = QDialogButtonBox()
-    overflow_btn = buttons.addButton(
-        "Send to cards\u2026", QDialogButtonBox.ButtonRole.ActionRole
-    )
-    save_btn = buttons.addButton("Save map", QDialogButtonBox.ButtonRole.ActionRole)
-    buttons.addButton(QDialogButtonBox.StandardButton.Close)
+    buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+    buttons.setContentsMargins(8, 4, 8, 8)
+    qconnect(buttons.rejected, dialog.reject)
     outer.addWidget(buttons)
 
-    def make_item(label: str, cid: int) -> "QTreeWidgetItem":
-        item = QTreeWidgetItem([label])
-        item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
-        item.setData(0, Qt.ItemDataRole.UserRole, cid)
-        return item
+    # Tear down the webview on close so a late AI callback can't touch a
+    # torn-down page. (Save is explicit, via the in-canvas "Save map" button.)
+    qconnect(dialog.finished, lambda _code: cleanup())
 
-    def collect() -> list[dict]:
-        out: list[dict] = []
-
-        def walk(item, parent_id) -> None:
-            cid = item.data(0, Qt.ItemDataRole.UserRole)
-            out.append({"id": cid, "parent": parent_id, "label": item.text(0).strip()})
-            for i in range(item.childCount()):
-                walk(item.child(i), cid)
-
-        for i in range(tree.topLevelItemCount()):
-            walk(tree.topLevelItem(i), None)
-        return out
-
-    def refresh_targets(concepts: list[dict]) -> None:
-        target_combo.clear()
-        for c in concepts:
-            target_combo.addItem(c["label"] or "(unnamed)", c["id"])
-
-    def refresh_links(concepts: list[dict]) -> None:
-        label_of = {c["id"]: (c["label"] or "(unnamed)") for c in concepts}
-        links_list.clear()
-        for link in links:
-            src = label_of.get(link["src"], "?")
-            dst = label_of.get(link["dst"], "?")
-            links_list.addItem(f"{src} \u2014[{link['label']}]\u2192 {dst}")
-
-    def refresh_warnings(concepts: list[dict]) -> None:
-        warn_list.clear()
-        warnings = prog.lint_concepts(concepts, links)
-        if not warnings:
-            warn_list.addItem("No warnings \u2014 nicely chunked.")
-            return
-        for w in warnings:
-            warn_list.addItem("\u26a0 " + w)
-
-    def refresh_all() -> None:
-        concepts = collect()
-        refresh_targets(concepts)
-        refresh_links(concepts)
-        refresh_warnings(concepts)
-
-    def add_root() -> None:
-        text, ok = QInputDialog.getText(dialog, "Add concept", "Concept:")
-        if ok and text.strip():
-            tree.addTopLevelItem(make_item(text.strip(), next_id[0]))
-            next_id[0] += 1
-            refresh_all()
-
-    def add_child() -> None:
-        parent = tree.currentItem()
-        if parent is None:
-            showInfo("Select a concept first, then Add child.", parent=dialog)
-            return
-        text, ok = QInputDialog.getText(dialog, "Add sub-concept", "Sub-concept:")
-        if ok and text.strip():
-            parent.addChild(make_item(text.strip(), next_id[0]))
-            next_id[0] += 1
-            parent.setExpanded(True)
-            refresh_all()
-
-    def delete_current() -> None:
-        item = tree.currentItem()
-        if item is None:
-            return
-        removed = {
-            c["id"]
-            for c in _subtree_ids(item)
-        }
-        # prune links touching any removed concept
-        links[:] = [
-            link for link in links if link["src"] not in removed and link["dst"] not in removed
-        ]
-        parent = item.parent()
-        if parent is None:
-            tree.takeTopLevelItem(tree.indexOfTopLevelItem(item))
-        else:
-            parent.removeChild(item)
-        refresh_all()
-
-    def _subtree_ids(item) -> list[dict]:
-        out = [{"id": item.data(0, Qt.ItemDataRole.UserRole)}]
-        for i in range(item.childCount()):
-            out.extend(_subtree_ids(item.child(i)))
-        return out
-
-    def draft_ai() -> None:
-        candidates = ai.concept_candidates(spans, topic.name)
-        for label in candidates:
-            tree.addTopLevelItem(make_item(label, next_id[0]))
-            next_id[0] += 1
-        refresh_all()
-        # ponytail: "suggest missing links" is a one-shot hint on unlinked
-        # concepts, not an inline suggestion engine. Ceiling: no ranked link
-        # proposals; the learner draws the relationships.
-        concepts = collect()
-        linked = {link["src"] for link in links} | {link["dst"] for link in links}
-        unlinked = [c["label"] for c in concepts if c["id"] not in linked]
-        msg = f"Added {len(candidates)} candidate concept(s) \u2014 edit or delete freely."
-        if unlinked:
-            msg += "\nNo links yet on: " + ", ".join(unlinked[:6])
-        tooltip(msg, parent=mw, period=4000)
-
-    def add_link() -> None:
-        source = tree.currentItem()
-        if source is None:
-            showInfo("Select the source concept in the outline first.", parent=dialog)
-            return
-        if target_combo.currentIndex() < 0:
-            showInfo("Add a concept to link to first.", parent=dialog)
-            return
-        src_id = source.data(0, Qt.ItemDataRole.UserRole)
-        dst_id = target_combo.currentData()
-        if src_id == dst_id:
-            showInfo("Link two different concepts.", parent=dialog)
-            return
-        label = rel_edit.text().strip() or "relates to"
-        links.append({"src": src_id, "dst": dst_id, "label": label})
-        rel_edit.clear()
-        refresh_all()
-
-    def remove_link() -> None:
-        row = links_list.currentRow()
-        if 0 <= row < len(links):
-            del links[row]
-            refresh_all()
-
-    def send_to_cards() -> None:
-        item = tree.currentItem()
-        if item is None:
-            showInfo("Select the detail concept you couldn't relate.", parent=dialog)
-            return
-        if not spans:
-            # No bundled source for this topic, so a card made here could not
-            # trace back to a named source. Block it rather than adding untraced.
-            showInfo(
-                f"\u201c{topic.name}\u201d has no bundled source document yet, so a "
-                "card made here couldn't be traced to a named source.\n\nSend to "
-                "cards is disabled for this topic.",
-                parent=dialog,
-            )
-            return
-        _confirm_overflow_card(mw, topic, spans, item.text(0).strip())
-
-    def persist() -> None:
-        prog.save_build(mw.col, topic, collect(), list(links))
-
-    def persist_on_close() -> None:
-        # Don't write an empty record just because Build was opened; only save
-        # when there's something now, or something was saved before.
-        if collect() or links or rec.get("concepts") or rec.get("links"):
-            persist()
-
-    def do_save() -> None:
-        persist()
-        tooltip(f"Saved the map for \u201c{topic.name}\u201d.", parent=mw)
-
-    # Load an existing map, then wire signals (so loading doesn't re-lint per row).
-    saved_concepts = rec.get("concepts") or []
-    if saved_concepts:
-        item_by_id: dict = {}
-        for c in saved_concepts:
-            item_by_id[c["id"]] = make_item(c["label"], c["id"])
-            next_id[0] = max(next_id[0], int(c["id"]) + 1)
-        for c in saved_concepts:
-            item = item_by_id[c["id"]]
-            parent_id = c.get("parent")
-            if parent_id is None or parent_id not in item_by_id:
-                tree.addTopLevelItem(item)
-            else:
-                item_by_id[parent_id].addChild(item)
-        tree.expandAll()
-
-    qconnect(add_root_btn.clicked, add_root)
-    qconnect(add_child_btn.clicked, add_child)
-    qconnect(del_btn.clicked, delete_current)
-    qconnect(draft_btn.clicked, draft_ai)
-    qconnect(add_link_btn.clicked, add_link)
-    qconnect(del_link_btn.clicked, remove_link)
-    qconnect(overflow_btn.clicked, send_to_cards)
-    qconnect(save_btn.clicked, do_save)
-    qconnect(buttons.rejected, dialog.reject)
-    qconnect(tree.itemChanged, lambda _i, _c: refresh_all())
-    qconnect(dialog.finished, lambda _code: persist_on_close())
-
-    refresh_all()
-    dialog.resize(780, 560)
+    dialog.resize(1040, 700)
     dialog.exec()
 
 

@@ -1,0 +1,48 @@
+/* MCAT Speedrun — Synapse canvas styles. Served inline by mcat_synapse.py via
+   AnkiWebView.stdHtml (default_css off), so this fully owns the page look. */
+:root { --bg:#f6f7fb; --panel:#ffffff; --ink:#1a1a1a; --sub:#666; --accent:#4b56d2;
+        --line:#e2e4ee; --chip:#eef0fb; }
+* { box-sizing:border-box; }
+html,body { margin:0; padding:0; height:100%; width:100%;
+            font-family:-apple-system,Helvetica,Arial,sans-serif;
+            color:var(--ink); background:var(--bg); overflow:hidden; }
+#bar { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--panel);
+       border-bottom:1px solid var(--line); flex-wrap:wrap; }
+#bar .brand { font-weight:700; font-size:15px; color:var(--accent); margin-right:6px; letter-spacing:.2px; }
+#bar .grow { flex:1; }
+#bar .sep { width:1px; height:20px; background:var(--line); margin:0 4px; }
+button { font:inherit; font-size:13px; padding:6px 11px; border:1px solid var(--line);
+         background:#fff; color:var(--ink); border-radius:7px; cursor:pointer; }
+button:hover { border-color:#c7cbe0; }
+button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+button.ai { color:var(--accent); border-color:#cdd2f2; }
+#status { font-size:12px; color:var(--sub); margin-right:6px; }
+#net { position:absolute; top:49px; bottom:0; left:0; right:0; }
+#hint { position:absolute; left:12px; bottom:10px; font-size:11px; color:var(--sub);
+        background:rgba(255,255,255,.8); padding:4px 8px; border-radius:6px; pointer-events:none; }
+#warn { position:absolute; right:12px; top:58px; max-width:300px; font-size:11px; color:#8a5a00; }
+#warn div { background:#fff7e6; border:1px solid #ffe1a6; border-radius:6px; padding:4px 8px; margin-bottom:4px; }
+.hidden { display:none !important; }
+/* modal */
+#modal { position:absolute; inset:0; background:rgba(20,20,30,.28); display:flex;
+         align-items:center; justify-content:center; z-index:20; }
+#modal .card { background:#fff; border-radius:12px; padding:18px; width:340px; box-shadow:0 8px 30px rgba(0,0,0,.18); }
+#modal .mtitle { font-weight:600; margin-bottom:10px; }
+#chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.chip { background:var(--chip); border:1px solid #dfe3f7; color:var(--accent); border-radius:999px; padding:5px 12px; }
+.chip.sel { background:var(--accent); color:#fff; }
+#relText { width:100%; padding:8px; border:1px solid var(--line); border-radius:7px; margin-bottom:12px; }
+.mbtns { display:flex; justify-content:flex-end; gap:8px; }
+/* chat */
+#chat { position:absolute; right:0; top:49px; bottom:0; width:320px; background:var(--panel);
+        border-left:1px solid var(--line); display:flex; flex-direction:column; z-index:15; }
+.chead { display:flex; justify-content:space-between; align-items:center; padding:10px 12px;
+         border-bottom:1px solid var(--line); font-weight:600; }
+.chead button { border:none; font-size:18px; padding:0 6px; }
+#chatLog { flex:1; overflow:auto; padding:10px 12px; font-size:13px; }
+#chatLog .msg { margin-bottom:10px; }
+#chatLog .me { color:var(--ink); font-weight:600; }
+#chatLog .ai { color:#333; background:#f2f3fb; border-radius:8px; padding:8px 10px; white-space:pre-wrap; }
+.crow { display:flex; gap:6px; padding:10px; border-top:1px solid var(--line); }
+.crow input { flex:1; padding:8px; border:1px solid var(--line); border-radius:7px; }
+.spin { opacity:.6; pointer-events:none; }
