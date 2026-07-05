@@ -1499,6 +1499,11 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat.addAction(self.action_mcat_ablation)
         qconnect(self.action_mcat_ablation.triggered, self.on_mcat_ablation)
 
+        self.action_mcat_evidence = QAction("Evidence", self)
+        self.action_mcat_evidence.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_evidence)
+        qconnect(self.action_mcat_evidence.triggered, self.on_mcat_evidence)
+
         self.menu_mcat.addSeparator()
 
         self.action_mcat_library = QAction("Library", self)
@@ -1699,6 +1704,11 @@ title="{}" {}>{}</button>""".format(
         import aqt.mcat_ablation
 
         aqt.mcat_ablation.show(self)
+
+    def on_mcat_evidence(self) -> None:
+        import aqt.mcat_evidence
+
+        aqt.mcat_evidence.show(self)
 
     def on_mcat_devtools(self) -> None:
         import aqt.mcat_devtools
