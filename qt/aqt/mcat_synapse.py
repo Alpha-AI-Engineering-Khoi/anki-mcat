@@ -50,6 +50,11 @@ _MARKUP = """
 </div>
 <div id="net"></div>
 <div id="warn"></div>
+<div id="proposed" class="hidden">
+  <span id="proposedText"></span>
+  <button id="pKeep" class="primary">Keep all</button>
+  <button id="pDiscard">Discard</button>
+</div>
 <div id="hint">Drag concepts to arrange &middot; "Draw arrow" then drag node&rarr;node &middot; double-click to rename.</div>
 
 <div id="modal" class="hidden">

@@ -22,6 +22,11 @@ button.ai { color:var(--accent); border-color:#cdd2f2; }
         background:rgba(255,255,255,.8); padding:4px 8px; border-radius:6px; pointer-events:none; }
 #warn { position:absolute; right:12px; top:58px; max-width:300px; font-size:11px; color:#8a5a00; }
 #warn div { background:#fff7e6; border:1px solid #ffe1a6; border-radius:6px; padding:4px 8px; margin-bottom:4px; }
+#proposed { position:absolute; top:58px; left:50%; transform:translateX(-50%); z-index:16;
+            background:#fff7e6; border:1px solid #f0c66b; border-radius:8px; padding:6px 10px;
+            display:flex; align-items:center; gap:8px; font-size:12px; color:#7a5300;
+            box-shadow:0 4px 14px rgba(0,0,0,.12); }
+#proposed button { font-size:12px; padding:4px 10px; }
 .hidden { display:none !important; }
 /* modal */
 #modal { position:absolute; inset:0; background:rgba(20,20,30,.28); display:flex;

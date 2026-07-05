@@ -47,8 +47,28 @@ function nextId() { const ids = nodes.getIds().map(Number).filter((n) => !isNaN(
 function collect() {
   return {
     concepts: nodes.get().map((n) => ({ id: Number(n.id), parent: (n.parent ?? null), label: (n.label || "").trim() })),
-    links: edges.get().map((e) => ({ src: Number(e.from), dst: Number(e.to), label: (e.label || "").trim() })),
+    // pending AI proposals are NOT saved until the learner accepts them
+    links: edges.get().filter((e) => !e.pending).map((e) => ({ src: Number(e.from), dst: Number(e.to), label: (e.label || "").trim() })),
   };
+}
+function pendingEdges() { return edges.get().filter((e) => e.pending); }
+function showProposed() {
+  const c = pendingEdges().length;
+  const box = document.getElementById("proposed");
+  if (c > 0) {
+    document.getElementById("proposedText").textContent =
+      "AI proposed " + c + " arrow" + (c > 1 ? "s" : "") +
+      " (dashed) \u2014 double-click one to keep it, select + Delete to drop it, or:";
+    box.classList.remove("hidden");
+  } else {
+    box.classList.add("hidden");
+  }
+}
+function acceptEdge(id) {
+  const e = edges.get(id);
+  if (!e || !e.pending) return;
+  edges.update({ id, pending: false, dashes: false, color: { color: "#9aa0c7", highlight: "#4b56d2" } });
+  showProposed(); relint();
 }
 // Python -> JS: replace the whole map (initial load or AI auto-build).
 window.loadMap = function (json) {
@@ -56,7 +76,7 @@ window.loadMap = function (json) {
   nodes.clear(); edges.clear();
   nodes.add((m.concepts || []).map((c) => ({ id: c.id, label: c.label, parent: c.parent ?? null })));
   edges.add((m.links || []).map((l, i) => ({ id: "e" + i, from: l.src, to: l.dst, label: l.label || "", arrows: "to" })));
-  relint(); busy(false); status("Loaded " + (m.concepts || []).length + " concepts"); refit();
+  relint(); busy(false); status("Loaded " + (m.concepts || []).length + " concepts"); showProposed(); refit();
 };
 // Python -> JS: add fresh concept nodes (auto-ids), keeping the current map.
 window.applyNodes = function (json) {
@@ -72,9 +92,13 @@ window.applyLinks = function (json) {
   let base = edges.length, n = 0;
   arr.forEach((l) => {
     const s = byLabel[(l.src_label || "").trim().toLowerCase()], d = byLabel[(l.dst_label || "").trim().toLowerCase()];
-    if (s != null && d != null && s !== d) { edges.add({ id: "a" + (base + n++), from: s, to: d, label: l.label || "", arrows: "to" }); }
+    if (s != null && d != null && s !== d) {
+      // proposed arrows land as PENDING (dashed amber): the learner accepts or rejects
+      edges.add({ id: "p" + (base + n++), from: s, to: d, label: l.label || "", arrows: "to",
+                  pending: true, dashes: true, color: { color: "#f0a500", highlight: "#e08a00" } });
+    }
   });
-  relint(); busy(false); status("AI proposed " + n + " arrows"); refit();
+  busy(false); status("AI proposed " + n + " arrow" + (n !== 1 ? "s" : "") + " \u2014 review below"); showProposed(); refit();
 };
 window.chatReply = function (text) { addChat("ai", text); busy(false); };
 // Python -> JS: apply a batch of edits from the chat assistant (add concepts,
@@ -106,7 +130,7 @@ window.applyOps = function (json) {
 /* ---- linter (mirrors mcat_program.lint_concepts, non-blocking) ---- */
 function relint() {
   const box = document.getElementById("warn"); box.innerHTML = "";
-  const cs = nodes.get(), es = edges.get();
+  const cs = nodes.get(), es = edges.get().filter((e) => !e.pending);
   const indeg = {}, outdeg = {}; cs.forEach((c) => { indeg[c.id] = 0; outdeg[c.id] = 0; });
   es.forEach((e) => { if (outdeg[e.from] != null) outdeg[e.from]++; if (indeg[e.to] != null) indeg[e.to]++; });
   cs.forEach((c) => { if (indeg[c.id] === 1 && outdeg[c.id] === 1)
@@ -139,7 +163,16 @@ function editLabel(id) {
   const n = nodes.get(id); if (!n) return;
   const v = window.prompt("Concept name:", n.label || ""); if (v != null) { nodes.update({ id, label: v.trim() }); relint(); }
 }
-network.on("doubleClick", (p) => { if (p.nodes && p.nodes.length) editLabel(p.nodes[0]); });
+network.on("doubleClick", (p) => {
+  if (p.nodes && p.nodes.length) { editLabel(p.nodes[0]); return; }
+  if (p.edges && p.edges.length) acceptEdge(p.edges[0]);  // double-click a pending arrow to keep it
+});
+// proposed-arrows review banner
+document.getElementById("pKeep").onclick = () => { pendingEdges().forEach((e) => acceptEdge(e.id)); status("Kept all proposed arrows"); };
+document.getElementById("pDiscard").onclick = () => {
+  const ids = pendingEdges().map((e) => e.id);
+  edges.remove(ids); showProposed(); relint(); status("Discarded " + ids.length + " proposed arrows");
+};
 
 /* ---- toolbar ---- */
 document.getElementById("bAdd").onclick = () => network.addNodeMode();
