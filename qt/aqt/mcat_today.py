@@ -332,6 +332,101 @@ def _snapshot_html(assessment) -> str:
     )
 
 
+def home_html(col) -> str:  # type: ignore[no-untyped-def]
+    """Compact program dashboard prepended to the deck-browser home page (the real
+    front door): Day N of H, phase + topic, a phase-colored calendar with today
+    ringed, and quick actions. Read-only (uses ``get_cal`` — no writes in the
+    render path); clicks route through ``pycmd('mcat-home:...')`` handled in
+    main.py. The caller guards against exceptions so this can never break the
+    home page."""
+    import html as _html  # noqa: PLC0415
+
+    from aqt import mcat_program as prog  # noqa: PLC0415
+
+    cal = get_cal(col)
+    horizon = cal["horizon_days"]
+    di = effective_day_index(cal["start_date"], _today_str(), get_day_override(col))
+    topics = prog.all_topics()
+    done = di >= horizon
+    show_day = di if not done else horizon - 1
+    plan = day_plan(show_day, horizon, topics)
+    topic = plan["topic"]
+    phase = plan["phase"]
+    accent = _PHASE_ACCENT.get(phase, "#4b56d2")
+
+    head_day = (
+        f"Program complete \u2014 {horizon}-day plan finished"
+        if done
+        else f"Day {di + 1} of {horizon}"
+    )
+    topic_line = (
+        ""
+        if done
+        else (
+            f"<div style='font-size:13px;opacity:.8;margin-top:3px'>{phase} \u00b7 "
+            f"{_html.escape(topic.section)} \u00b7 <b>{_html.escape(topic.name)}</b></div>"
+        )
+    )
+
+    cells = []
+    for d in range(horizon):
+        p = phase_for(d, horizon)
+        bg = _PHASE_BG.get(p, "#eee")
+        ac = _PHASE_ACCENT.get(p, "#888")
+        is_today = (not done) and d == di
+        border = f"2px solid {ac}" if is_today else "1px solid rgba(128,128,128,.35)"
+        weight = "800" if is_today else "500"
+        cells.append(
+            f"<a href=# onclick=\"pycmd('mcat-home:day:{d}');return false\" "
+            f'title="Day {d + 1} \u00b7 {p}" '
+            f"style=\"display:flex;align-items:center;justify-content:center;"
+            f"width:34px;height:28px;background:{bg};border:{border};border-radius:6px;"
+            f'color:#222;font-weight:{weight};font-size:12px;text-decoration:none">{d + 1}</a>'
+        )
+    grid = (
+        "<div style='display:grid;grid-template-columns:repeat(7,34px);gap:4px;"
+        "justify-content:center;margin:10px 0'>" + "".join(cells) + "</div>"
+    )
+
+    def _chip(label: str, p: str) -> str:
+        return (
+            f"<span style='background:{_PHASE_BG[p]};border:1px solid {_PHASE_ACCENT[p]};"
+            f"padding:1px 6px;border-radius:4px;color:#222;font-size:11px'>{label}</span>"
+        )
+
+    legend = (
+        _chip("Encode", PHASE_ENCODE) + " " + _chip("Recall", PHASE_RECALL) + " "
+        + _chip("Consolidate", PHASE_CONSOLIDATE) + " &nbsp;<b>ring = today</b>"
+    )
+
+    def _btn(label: str, cmd: str) -> str:
+        return (
+            f"<a href=# onclick=\"pycmd('mcat-home:{cmd}');return false\" "
+            f"style='display:inline-block;padding:6px 14px;margin:0 4px;border-radius:7px;"
+            f"background:{accent};color:#fff;font-weight:600;font-size:12px;"
+            f"text-decoration:none'>{label}</a>"
+        )
+
+    actions = (
+        _btn("Open program \u25b8", "today")
+        + _btn("Diagnostic", "diagnostic")
+        + _btn("Readiness", "readiness")
+    )
+
+    return (
+        "<div style=\"max-width:640px;margin:0 auto 16px;padding:14px 18px;"
+        "border:1px solid rgba(128,128,128,.3);border-radius:12px;"
+        "background:linear-gradient(180deg,rgba(75,86,210,.08),rgba(75,86,210,0))\">"
+        "<div style='display:flex;justify-content:space-between;align-items:baseline'>"
+        "<div style='font-size:16px;font-weight:800'>MCAT program</div>"
+        f"<div style='font-size:13px;opacity:.7'>{head_day}</div></div>"
+        f"{topic_line}{grid}"
+        f"<div style='text-align:center;opacity:.75;margin-bottom:10px'>{legend}</div>"
+        f"<div style='text-align:center'>{actions}</div>"
+        "</div>"
+    )
+
+
 def show(mw) -> None:  # type: ignore[no-untyped-def]
     """The Today front door: today's phase + topic, the five stage buttons, a
     daily reflection, a progress line, and a compact readiness snapshot."""

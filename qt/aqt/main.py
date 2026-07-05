@@ -1530,6 +1530,13 @@ title="{}" {}>{}</button>""".format(
         # Attribute review time to the active ablation build (real study minutes).
         gui_hooks.reviewer_did_answer_card.append(self._mcat_record_review_time)
 
+        # The program calendar IS the home page: prepend the Today dashboard to the
+        # deck browser, and route its pycmd clicks to the MCAT dialogs.
+        gui_hooks.deck_browser_will_render_content.append(
+            self._mcat_deck_browser_content
+        )
+        gui_hooks.webview_did_receive_js_message.append(self._mcat_home_link)
+
         # View
         qconnect(
             m.actionZoomIn.triggered,
@@ -1664,6 +1671,36 @@ title="{}" {}>{}</button>""".format(
                 ab.record_session(self.col, build, minutes)
         except Exception:
             pass
+
+    def _mcat_deck_browser_content(self, deck_browser, content) -> None:  # type: ignore[no-untyped-def]
+        # The program calendar is the home page: prepend the Today dashboard above
+        # the deck list. Guarded so a render failure can never break the deck list.
+        try:
+            from aqt import mcat_today
+
+            content.tree = mcat_today.home_html(self.col) + content.tree
+        except Exception:
+            pass
+
+    def _mcat_home_link(self, handled, message, context):  # type: ignore[no-untyped-def]
+        # Route the home dashboard's pycmd clicks to the MCAT dialogs.
+        if not isinstance(message, str) or not message.startswith("mcat-home:"):
+            return handled
+        verb = message[len("mcat-home:") :]
+        try:
+            if verb == "diagnostic":
+                import aqt.mcat_diagnostic
+
+                aqt.mcat_diagnostic.show(self)
+            elif verb == "readiness":
+                self.on_mcat_readiness()
+            else:  # "today" or "day:N" -> open the full program board
+                import aqt.mcat_today
+
+                aqt.mcat_today.show(self)
+        except Exception:
+            pass
+        return (True, None)
 
     def on_mcat_paraphrase(self) -> None:
         import aqt.mcat_paraphrase
