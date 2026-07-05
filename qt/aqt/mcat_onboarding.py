@@ -123,11 +123,31 @@ def _prose(text: str):  # type: ignore[no-untyped-def]
     return lbl
 
 
+def _night() -> bool:
+    try:
+        from aqt import theme  # noqa: PLC0415
+
+        return bool(theme.theme_manager.night_mode)
+    except Exception:
+        return False
+
+
+def _muted() -> str:
+    """Dim-but-legible secondary text on whichever Qt theme is active."""
+    return "#a2a6b3" if _night() else "#5d636e"
+
+
 def _card(html: str) -> str:
-    # Light "paper" card with explicit dark text so it reads on a dark app theme.
+    # A subtle, theme-aware grouped section that reads the current Qt theme (like
+    # mcat_ui) — never a bright white box on the dark app theme.
+    if _night():
+        box = "background:#31333b;color:#e4e5ea;border:1px solid #40424d"
+    else:
+        box = "background:#f5f6fb;color:#1a1a1a;border:1px solid #e3e5ef"
     return (
-        "<div style='background:#f5f6fb;color:#1a1a1a;border-radius:10px;"
-        "padding:12px 14px;margin:6px 0'>" + html + "</div>"
+        f"<div style='{box};border-radius:10px;padding:12px 14px;margin:6px 0'>"
+        + html
+        + "</div>"
     )
 
 
@@ -198,7 +218,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lay.addWidget(ans)
         lay.addWidget(
             _prose(
-                "<span style='color:#9aa0c7'>Most people can't answer this from a skim "
+                f"<span style='color:{_muted()}'>Most people can't answer this from a skim "
                 "alone \u2014 that's the point. Recall \u2260 reasoning.</span>"
             )
         )
@@ -221,7 +241,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
                 "(you're on Day 1). Your job is the part that actually teaches: draw "
                 "<b>labeled arrows</b>. Click <b>Draw arrow</b>, drag between two "
                 "concepts, then name the link.</p>"
-                "<p style='margin:0 0 6px;color:#9aa0c7'>A plain line just says "
+                f"<p style='margin:0 0 6px;color:{_muted()}'>A plain line just says "
                 "\u201crelated.\u201d An <b>arrow</b> says <i>how</i> and <i>which "
                 "way</i> \u2014 committing to that is the reasoning the MCAT tests.</p>"
                 + _card(
@@ -294,7 +314,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lay.addWidget(
             _prose(
                 "<h3 style='margin:12px 0 2px'>Quick recall check</h3>"
-                "<p style='margin:0 0 4px;color:#9aa0c7'>Answer each out loud first "
+                f"<p style='margin:0 0 4px;color:{_muted()}'>Answer each out loud first "
                 "\u2014 <i>then</i> check. The attempt is what makes it stick.</p>"
             )
         )
@@ -340,7 +360,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
                 + _card(
                     "<b>Your daily method:</b> "
                     "Scaffold \u2192 <b>Mindmap</b> \u2192 Recall \u2192 Ready.<br>"
-                    "<span style='color:#555'>Mapping makes the reasoning answerable; "
+                    f"<span style='color:{_muted()}'>Mapping makes the reasoning answerable; "
                     "retrieval makes it stick.</span>"
                 )
             )
