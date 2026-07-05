@@ -1467,7 +1467,7 @@ title="{}" {}>{}</button>""".format(
 
         # Day-1 onboarding: the 5-minute "sample lesson" (also surfaced on the home
         # board on day 1). In the menu so it stays replayable any time.
-        self.action_mcat_onboarding = QAction("Sample lesson", self)
+        self.action_mcat_onboarding = QAction("Onboarding", self)
         self.action_mcat_onboarding.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_onboarding)
         qconnect(self.action_mcat_onboarding.triggered, self.on_mcat_onboarding)

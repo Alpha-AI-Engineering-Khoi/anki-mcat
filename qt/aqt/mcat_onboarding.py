@@ -11,15 +11,16 @@ Honesty (see ``brainlifts/anki-for-mcat/brainlift.md``, SPOV 2): the claim is
 does not stage a rigged score; it lets the learner *experience* a reasoning
 question becoming answerable after they build the map, then shows real numbers.
 
-Arc (a 4-page wizard):
-  1. Cold open: skim the topic, try a reasoning question with no map (the
+Arc (a 5-page wizard):
+  1. Welcome: orient to the app, the 28-day program, and the daily method.
+  2. Cold open: skim the topic, try a reasoning question with no map (the
      honest "before").
-  2. Build: the REAL Mindmap canvas, concepts pre-seeded (Day-1 beginner ->
+  3. Build: the REAL Mindmap canvas, concepts pre-seeded (Day-1 beginner ->
      seed the scaffold, per the expertise-reversal SPOV); the learner draws the
      labeled arrows (the generative act).
-  3. Retry: the same question, now traceable through their arrows + quick
+  4. Retry: the same question, now traceable through their arrows + quick
      recall checks.
-  4. Evidence: cited effect sizes + handoff into the Day-1 board.
+  5. Evidence: cited effect sizes + handoff into the Day-1 board.
 
 The demo uses a fixed, isolated topic slug (``onboarding.enzymes``) so it never
 touches the 50 real program topics.
@@ -171,7 +172,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     prog.save_build(col, topic, [dict(c) for c in _CONCEPTS], [])
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle("MCAT \u00b7 Sample lesson")
+    dialog.setWindowTitle("MCAT \u00b7 Onboarding")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
     dialog.resize(780, 660)
@@ -367,7 +368,42 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lay.addStretch(1)
         return w
 
-    pages = [page_cold(), page_build(), page_retry(), page_evidence()]
+    # ---- page 0: welcome / orientation -------------------------------------
+    def page_welcome() -> QWidget:
+        w = QWidget()
+        lay = QVBoxLayout(w)
+        lay.addWidget(
+            _prose(
+                "<h2 style='margin:0 0 2px'>Welcome to MCAT Speedrun</h2>"
+                "<p style='margin:0 0 8px'>You have about a month, and that's a bold "
+                "bet. So the plan spends most of it building real understanding, then "
+                "one final week locking it in. Most of the MCAT rewards reasoning, not "
+                "memory, so reasoning is what we train.</p>"
+                + _card(
+                    "<b>Your 28-day program</b><br>"
+                    "Weeks 1 to 3 build and connect ideas (the Encode phase). Week 4 "
+                    "turns to retrieval and timed practice, so recall peaks on test day."
+                )
+                + _card(
+                    "<b>Every topic, four steps:</b>"
+                    "<ul style='margin:6px 0 0 -8px'>"
+                    "<li><b>Scaffold</b>: skim the big picture.</li>"
+                    "<li><b>Mindmap</b>: connect the ideas yourself.</li>"
+                    "<li><b>Recall</b>: drill with feedback.</li>"
+                    "<li><b>Ready</b>: check where you stand.</li>"
+                    "</ul>"
+                )
+                + _card(
+                    "<b>First, the proof.</b> The next five minutes show you why "
+                    "building beats memorizing, on you, not as a claim. Then you start "
+                    "Day 1."
+                )
+            )
+        )
+        lay.addStretch(1)
+        return w
+
+    pages = [page_welcome(), page_cold(), page_build(), page_retry(), page_evidence()]
     for p in pages:
         stack.addWidget(p)
 
@@ -385,6 +421,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     root.addLayout(nav)
 
     _NEXT_LABELS = [
+        "Start the 5-minute proof \u2192",
         "Build the map \u2192",
         "See the question again \u2192",
         "Show me the evidence \u2192",
@@ -401,8 +438,8 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         i = max(0, min(i, len(pages) - 1))
         idx["i"] = i
         stack.setCurrentIndex(i)
-        if i == 1:
-            holder = pages[1]._canvas_holder  # type: ignore[attr-defined]
+        if i == 2:
+            holder = pages[2]._canvas_holder  # type: ignore[attr-defined]
             ensure_canvas(holder)
             QTimer.singleShot(
                 300,
@@ -410,7 +447,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
                     "window.__refit&&window.__refit()"
                 ),
             )
-        if i == 2:
+        if i == 3:
             cold = refs.get("cold")
             lbl = refs.get("cold_lbl")
             if cold is not None and lbl is not None:

@@ -447,7 +447,7 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
     if not done and di == 0 and not mcat_onboarding.is_done(col):
         start_btn = (
             "<a href=# onclick=\"pycmd('mcat-home:onboarding');return false\" "
-            "class='mcatp-btn'>Start here: 5-min lesson</a>"
+            "class='mcatp-btn'>Onboarding</a>"
         )
         open_ghost = (
             "<a href=# onclick=\"pycmd('mcat-home:open:'+window.mcatpSel);return false\" "
@@ -460,7 +460,7 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         # Lesson done: the program board leads; keep the diagnostic baseline + a replay.
         actions = (
             open_btn
-            + _ghost("Replay lesson", "onboarding")
+            + _ghost("Replay onboarding", "onboarding")
             + _ghost("Diagnostic", "diagnostic")
             + _ghost("Scores", "scores")
         )
