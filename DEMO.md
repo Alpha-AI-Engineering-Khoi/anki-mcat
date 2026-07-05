@@ -2,8 +2,14 @@
 
 One exam (MCAT), two apps (desktop + iOS) on one shared Rust engine, a real engine
 change, three honest scores, and re-runnable proof. This is the filming script for
-the 3–5 minute demo, mapped to the PRD's required contents (review session, Rust
-change, phone→desktop sync, the three scores with ranges, AI features, test results).
+the demo, mapped to the PRD's required contents (review session, Rust change,
+phone→desktop sync, the three scores with ranges, AI features, test results).
+
+It also covers the **learning-science method** — Spark → Synapse → Recall → Ready —
+with a 30-day program, an honest diagnostic projection, dev-tool time-travel, and
+the ablation harness that tests whether the method actually works. Lead with that
+method section for the Sunday story, then use the numbered sections as technical
+proof.
 
 Every command below was verified to run. The offline scripts need no network; the
 three AI commands read the key from `~/.mcat_openai_key`.
@@ -38,6 +44,54 @@ xcrun simctl launch 13C9FD93-440E-4B13-BEF7-0427F90CCF93 com.khoilam.ankispeedru
 Sync target is the same for both apps: `https://anki-mcat-sync.fly.dev/`
 (desktop: Preferences → Syncing; iOS: Settings → Custom sync server). Both must be
 logged into the same account for cross-device sync.
+
+## The learning-science method — Spark → Synapse → Recall → Ready
+
+The core bet: **encode before you drill**. Rather than grinding flashcards from day
+one, the program front-loads understanding, then drills and scores honestly. A
+30-day program sequences it, and every projected number stays a range + confidence.
+
+### A. Today — the 30-day program (Tools ▸ MCAT ▸ Today)
+
+Show the home board: **Day N of 28 · phase**, today's topic, and the **30-day
+calendar** — each day colored by phase (Encode / Recall / Consolidate), today
+ringed. Tap any day to preview its plan. The stage buttons are the day's tasks:
+**Spark → Synapse → Recall → Ready**.
+
+### B. Diagnostic → honest projection (Tools ▸ MCAT ▸ Diagnostic)
+
+Answer the ~15 baseline questions and self-grade. The result gives a **starting
+readiness range** on 472–528 and a **projected exam-day range + confidence** —
+never a bare number, and it **abstains** below 10 answers. Aggressive plan, honest
+number (the rubric's auto-fail line).
+
+### C. Spark → Synapse — the encode front-half (Tools ▸ MCAT ▸ Encode)
+
+- **Spark**: skim the topic for the big picture (AI surfaces scope; you commit
+  hypotheses).
+- **Synapse** (the concept map): drop concepts and draw **labeled arrows**, or let
+  AI help — **AI: seed concepts**, **AI: propose arrows**, **AI: auto-build** the
+  whole map. Then **Chat**: "connect Speed and Velocity as scalar vs vector" and it
+  adds the labeled arrow. You own the relationships; AI only proposes.
+
+### D. Dev tools — time-travel + ablation (Tools ▸ MCAT ▸ Dev tools)
+
+- **Jump to day**: set the program to any day (e.g., 24) — the whole board moves
+  (phase → Recall, the calendar ring jumps, the plan changes). Demos the timeline
+  without waiting weeks.
+- **Ablation build**: switch **Normal / A plain Anki / B ablated / C full**. In A/B
+  the encode workflow is disabled ("off in build A") — how a solo tester lives the
+  ablated-vs-full loop; review time is attributed to the active build.
+
+### E. Gated gap-catcher flashcards (Tools ▸ MCAT ▸ Generate flashcards)
+
+On an encode day it's **locked** ("unlocks in week 4") so drilling can't pre-empt
+understanding. Jump to a recall day and it opens: AI drafts atomic, source-traced
+cards for the gaps.
+
+---
+
+## Technical proof (PRD-mapped)
 
 ## 1. Review session (both apps share one engine)
 

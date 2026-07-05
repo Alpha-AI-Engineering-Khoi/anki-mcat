@@ -1,17 +1,15 @@
 # Copyright: Ankitects Pty Ltd and contributors
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
-"""Desktop MCAT "encode front-half": Prime -> Connect -> Build.
+"""Desktop MCAT "encode front-half": Spark -> Synapse.
 
-Three interactive panels that teach encoding *before* drilling, plus an
-overflow -> cards bridge into Anki's normal add-note path:
+Interactive panels that teach encoding *before* drilling:
 
-- Prime: skim the whole topic for the big picture, commit hypotheses, mark the
-  topic primed (a synced per-topic flag).
-- Connect: make the topic personal via four editable inquiry prompts.
-- Build: lay out concepts as an indented outline and add labeled links, with a
-  live, non-blocking 2-4 linter; overflow details you couldn't relate become
-  flashcards.
+- Spark: skim the whole topic for the big picture, commit hypotheses, mark the
+  topic sparked (a synced per-topic flag).
+- Synapse: lay concepts on a canvas and draw labeled relationships between them
+  (the higher-order encoding map; the canvas lives in ``mcat_synapse``), with a
+  live, non-blocking 2-4 linter.
 
 All pure logic (topic mapping, state, the linter) lives in the shared, tested
 ``mcat_program``; the lower-order AI (scope / keywords / concepts / overflow
@@ -75,7 +73,7 @@ def _encode_gated(mw) -> bool:  # type: ignore[no-untyped-def]
 
 
 def show(mw) -> None:  # type: ignore[no-untyped-def]
-    """The launcher: pick a topic, then open Prime / Connect / Build."""
+    """The launcher: pick a topic, then open Spark / Synapse."""
     if _encode_gated(mw):
         return
     from aqt.qt import (
@@ -93,15 +91,14 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     topics = prog.all_topics()
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle("Encode: Prime \u2192 Build")
+    dialog.setWindowTitle("Encode: Spark \u2192 Synapse")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
 
     layout = QVBoxLayout(dialog)
     layout.addWidget(
         QLabel(
-            "Encode before you drill: prime the topic for the big picture, "
-            "then build the map."
+            "Encode before you drill: Spark the big picture, then map it in Synapse."
         )
     )
 
@@ -114,11 +111,11 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         combo.addItem(f"{t.section} \u00b7 {t.name}", t.slug)
     layout.addWidget(combo)
 
-    prime_btn = QPushButton("\u2460 Prime\u2026")
-    build_btn = QPushButton("\u2461 Build\u2026")
+    prime_btn = QPushButton("\u2460 Spark\u2026")
+    build_btn = QPushButton("\u2461 Synapse\u2026")
     row = QHBoxLayout()
     for b in (prime_btn, build_btn):
-        # keep both neutral/gray — don't let Prime become the blue default button
+        # keep both neutral/gray — don't let Spark become the blue default button
         b.setAutoDefault(False)
         b.setDefault(False)
         row.addWidget(b)
@@ -175,7 +172,7 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     holder: dict = {"items": []}
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle(f"Prime: {topic.name}")
+    dialog.setWindowTitle(f"Spark: {topic.name}")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
 
@@ -211,7 +208,7 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
 
     def do_mark() -> None:
         prog.mark_primed(mw.col, topic, hypotheses.toPlainText().strip())
-        tooltip(f"Primed \u201c{topic.name}\u201d.", parent=mw)
+        tooltip(f"Sparked \u201c{topic.name}\u201d.", parent=mw)
         dialog.accept()
 
     qconnect(hypotheses.textChanged, revalidate)
