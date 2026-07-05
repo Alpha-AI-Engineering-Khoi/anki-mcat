@@ -1541,6 +1541,9 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat.addAction(self.action_mcat_devtools)
         qconnect(self.action_mcat_devtools.triggered, self.on_mcat_devtools)
 
+        # Attribute review time to the active ablation build (real study minutes).
+        gui_hooks.reviewer_did_answer_card.append(self._mcat_record_review_time)
+
         # View
         qconnect(
             m.actionZoomIn.triggered,
@@ -1646,9 +1649,45 @@ title="{}" {}>{}</button>""".format(
         aqt.mcat_encode.show(self)
 
     def on_mcat_aicards(self) -> None:
+        # Gap-catcher flashcards unlock in week 4 (the recall phase): the program
+        # front-loads encoding (Spark -> Synapse), then generates cards for the
+        # gaps at the end, so drilling doesn't pre-empt understanding.
+        from aqt import mcat_today as _t
+
+        cal = _t.ensure_started(self.col)
+        di = _t.effective_day_index(
+            cal["start_date"], _t._today_str(), _t.get_day_override(self.col)
+        )
+        if _t.phase_for(di, cal["horizon_days"]) == _t.PHASE_ENCODE:
+            from aqt.utils import showInfo
+
+            showInfo(
+                "Gap-catcher flashcards unlock in week 4 (the recall phase). The "
+                "program front-loads encoding (Spark \u2192 Synapse), then drills the gaps "
+                "in your concept maps at the end \u2014 so cards reinforce understanding "
+                "instead of replacing it.\n\n(Tools \u203a MCAT \u203a Dev tools \u203a jump to a "
+                "recall day to preview.)",
+                parent=self,
+            )
+            return
         import aqt.mcat_aicards
 
         aqt.mcat_aicards.show(self)
+
+    def _mcat_record_review_time(self, reviewer, card, ease) -> None:  # type: ignore[no-untyped-def]
+        # When an ablation build is active, attribute real per-card review time to
+        # it so the study-feature comparison uses measured minutes, not guesses.
+        try:
+            from aqt import mcat_ablation as ab
+
+            build = ab.active_build(self.col)
+            if not build:
+                return
+            minutes = min(int(card.time_taken()), 60000) / 60000.0
+            if minutes > 0:
+                ab.record_session(self.col, build, minutes)
+        except Exception:
+            pass
 
     def on_mcat_paraphrase(self) -> None:
         import aqt.mcat_paraphrase
