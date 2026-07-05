@@ -6,8 +6,7 @@
 Turns the loose MCAT toolkit into a guided, time-boxed program that answers one
 question: "what do I do right now?" One panel shows today's phase, today's
 topic, the stage tasks (Spark -> Synapse -> Recall -> Ready) as
-buttons into the features we already built, a one-line reflection, and a compact
-readiness snapshot.
+buttons into the features we already built, and a compact readiness snapshot.
 
 Everything schedule-shaped is pure and unit-testable so the Qt panel stays thin:
 
@@ -19,7 +18,7 @@ Everything schedule-shaped is pure and unit-testable so the Qt panel stays thin:
   needs no collection or Qt).
 
 The horizon is parameterized (default 28 days): the first ~75% is
-encode-dominant (Prime/Connect/Build the sequenced topics), the final ~25% is
+encode-dominant (Spark/Synapse the sequenced topics), the final ~25% is
 recall-dominant (interleaved review, no new encoding), with one Consolidate day
 per 7. Run this file directly for an assert-based self-check of that logic.
 """
@@ -30,9 +29,9 @@ from datetime import date, timedelta
 
 # ponytail: the calendar lives in collection config (col.get_config/set_config)
 # under one key, exactly like mcat_program/mcat_ablation — config already syncs
-# and holds arbitrary JSON, so this is the lazy "persists and syncs" path. The
-# same dict also holds per-day reflections under "reflect". Ceiling: no history
-# of past horizons; changing the exam date just rewrites the single record.
+# and holds arbitrary JSON, so this is the lazy "persists and syncs" path.
+# Ceiling: no history of past horizons; changing the exam date just rewrites the
+# single record.
 CAL_KEY = "mcat_program_cal"
 DEFAULT_HORIZON = 28
 
@@ -136,7 +135,6 @@ def _blocks_for_phase(phase: str) -> list[dict]:
         {"stage": "Spark", "minutes": 20},
         {"stage": "Synapse", "minutes": 90},
         {"stage": "Recall", "minutes": 40},
-        {"stage": "Reflect", "minutes": 5},
     ]
 
 
@@ -170,19 +168,9 @@ def get_horizon_in(state: dict) -> int:
 
 
 def set_program_in(state: dict, start_date: str, horizon_days: int) -> dict:
-    """Set start date + horizon, preserving any saved reflections."""
+    """Set start date + horizon."""
     state["start_date"] = start_date
     state["horizon_days"] = max(1, int(horizon_days))
-    return state
-
-
-def get_reflect_in(state: dict, date_str: str) -> str:
-    return (state.get("reflect") or {}).get(date_str, "")
-
-
-def set_reflect_in(state: dict, date_str: str, text: str) -> dict:
-    reflect = state.setdefault("reflect", {})
-    reflect[date_str] = text
     return state
 
 
@@ -245,15 +233,6 @@ def ensure_started(col) -> dict:  # type: ignore[no-untyped-def]
         "start_date": state["start_date"],
         "horizon_days": get_horizon_in(state),
     }
-
-
-def get_reflect(col, date_str: str) -> str:  # type: ignore[no-untyped-def]
-    return get_reflect_in(_load(col), date_str)
-
-
-def save_reflect(col, date_str: str, text: str):  # type: ignore[no-untyped-def]
-    state = set_reflect_in(_load(col), date_str, text)
-    return col.set_config(CAL_KEY, state)
 
 
 def get_day_override(col) -> int | None:  # type: ignore[no-untyped-def]
@@ -478,8 +457,8 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
 
 
 def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
-    """The Today front door: today's phase + topic, the five stage buttons, a
-    daily reflection, a progress line, and a compact readiness snapshot.
+    """The Today front door: today's phase + topic, the stage buttons, a
+    progress line, and a compact readiness snapshot.
 
     ``day`` (0-based, optional) opens the board previewing that program day — the
     date picked on the home dashboard — instead of the effective "today"."""
@@ -497,7 +476,6 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
         QHBoxLayout,
         QInputDialog,
         QLabel,
-        QLineEdit,
         QPushButton,
         QVBoxLayout,
         Qt,
@@ -701,17 +679,6 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
     line2.setEnabled(False)
     layout.addWidget(line2)
 
-    # --- daily reflection ---
-    layout.addWidget(QLabel("Reflect \u2014 what will I change 1%?"))
-    reflect_edit = QLineEdit(get_reflect(col, today))
-    reflect_edit.setPlaceholderText("One small change for tomorrow (saved for today)\u2026")
-    layout.addWidget(reflect_edit)
-
-    def save_reflection() -> None:
-        save_reflect(col, today, reflect_edit.text().strip())
-
-    qconnect(reflect_edit.editingFinished, save_reflection)
-
     # --- progress + snapshot ---
     progress = QLabel("")
     layout.addWidget(progress)
@@ -802,7 +769,6 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
 
     def on_finished(_code: int) -> None:
         alive["v"] = False
-        save_reflection()
 
     qconnect(dialog.finished, on_finished)
 
@@ -874,9 +840,7 @@ def _self_test() -> None:
     # day_plan: encode day is the Spark->Synapse budget; recall day drops encoding.
     enc = day_plan(0, h, fake)
     assert enc["phase"] == PHASE_ENCODE
-    assert [b["stage"] for b in enc["blocks"]] == [
-        "Spark", "Synapse", "Recall", "Reflect",
-    ]
+    assert [b["stage"] for b in enc["blocks"]] == ["Spark", "Synapse", "Recall"]
     assert enc["day_number"] == 1 and enc["topic"] in fake
     rec = day_plan(encode_days, h, fake)  # first clean recall day (idx 21)
     assert rec["phase"] == PHASE_RECALL
@@ -887,20 +851,16 @@ def _self_test() -> None:
     assert con["phase"] == PHASE_CONSOLIDATE
     assert any("checkpoint" in (b.get("note") or "") for b in con["blocks"])
 
-    # calendar state round-trips through a plain dict, preserving reflections.
+    # calendar state round-trips through a plain dict.
     st: dict = {}
     assert get_horizon_in(st) == DEFAULT_HORIZON
     assert get_start_date_in(st, "2026-03-03") == "2026-03-03"
     set_program_in(st, "2026-01-01", 28)
     assert get_start_date_in(st, "2026-09-09") == "2026-01-01"
     assert get_horizon_in(st) == 28
-    set_reflect_in(st, "2026-01-02", "sleep 8h")
-    assert get_reflect_in(st, "2026-01-02") == "sleep 8h"
-    # changing the exam date rewrites start/horizon but keeps reflections.
+    # changing the exam date rewrites start/horizon.
     set_program_in(st, "2026-02-01", 14)
     assert get_horizon_in(st) == 14
-    assert get_reflect_in(st, "2026-01-02") == "sleep 8h"
-    assert get_reflect_in(st, "2026-12-31") == ""  # unknown day -> empty
     # horizon is always sane: 0/blank -> default, negatives clamp to 1.
     assert get_horizon_in({"horizon_days": 0}) == DEFAULT_HORIZON
     assert get_horizon_in({"horizon_days": -5}) == 1
