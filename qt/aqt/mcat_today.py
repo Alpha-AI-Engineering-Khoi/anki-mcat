@@ -562,13 +562,18 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
         refresh()
 
     def open_recall():
-        # ponytail: land on the current deck's study/overview screen — Anki
-        # starts the actual review from there. Robust with no due cards / AI off,
-        # unlike jumping straight into "review". Ceiling: one extra click to
-        # begin. Close Today so the main window is visible.
-        col.startTimebox()
-        mw.moveToState("overview")
+        # Close Today FIRST, then land on the current deck's study/overview screen
+        # on the next event-loop tick. Calling moveToState() while this modal is
+        # still open bounces back to the deck list ("nothing happens").
+        from aqt.qt import QTimer  # noqa: PLC0415
+
         dialog.accept()
+
+        def _study() -> None:
+            col.startTimebox()
+            mw.moveToState("overview")
+
+        QTimer.singleShot(0, _study)
 
     def open_ready():
         ready_shown["v"] = True

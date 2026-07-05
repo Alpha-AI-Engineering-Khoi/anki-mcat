@@ -150,6 +150,10 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     dialog.setWindowTitle(f"Spark: {topic.name}")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
+    # The AI scope call is parented to mw, so it outlives this dialog. Guard the
+    # late callback so it can't touch widgets after the dialog is closed.
+    alive = {"v": True}
+    qconnect(dialog.finished, lambda *_: alive.update(v=False))
 
     layout = QVBoxLayout(dialog)
     layout.addWidget(
@@ -191,6 +195,8 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     qconnect(buttons.rejected, dialog.reject)
 
     def _fill(items: list) -> None:
+        if not alive["v"]:
+            return  # dialog already closed — don't touch destroyed widgets
         holder["items"] = items or []
         scope_list.clear()
         if not holder["items"]:
