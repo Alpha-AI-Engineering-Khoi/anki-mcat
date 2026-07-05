@@ -174,7 +174,7 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     layout.addWidget(hypotheses)
 
     buttons = QDialogButtonBox()
-    mark_btn = buttons.addButton("Mark primed", QDialogButtonBox.ButtonRole.ActionRole)
+    mark_btn = buttons.addButton("Mark sparked", QDialogButtonBox.ButtonRole.ActionRole)
     buttons.addButton(QDialogButtonBox.StandardButton.Close)
     layout.addWidget(buttons)
 
