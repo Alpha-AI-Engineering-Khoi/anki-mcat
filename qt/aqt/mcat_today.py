@@ -5,7 +5,7 @@
 
 Turns the loose MCAT toolkit into a guided, time-boxed program that answers one
 question: "what do I do right now?" One panel shows today's phase, today's
-topic, the stage tasks (Spark -> Synapse -> Recall -> Ready) as
+topic, the stage tasks (Scaffold -> Synapse -> Recall -> Ready) as
 buttons into the features we already built, and a compact readiness snapshot.
 
 Everything schedule-shaped is pure and unit-testable so the Qt panel stays thin:
@@ -18,7 +18,7 @@ Everything schedule-shaped is pure and unit-testable so the Qt panel stays thin:
   needs no collection or Qt).
 
 The horizon is parameterized (default 28 days): the first ~75% is
-encode-dominant (Spark/Synapse the sequenced topics), the final ~25% is
+encode-dominant (Scaffold/Synapse the sequenced topics), the final ~25% is
 recall-dominant (interleaved review, no new encoding), with one Consolidate day
 per 7. Run this file directly for an assert-based self-check of that logic.
 """
@@ -43,9 +43,9 @@ PHASE_ENCODE = "Encode"
 PHASE_RECALL = "Recall"
 PHASE_CONSOLIDATE = "Consolidate"
 
-# The stage tasks the panel surfaces as buttons: Spark -> Synapse -> Recall ->
+# The stage tasks the panel surfaces as buttons: Scaffold -> Synapse -> Recall ->
 # Ready (the learning-science workflow; the old "Connect" step is dropped).
-STAGES = ("Spark", "Synapse", "Recall", "Ready")
+STAGES = ("Scaffold", "Synapse", "Recall", "Ready")
 
 
 # --- pure calendar math -----------------------------------------------------
@@ -128,7 +128,7 @@ def _blocks_for_phase(phase: str) -> list[dict]:
             {"stage": "Ready", "minutes": 15, "note": "\u224880% checkpoint"},
         ]
     return [
-        {"stage": "Spark", "minutes": 20},
+        {"stage": "Scaffold", "minutes": 20},
         {"stage": "Synapse", "minutes": 90},
         {"stage": "Recall", "minutes": 40},
     ]
@@ -596,7 +596,7 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
             lambda e: showWarning(f"Could not compute readiness: {e}", parent=mw)
         ).run_in_background()
 
-    add_row(0, "Spark", "Spark\u2026", lambda: open_encode("prime"))
+    add_row(0, "Scaffold", "Scaffold\u2026", lambda: open_encode("prime"))
     add_row(1, "Synapse", "Synapse\u2026", lambda: open_encode("build"))
     add_row(2, "Recall", "Study now\u2026", open_recall)
     add_row(3, "Ready", "Check readiness\u2026", open_ready)
@@ -664,7 +664,7 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
 
         rec = prog.get_record(col, topic)
         done = {
-            "Spark": bool(rec.get("primed")),
+            "Scaffold": bool(rec.get("primed")),
             "Synapse": len(rec.get("concepts", [])) > 0,
             "Recall": studied_today(col),
             "Ready": ready_shown["v"],
@@ -676,13 +676,13 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
         # dev: the ablation build gates the encode stages; a day override retitles.
         build = ab.active_build(col)
         enc_on = ab.encode_enabled(col)
-        for st in ("Spark", "Synapse"):
+        for st in ("Scaffold", "Synapse"):
             stage_buttons[st].setEnabled(enc_on)
             if not enc_on:
                 hints[st].setText(f"off in build {build}")
 
         # The blue "next action" button = the first incomplete, actionable stage,
-        # so the highlight advances (Spark -> Synapse -> ...) as stages are done.
+        # so the highlight advances (Scaffold -> Synapse -> ...) as stages are done.
         current = next(
             (s for s in STAGES if not done[s] and stage_buttons[s].isEnabled()), None
         )
@@ -762,15 +762,15 @@ def _self_test() -> None:
         assert t in fake
     assert topic_for_day(len(fake), fake) == topic_for_day(0, fake)  # wraps
 
-    # day_plan: encode day is the Spark->Synapse budget; recall day drops encoding.
+    # day_plan: encode day is the Scaffold->Synapse budget; recall day drops encoding.
     enc = day_plan(0, h, fake)
     assert enc["phase"] == PHASE_ENCODE
-    assert [b["stage"] for b in enc["blocks"]] == ["Spark", "Synapse", "Recall"]
+    assert [b["stage"] for b in enc["blocks"]] == ["Scaffold", "Synapse", "Recall"]
     assert enc["day_number"] == 1 and enc["topic"] in fake
     rec = day_plan(encode_days, h, fake)  # first clean recall day (idx 21)
     assert rec["phase"] == PHASE_RECALL
     rec_stages = [b["stage"] for b in rec["blocks"]]
-    assert "Spark" not in rec_stages and "Synapse" not in rec_stages
+    assert "Scaffold" not in rec_stages and "Synapse" not in rec_stages
     assert "Recall" in rec_stages and "Ready" in rec_stages
     con = day_plan(6, h, fake)  # day 7 Consolidate
     assert con["phase"] == PHASE_CONSOLIDATE

@@ -1,12 +1,12 @@
 # Copyright: Ankitects Pty Ltd and contributors
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
-"""Desktop MCAT "encode front-half": Spark -> Synapse.
+"""Desktop MCAT "encode front-half": Scaffold -> Synapse.
 
 Interactive panels that teach encoding *before* drilling:
 
-- Spark: skim the whole topic for the big picture, commit hypotheses, mark the
-  topic sparked (a synced per-topic flag).
+- Scaffold: skim the whole topic for the big picture, commit hypotheses, mark the
+  topic scaffolded (a synced per-topic flag).
 - Synapse: lay concepts on a canvas and draw labeled relationships between them
   (the higher-order encoding map; the canvas lives in ``mcat_synapse``), with a
   live, non-blocking 2-4 linter.
@@ -42,7 +42,7 @@ def _encode_gated(mw) -> bool:  # type: ignore[no-untyped-def]
     if ab.encode_enabled(mw.col):
         return False
     showInfo(
-        "The encode workflow (Spark \u2192 Synapse) is OFF in this ablation build. "
+        "The encode workflow (Scaffold \u2192 Synapse) is OFF in this ablation build. "
         "Switch to Normal or build C in Tools \u2192 MCAT \u2192 Dev tools to use it.",
         parent=mw,
     )
@@ -50,7 +50,7 @@ def _encode_gated(mw) -> bool:  # type: ignore[no-untyped-def]
 
 
 def show(mw) -> None:  # type: ignore[no-untyped-def]
-    """The launcher: pick a topic, then open Spark / Synapse."""
+    """The launcher: pick a topic, then open Scaffold / Synapse."""
     if _encode_gated(mw):
         return
     from aqt.qt import (
@@ -68,14 +68,14 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     topics = prog.all_topics()
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle("Encode: Spark \u2192 Synapse")
+    dialog.setWindowTitle("Encode: Scaffold \u2192 Synapse")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
 
     layout = QVBoxLayout(dialog)
     layout.addWidget(
         QLabel(
-            "Encode before you drill: Spark the big picture, then map it in Synapse."
+            "Encode before you drill: Scaffold the big picture, then map it in Synapse."
         )
     )
 
@@ -88,11 +88,11 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         combo.addItem(f"{t.section} \u00b7 {t.name}", t.slug)
     layout.addWidget(combo)
 
-    prime_btn = QPushButton("\u2460 Spark\u2026")
+    prime_btn = QPushButton("\u2460 Scaffold\u2026")
     build_btn = QPushButton("\u2461 Synapse\u2026")
     row = QHBoxLayout()
     for b in (prime_btn, build_btn):
-        # keep both neutral/gray — don't let Spark become the blue default button
+        # keep both neutral/gray — don't let Scaffold become the blue default button
         b.setAutoDefault(False)
         b.setDefault(False)
         row.addWidget(b)
@@ -114,7 +114,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
 
 def open_for(mw, topic: "prog.Topic", stage: str | None = None) -> None:  # type: ignore[no-untyped-def]
     """Open one encode stage for a preselected topic (entry point for the Today
-    panel). ``stage`` is "prime" (Spark) or "build" (Synapse); anything else
+    panel). ``stage`` is "prime" (Scaffold) or "build" (Synapse); anything else
     falls back to the topic-picker launcher. Keeps ``show(mw)`` standalone."""
     if _encode_gated(mw):
         return
@@ -147,7 +147,7 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     holder: dict = {"items": []}
 
     dialog = QDialog(mw)
-    dialog.setWindowTitle(f"Spark: {topic.name}")
+    dialog.setWindowTitle(f"Scaffold: {topic.name}")
     disable_help_button(dialog)
     mw.garbage_collect_on_dialog_finish(dialog)
     # The AI scope call is parented to mw, so it outlives this dialog. Guard the
@@ -178,7 +178,7 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     layout.addWidget(hypotheses)
 
     buttons = QDialogButtonBox()
-    mark_btn = buttons.addButton("Mark sparked", QDialogButtonBox.ButtonRole.ActionRole)
+    mark_btn = buttons.addButton("Mark scaffolded", QDialogButtonBox.ButtonRole.ActionRole)
     buttons.addButton(QDialogButtonBox.StandardButton.Close)
     layout.addWidget(buttons)
 
@@ -187,7 +187,7 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
 
     def do_mark() -> None:
         prog.mark_primed(mw.col, topic, hypotheses.toPlainText().strip())
-        tooltip(f"Sparked \u201c{topic.name}\u201d.", parent=mw)
+        tooltip(f"Scaffolded \u201c{topic.name}\u201d.", parent=mw)
         dialog.accept()
 
     qconnect(hypotheses.textChanged, revalidate)

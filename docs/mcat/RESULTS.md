@@ -89,7 +89,7 @@ Reproduce: `PYTHONPATH=out/pylib out/pyenv/bin/python qt/aqt/mcat_eval.py --live
 
 ## 5. Study-feature ablation (PRD §8)
 
-Feature under test: the **encode workflow** (Spark → Synapse). Pre-registered
+Feature under test: the **encode workflow** (Scaffold → Synapse). Pre-registered
 hypothesis, failure criterion, and primary metric ("held-out paraphrase accuracy per
 study minute", predicted order C > B > A) are committed in
 [`ablation-preregistration.md`](./ablation-preregistration.md).
