@@ -1669,30 +1669,40 @@ title="{}" {}>{}</button>""".format(
         if not isinstance(message, str) or not message.startswith("mcat-home:"):
             return handled
         verb = message[len("mcat-home:") :]
-        try:
-            if verb == "diagnostic":
-                import aqt.mcat_diagnostic
 
-                aqt.mcat_diagnostic.show(self)
-            elif verb in ("scores", "readiness"):
-                import aqt.mcat_scores
+        def _open() -> None:
+            # Deferred to the main event loop: opening a modal (and, from the Today
+            # board, a nested Synapse webview) *synchronously inside this webview
+            # message handler* leaves the nested webview blank. Running it on the
+            # next tick roots the modal stack in the main loop, so Synapse paints.
+            try:
+                if verb == "diagnostic":
+                    import aqt.mcat_diagnostic
 
-                aqt.mcat_scores.show(self)
-            elif verb.startswith(("open:", "day:")):
-                # open the program board at the day picked on the home calendar
-                import aqt.mcat_today
+                    aqt.mcat_diagnostic.show(self)
+                elif verb in ("scores", "readiness"):
+                    import aqt.mcat_scores
 
-                try:
-                    picked = int(verb.split(":", 1)[1])
-                except (ValueError, IndexError):
-                    picked = None
-                aqt.mcat_today.show(self, day=picked)
-            else:  # "today" -> open the board at the effective day
-                import aqt.mcat_today
+                    aqt.mcat_scores.show(self)
+                elif verb.startswith(("open:", "day:")):
+                    # open the program board at the day picked on the home calendar
+                    import aqt.mcat_today
 
-                aqt.mcat_today.show(self)
-        except Exception:
-            pass
+                    try:
+                        picked = int(verb.split(":", 1)[1])
+                    except (ValueError, IndexError):
+                        picked = None
+                    aqt.mcat_today.show(self, day=picked)
+                else:  # "today" -> open the board at the effective day
+                    import aqt.mcat_today
+
+                    aqt.mcat_today.show(self)
+            except Exception:
+                pass
+
+        from aqt.qt import QTimer
+
+        QTimer.singleShot(0, _open)
         return (True, None)
 
     def on_mcat_paraphrase(self) -> None:
