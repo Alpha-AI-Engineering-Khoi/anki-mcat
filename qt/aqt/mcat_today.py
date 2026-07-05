@@ -443,7 +443,9 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
             f'class="mcatp-btn mcatp-btn--ghost">{label}</a>'
         )
 
-    actions = open_btn + _ghost("Diagnostic", "diagnostic") + _ghost("Readiness", "readiness")
+    # Diagnostic is a day-1 baseline, so it only appears on the first program day.
+    diag_btn = _ghost("Diagnostic", "diagnostic") if (not done and di == 0) else ""
+    actions = open_btn + diag_btn + _ghost("Scores", "scores")
 
     return (
         _HOME_CSS

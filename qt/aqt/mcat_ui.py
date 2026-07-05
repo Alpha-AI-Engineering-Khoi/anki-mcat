@@ -230,3 +230,147 @@ def deck_scoped_panel(  # type: ignore[no-untyped-def]
 
     dialog.resize(width, height)
     dialog.exec()
+
+
+def deck_scoped_tabs(  # type: ignore[no-untyped-def]
+    mw, title, deck_names, tabs, width: int = 680, height: int = 700
+) -> None:
+    """Like ``deck_scoped_panel`` but several tabs share ONE deck checklist.
+
+    - ``tabs``: list of ``(tab_name, compute(col, selected), render(selected, result))``.
+    - Each tab recomputes lazily: changing the deck selection recomputes the
+      visible tab and marks the others stale; switching tabs recomputes if needed.
+    """
+    from aqt.operations import QueryOp
+    from aqt.qt import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFrame,
+        QLabel,
+        QScrollArea,
+        QTabWidget,
+        QTextBrowser,
+        QVBoxLayout,
+        QWidget,
+        qconnect,
+    )
+    from aqt.utils import disable_help_button, showWarning
+
+    dialog = QDialog(mw)
+    dialog.setWindowTitle(title)
+    disable_help_button(dialog)
+    mw.garbage_collect_on_dialog_finish(dialog)
+
+    layout = QVBoxLayout(dialog)
+    heading = QLabel("Scoring decks — tick one or more; the scores combine them.")
+    heading.setWordWrap(True)
+    layout.addWidget(heading)
+
+    host = QWidget()
+    host_layout = QVBoxLayout(host)
+    host_layout.setContentsMargins(4, 4, 4, 4)
+    host_layout.setSpacing(2)
+    select_all = QCheckBox("Select all")
+    checks: list[tuple[object, str]] = []
+    if deck_names:
+        host_layout.addWidget(select_all)
+    for name in deck_names:
+        cb = QCheckBox(name.replace("&", "&&"))
+        host_layout.addWidget(cb)
+        checks.append((cb, name))
+    host_layout.addStretch(1)
+
+    scroll = QScrollArea()
+    scroll.setWidgetResizable(True)
+    scroll.setWidget(host)
+    scroll.setMinimumHeight(84)
+    scroll.setMaximumHeight(150)
+    scroll.setFrameShape(QFrame.Shape.StyledPanel)
+    layout.addWidget(scroll)
+
+    tabw = QTabWidget()
+    layout.addWidget(tabw, 1)
+    prompt = (
+        f"<div style='font-size:13px; color:{MUTED}'>Tick one or more decks above "
+        "to compute your scores.</div>"
+    )
+    views: list = []  # (compute, render, browser)
+    for name, compute, render in tabs:
+        b = QTextBrowser()
+        b.setOpenExternalLinks(True)
+        b.setHtml(prompt)
+        tabw.addTab(b, name)
+        views.append((compute, render, b))
+
+    def selected() -> list[str]:
+        return [name for cb, name in checks if cb.isChecked()]
+
+    computed: dict[int, tuple] = {}
+
+    def recompute(idx: int) -> None:
+        if idx < 0 or idx >= len(views):
+            return
+        sel = selected()
+        compute, render, b = views[idx]
+        if not sel:
+            b.setHtml(prompt)
+            return
+        if computed.get(idx) == tuple(sel):
+            return
+        b.setHtml(f"<div style='font-size:13px; color:{MUTED}'>Scoring…</div>")
+
+        def ok(result: object, i: int = idx, s: list = sel, r=render, bb=b) -> None:
+            bb.setHtml(
+                f"<div style='font-size:13px; line-height:1.4'>{r(s, result)}</div>"
+            )
+            computed[i] = tuple(s)
+
+        QueryOp(
+            parent=dialog, op=lambda col, c=compute, s=sel: c(col, s), success=ok
+        ).failure(
+            lambda e: showWarning(f"Could not compute: {e}", parent=dialog)
+        ).run_in_background()
+
+    def on_selection_changed() -> None:
+        computed.clear()
+        recompute(tabw.currentIndex())
+
+    syncing = {"on": False}
+
+    def sync_select_all() -> None:
+        select_all.setChecked(bool(checks) and all(cb.isChecked() for cb, _ in checks))
+
+    def on_select_all_clicked(checked: bool) -> None:
+        syncing["on"] = True
+        try:
+            for cb, _name in checks:
+                cb.setChecked(checked)
+        finally:
+            syncing["on"] = False
+        on_selection_changed()
+
+    def on_deck_toggled(_checked: bool) -> None:
+        if syncing["on"]:
+            return
+        sync_select_all()
+        on_selection_changed()
+
+    qconnect(select_all.clicked, on_select_all_clicked)
+    for cb, _name in checks:
+        qconnect(cb.toggled, on_deck_toggled)
+    qconnect(tabw.currentChanged, recompute)
+
+    if not deck_names:
+        for _c, _r, b in views:
+            b.setHtml(
+                f"<div style='font-size:13px; color:{MUTED}'>No decks to score yet. "
+                "Import or create a deck first.</div>"
+            )
+
+    buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+    qconnect(buttons.rejected, dialog.reject)
+    layout.addWidget(buttons)
+
+    dialog.resize(width, height)
+    dialog.exec()

@@ -1465,22 +1465,12 @@ title="{}" {}>{}</button>""".format(
         qconnect(self.action_mcat_ai.toggled, self.on_mcat_ai_toggle)
         self.menu_mcat.addSeparator()
 
-        # The program board (Today) is the deck-browser home page now; it opens
-        # from there. Diagnostic leads the menu's score group.
-        self.action_mcat_diagnostic = QAction("Diagnostic", self)
-        self.action_mcat_diagnostic.setMenuRole(QAction.MenuRole.NoRole)
-        self.menu_mcat.addAction(self.action_mcat_diagnostic)
-        qconnect(self.action_mcat_diagnostic.triggered, self.on_mcat_diagnostic)
-
-        self.action_mcat_readiness = QAction("Readiness", self)
-        self.action_mcat_readiness.setMenuRole(QAction.MenuRole.NoRole)
-        self.menu_mcat.addAction(self.action_mcat_readiness)
-        qconnect(self.action_mcat_readiness.triggered, self.on_mcat_readiness)
-
-        self.action_mcat_coverage = QAction("Coverage", self)
-        self.action_mcat_coverage.setMenuRole(QAction.MenuRole.NoRole)
-        self.menu_mcat.addAction(self.action_mcat_coverage)
-        qconnect(self.action_mcat_coverage.triggered, self.on_mcat_coverage)
+        # Scores: Memory/Performance/Readiness + Coverage in one tabbed panel.
+        # Diagnostic + the program board (Today) live on the deck-browser home page.
+        self.action_mcat_scores = QAction("Scores", self)
+        self.action_mcat_scores.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_scores)
+        qconnect(self.action_mcat_scores.triggered, self.on_mcat_scores)
 
         self.action_mcat_weak = QAction("Focus Weak Topics", self)
         self.action_mcat_weak.setMenuRole(QAction.MenuRole.NoRole)
@@ -1592,25 +1582,15 @@ title="{}" {}>{}</button>""".format(
                            else "OFF \u2014 offline fallbacks everywhere"),
             parent=self)
 
-    def on_mcat_diagnostic(self) -> None:
-        import aqt.mcat_diagnostic
+    def on_mcat_scores(self) -> None:
+        import aqt.mcat_scores
 
-        aqt.mcat_diagnostic.show(self)
-
-    def on_mcat_readiness(self) -> None:
-        import aqt.mcat_readiness
-
-        aqt.mcat_readiness.show(self)
+        aqt.mcat_scores.show(self)
 
     def on_mcat_library(self) -> None:
         import aqt.mcat_library
 
         aqt.mcat_library.show(self)
-
-    def on_mcat_coverage(self) -> None:
-        import aqt.mcat_coverage
-
-        aqt.mcat_coverage.show(self)
 
     def on_mcat_weak_topics(self) -> None:
         import aqt.mcat_weak_topics
@@ -1689,8 +1669,10 @@ title="{}" {}>{}</button>""".format(
                 import aqt.mcat_diagnostic
 
                 aqt.mcat_diagnostic.show(self)
-            elif verb == "readiness":
-                self.on_mcat_readiness()
+            elif verb in ("scores", "readiness"):
+                import aqt.mcat_scores
+
+                aqt.mcat_scores.show(self)
             elif verb.startswith(("open:", "day:")):
                 # open the program board at the day picked on the home calendar
                 import aqt.mcat_today

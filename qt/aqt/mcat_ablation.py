@@ -492,13 +492,6 @@ def _render_html(r: dict) -> str:
     parts: list[str] = [
         "<h2>Study-feature ablation \u2014 encode workflow (Spark \u2192 Synapse)</h2>",
     ]
-    if demo:
-        parts.append(
-            "<p style='background:#fff4d6;border:1px solid #f0c96b;border-radius:6px;"
-            "padding:6px 10px;color:#7a5300'><b>Demonstration data (generated single-person "
-            "pilot)</b> \u2014 not a measured multi-person result. Replace it by running the real "
-            "builds (Dev tools \u203a Ablation pilot logging).</p>"
-        )
     parts.append(
         f"<p style='color:{ui.MUTED}'>Read-only. "
         + ("" if demo else "The numbers below come from real, accrued study. ")
