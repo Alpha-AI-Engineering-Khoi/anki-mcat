@@ -439,9 +439,33 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
             f'class="mcatp-btn mcatp-btn--ghost">{label}</a>'
         )
 
-    # Diagnostic is a day-1 baseline, so it only appears on the first program day.
-    diag_btn = _ghost("Diagnostic", "diagnostic") if (not done and di == 0) else ""
-    actions = open_btn + diag_btn + _ghost("Scores", "scores")
+    # Day 1: the 5-min sample lesson leads until the learner has done it; after that
+    # it steps aside to a small "Replay lesson" link and the program board becomes the
+    # primary CTA. Diagnostic is a day-1 baseline either way.
+    from aqt import mcat_onboarding  # noqa: PLC0415
+
+    if not done and di == 0 and not mcat_onboarding.is_done(col):
+        start_btn = (
+            "<a href=# onclick=\"pycmd('mcat-home:onboarding');return false\" "
+            "class='mcatp-btn'>Start here: 5-min lesson</a>"
+        )
+        open_ghost = (
+            "<a href=# onclick=\"pycmd('mcat-home:open:'+window.mcatpSel);return false\" "
+            "class='mcatp-btn mcatp-btn--ghost'>Open program</a>"
+        )
+        actions = (
+            start_btn + open_ghost + _ghost("Diagnostic", "diagnostic") + _ghost("Scores", "scores")
+        )
+    elif not done and di == 0:
+        # Lesson done: the program board leads; keep the diagnostic baseline + a replay.
+        actions = (
+            open_btn
+            + _ghost("Replay lesson", "onboarding")
+            + _ghost("Diagnostic", "diagnostic")
+            + _ghost("Scores", "scores")
+        )
+    else:
+        actions = open_btn + _ghost("Scores", "scores")
 
     return (
         _HOME_CSS

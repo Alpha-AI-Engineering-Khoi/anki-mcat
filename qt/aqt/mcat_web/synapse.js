@@ -36,6 +36,8 @@ function refit() {
     network.stabilize();
   } catch (e) { try { network.fit(); } catch (e2) {} }
 }
+// Host (e.g. the onboarding wizard) can re-frame after the canvas becomes visible.
+window.__refit = refit;
 
 /* ---- Python bridge (Anki pycmd) ---- */
 function send(cmd) { if (window.pycmd) { pycmd(cmd); return true; } return false; }

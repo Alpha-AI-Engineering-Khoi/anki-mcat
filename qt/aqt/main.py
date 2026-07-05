@@ -1465,6 +1465,13 @@ title="{}" {}>{}</button>""".format(
         qconnect(self.action_mcat_ai.toggled, self.on_mcat_ai_toggle)
         self.menu_mcat.addSeparator()
 
+        # Day-1 onboarding: the 5-minute "sample lesson" (also surfaced on the home
+        # board on day 1). In the menu so it stays replayable any time.
+        self.action_mcat_onboarding = QAction("Sample lesson", self)
+        self.action_mcat_onboarding.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_onboarding)
+        qconnect(self.action_mcat_onboarding.triggered, self.on_mcat_onboarding)
+
         # Scores: Memory/Performance/Readiness + Coverage in one tabbed panel.
         # Diagnostic + the program board (Today) live on the deck-browser home page.
         self.action_mcat_scores = QAction("Scores", self)
@@ -1587,6 +1594,11 @@ title="{}" {}>{}</button>""".format(
                            else "OFF \u2014 offline fallbacks everywhere"),
             parent=self)
 
+    def on_mcat_onboarding(self) -> None:
+        import aqt.mcat_onboarding
+
+        aqt.mcat_onboarding.show(self)
+
     def on_mcat_scores(self) -> None:
         import aqt.mcat_scores
 
@@ -1676,7 +1688,11 @@ title="{}" {}>{}</button>""".format(
             # message handler* leaves the nested webview blank. Running it on the
             # next tick roots the modal stack in the main loop, so Mindmap paints.
             try:
-                if verb == "diagnostic":
+                if verb == "onboarding":
+                    import aqt.mcat_onboarding
+
+                    aqt.mcat_onboarding.show(self)
+                elif verb == "diagnostic":
                     import aqt.mcat_diagnostic
 
                     aqt.mcat_diagnostic.show(self)
