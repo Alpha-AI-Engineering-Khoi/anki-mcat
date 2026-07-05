@@ -455,7 +455,7 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
 
     open_btn = (
         "<a href=# onclick=\"pycmd('mcat-home:open:'+window.mcatpSel);return false\" "
-        "class='mcatp-btn'>Open program \u25b8</a>"
+        "class='mcatp-btn'>Open program</a>"
     )
 
     def _ghost(label: str, cmd: str) -> str:
