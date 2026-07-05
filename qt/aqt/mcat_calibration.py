@@ -37,6 +37,20 @@ def graded_reviews(col):
     )
 
 
+def spaced_review_count(revs, min_days: int = 1) -> int:
+    """How many review-phase reviews happened >= ``min_days`` after the same
+    card's previous review. A reliability curve needs these (predicted retention
+    over a real interval vs observed recall); same-day cramming produces none."""
+    last: dict[int, int] = {}
+    n = 0
+    for cid, ts, _ease, t in revs:
+        cid, ts = int(cid), int(ts)
+        if int(t) == 1 and cid in last and (ts - last[cid]) >= min_days * 86400000:
+            n += 1
+        last[cid] = ts
+    return n
+
+
 def anki_eval(col, ignore_before_ms: int):
     r = col._backend.evaluate_params(
         search="", ignore_revlogs_before_ms=ignore_before_ms, num_of_relearning_steps=1
@@ -135,7 +149,10 @@ def main():
         print("MCAT MEMORY-MODEL CALIBRATION (FSRS)  —  PRD 9 / Sunday")
         print("=" * 68)
         print(f"collection        : {col_path}")
+        spaced = spaced_review_count(revs)
         print(f"graded reviews    : {len(revs)}  |  predictable: {len(pairs)}  |  held-out (recent {int(HOLDOUT*100)}%): {len(held_out)}")
+        print(f"spaced reviews    : {spaced} reviewed \u22651 day after the prior review "
+              "(a reliability curve needs these)")
         print("-" * 68)
         print("Anki's own FSRS engine (authoritative)  <- deliverable:")
         print(f"  log loss {ll_anki:.4f} · RMSE(bins) {rmse_anki*100:.2f}%")
@@ -149,12 +166,17 @@ def main():
             print(f"reliability chart : {path}  (replay validated vs engine)")
         else:
             OUT_PNG.unlink(missing_ok=True)
-            populated = len(reliability_bins(pairs))
             print("reliability chart : SKIPPED (honest).")
-            print(f"  The independent py-fsrs replay populates only {populated} of 10 retention bins")
-            print("  (its default short-term handling overestimates stability on this short-interval")
-            print("  demo data, so predictions cluster near R=1). A faithful reliability curve isn't")
-            print(f"  supported; the deliverable is Anki's own engine: log loss {ll_anki:.3f} / "
+            if spaced == 0:
+                print("  ROOT CAUSE: 0 spaced reviews \u2014 every review happened same-day (demo data was")
+                print("  bulk-seeded and drilled in one sitting). A reliability curve plots predicted vs")
+                print("  observed recall over an ELAPSED interval; with no intervals there is nothing to")
+                print("  plot. Fix = real spaced study over days/weeks (or a reference dataset) \u2014 not the exam.")
+            else:
+                populated = len(reliability_bins(pairs))
+                print(f"  The independent py-fsrs replay populates only {populated} of 10 retention bins")
+                print("  on this short-interval data, so a faithful curve isn't supported.")
+            print(f"  Deliverable stands: Anki's own engine \u2014 log loss {ll_anki:.3f} / "
                   f"RMSE(bins) {rmse_anki*100:.1f}%.")
         print("=" * 68)
     finally:
