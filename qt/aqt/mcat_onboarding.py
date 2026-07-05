@@ -138,17 +138,9 @@ def _muted() -> str:
 
 
 def _card(html: str) -> str:
-    # A subtle, theme-aware grouped section that reads the current Qt theme (like
-    # mcat_ui) — never a bright white box on the dark app theme.
-    if _night():
-        box = "background:#31333b;color:#e4e5ea;border:1px solid #40424d"
-    else:
-        box = "background:#f5f6fb;color:#1a1a1a;border:1px solid #e3e5ef"
-    return (
-        f"<div style='{box};border-radius:10px;padding:12px 14px;margin:6px 0'>"
-        + html
-        + "</div>"
-    )
+    # No box — plain text with light spacing (the learner asked for normal text,
+    # not cards). Text uses the native palette; secondary notes use _muted().
+    return f"<div style='margin:8px 0'>{html}</div>"
 
 
 def show(mw) -> None:  # type: ignore[no-untyped-def]
