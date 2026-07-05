@@ -77,6 +77,31 @@ window.applyLinks = function (json) {
   relint(); busy(false); status("AI proposed " + n + " arrows"); refit();
 };
 window.chatReply = function (text) { addChat("ai", text); busy(false); };
+// Python -> JS: apply a batch of edits from the chat assistant (add concepts,
+// add/remove labeled arrows). Matches endpoints to node labels case-insensitively.
+window.applyOps = function (json) {
+  const o = typeof json === "string" ? JSON.parse(json) : json;
+  let id = nextId();
+  (o.add_concepts || []).forEach((c) => {
+    const label = (c.label || c).toString().trim();
+    if (label) { nodes.add({ id, label }); id++; }
+  });
+  const byLabel = {}; nodes.get().forEach((n) => (byLabel[(n.label || "").trim().toLowerCase()] = n.id));
+  (o.remove_links || []).forEach((l) => {
+    const s = byLabel[(l.src_label || "").trim().toLowerCase()], d = byLabel[(l.dst_label || "").trim().toLowerCase()];
+    if (s != null && d != null) { edges.get().forEach((e) => { if (e.from === s && e.to === d) edges.remove(e.id); }); }
+  });
+  let base = edges.length, n = 0;
+  (o.add_links || []).forEach((l) => {
+    const s = byLabel[(l.src_label || "").trim().toLowerCase()], d = byLabel[(l.dst_label || "").trim().toLowerCase()];
+    if (s != null && d != null && s !== d) { edges.add({ id: "c" + (base + n++), from: s, to: d, label: l.label || "", arrows: "to" }); }
+  });
+  const parts = [];
+  if ((o.add_concepts || []).length) parts.push("+" + o.add_concepts.length + " concepts");
+  if (n) parts.push("+" + n + " arrows");
+  if ((o.remove_links || []).length) parts.push("\u2212 arrows");
+  relint(); status(parts.length ? "Applied " + parts.join(", ") : ""); refit();
+};
 
 /* ---- linter (mirrors mcat_program.lint_concepts, non-blocking) ---- */
 function relint() {

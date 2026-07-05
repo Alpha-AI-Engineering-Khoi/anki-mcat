@@ -144,6 +144,17 @@ def build_view(mw, topic, spans, parent=None):  # type: ignore[no-untyped-def]
         # collection lock; on_done runs back on main (safe for view.eval).
         mw.taskman.run_in_background(task, done, uses_collection=False)
 
+    def apply_chat(res: dict) -> None:
+        """Apply the chat assistant's edits (if any), then show its reply."""
+        res = res or {}
+        if res.get("add_concepts") or res.get("add_links") or res.get("remove_links"):
+            push("window.applyOps(%s)" % json.dumps({
+                "add_concepts": res.get("add_concepts") or [],
+                "add_links": res.get("add_links") or [],
+                "remove_links": res.get("remove_links") or [],
+            }))
+        push("window.chatReply(%s)" % json.dumps(res.get("reply", "")))
+
     def on_cmd(msg: str) -> Any:
         if not isinstance(msg, str) or not msg.startswith("synapse:"):
             return None
@@ -196,9 +207,7 @@ def build_view(mw, topic, spans, parent=None):  # type: ignore[no-untyped-def]
                 lambda: ai.map_chat(
                     d.get("msg", ""), d.get("map", {}), topic.name, spans
                 ),
-                lambda fut: push(
-                    "window.chatReply(%s)" % json.dumps(_future_result(fut, ""))
-                ),
+                lambda fut: apply_chat(_future_result(fut, {})),
             )
         return None
 
