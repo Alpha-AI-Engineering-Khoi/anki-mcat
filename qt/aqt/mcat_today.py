@@ -562,16 +562,24 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
         refresh()
 
     def open_recall():
-        # Close Today FIRST, then land on the current deck's study/overview screen
-        # on the next event-loop tick. Calling moveToState() while this modal is
-        # still open bounces back to the deck list ("nothing happens").
+        # Phase-aware "Study now": weeks 1-3 (Encode/Consolidate) drill ONLY
+        # today's topic; week 4 (Recall) interleaves all MCAT cards. Built as a
+        # filtered deck via mcat_recall.
+        # Close Today FIRST, then build/enter the study deck on the next
+        # event-loop tick — calling moveToState() while this modal is still open
+        # bounces back to the deck list ("nothing happens").
         from aqt.qt import QTimer  # noqa: PLC0415
+
+        from aqt import mcat_recall as recall  # noqa: PLC0415
+
+        topic = current_topic()
+        phase = phase_for(eff_di(), cal["horizon_days"])
 
         dialog.accept()
 
         def _study() -> None:
             col.startTimebox()
-            mw.moveToState("overview")
+            recall.start_program_study(mw, topic, phase)
 
         QTimer.singleShot(0, _study)
 

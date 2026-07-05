@@ -193,6 +193,67 @@ def start_focus(mw) -> None:  # type: ignore[no-untyped-def]
     start_focus_session(mw, deck)
 
 
+# --- phase-aware program "Study now" ----------------------------------------
+
+# One reusable filtered deck backing the Today board's "Study now" button. It is
+# rebuilt with the phase-appropriate search each time, so it never piles up
+# duplicate filtered decks.
+PROGRAM_DECK_NAME = "MCAT Study"
+
+
+def start_program_study(mw, topic, phase):  # type: ignore[no-untyped-def]
+    """Phase-aware "Study now" from the Today board.
+
+    Weeks 1-3 (Encode / Consolidate) are topic-focused: study ONLY today's
+    topic's cards, so drilling matches what you just encoded. Week 4 (Recall)
+    interleaves ALL MCAT cards in random order (the exam mixes topics, so recall
+    should too). Cards are gathered by tag (``MCAT::Section::Topic``), so this is
+    deck-agnostic across the whole program.
+
+    Same documented FilteredDeckForUpdate proto as the Create-Filtered-Deck
+    dialog; reschedule=True keeps FSRS scheduling valid; allow_empty avoids a
+    hard error when a topic has nothing to study yet."""
+    from anki.decks import DeckId, FilteredDeckConfig  # noqa: PLC0415
+    from aqt.operations.scheduling import add_or_update_filtered_deck  # noqa: PLC0415
+    from aqt.utils import tooltip  # noqa: PLC0415
+
+    col = mw.col
+    if phase == PHASE_RECALL:
+        search = col.build_search_string("tag:MCAT::* -is:suspended")
+        ready_msg = "Recall \u2014 all topics interleaved (random order)."
+    else:
+        # Encode / Consolidate: only today's topic (drill what you just encoded).
+        search = col.build_search_string(f"tag:{topic.tag} -is:suspended")
+        ready_msg = f"Studying today\u2019s topic: {topic.name}."
+
+    existing = col.decks.id_for_name(PROGRAM_DECK_NAME)
+    if existing is not None and not col.decks.is_filtered(existing):
+        existing = None
+    filtered = col.sched.get_or_create_filtered_deck(deck_id=existing or DeckId(0))
+    filtered.name = PROGRAM_DECK_NAME
+    filtered.allow_empty = True
+
+    config = filtered.config
+    config.reschedule = True
+    del config.search_terms[:]
+    config.search_terms.append(
+        FilteredDeckConfig.SearchTerm(
+            search=search,
+            limit=FOCUS_LIMIT,
+            order=FilteredDeckConfig.SearchTerm.RANDOM,
+        )
+    )
+
+    def on_success(out):  # type: ignore[no-untyped-def]
+        col.decks.set_current(out.id)
+        mw.moveToState("overview")
+        tooltip(ready_msg, parent=mw)
+
+    add_or_update_filtered_deck(parent=mw, deck=filtered).success(
+        on_success
+    ).run_in_background()
+
+
 # --- self-test (pure policy; no Qt, no collection) --------------------------
 
 
