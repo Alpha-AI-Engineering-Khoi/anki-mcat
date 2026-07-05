@@ -1465,12 +1465,8 @@ title="{}" {}>{}</button>""".format(
         qconnect(self.action_mcat_ai.toggled, self.on_mcat_ai_toggle)
         self.menu_mcat.addSeparator()
 
-        # Today is the front door: "what do I do right now?" — so it leads.
-        self.action_mcat_today = QAction("Today", self)
-        self.action_mcat_today.setMenuRole(QAction.MenuRole.NoRole)
-        self.menu_mcat.addAction(self.action_mcat_today)
-        qconnect(self.action_mcat_today.triggered, self.on_mcat_today)
-
+        # The program board (Today) is the deck-browser home page now; it opens
+        # from there. Diagnostic leads the menu's score group.
         self.action_mcat_diagnostic = QAction("Diagnostic", self)
         self.action_mcat_diagnostic.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_diagnostic)
@@ -1595,11 +1591,6 @@ title="{}" {}>{}</button>""".format(
             "MCAT AI: " + ("ON" if checked
                            else "OFF \u2014 offline fallbacks everywhere"),
             parent=self)
-
-    def on_mcat_today(self) -> None:
-        import aqt.mcat_today
-
-        aqt.mcat_today.show(self)
 
     def on_mcat_diagnostic(self) -> None:
         import aqt.mcat_diagnostic
