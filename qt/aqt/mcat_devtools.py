@@ -173,6 +173,13 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         spin.setValue(min(horizon, eff + 1))
         for btn, val in mode_btns:
             btn.setChecked(build == val)
+        # The home dashboard (deck browser) shows the day + build, so re-render it
+        # after a change — otherwise it keeps showing the pre-jump "Day N".
+        try:
+            if mw.state == "deckBrowser":
+                mw.deckBrowser.refresh()
+        except Exception:
+            pass
 
     def do_jump() -> None:
         today.set_day_override(col, spin.value() - 1)
