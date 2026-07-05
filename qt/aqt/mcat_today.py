@@ -47,6 +47,10 @@ PHASE_CONSOLIDATE = "Consolidate"
 # The five stage tasks the panel surfaces as buttons.
 STAGES = ("Prime", "Connect", "Build", "Recall", "Ready")
 
+# Calendar cell colors per phase (light chip bg + accent), readable on either theme.
+_PHASE_BG = {PHASE_ENCODE: "#e8ecfb", PHASE_RECALL: "#e7f6ec", PHASE_CONSOLIDATE: "#f3e9fb"}
+_PHASE_ACCENT = {PHASE_ENCODE: "#4b56d2", PHASE_RECALL: "#1b9e57", PHASE_CONSOLIDATE: "#8a4fd0"}
+
 
 # --- pure calendar math -----------------------------------------------------
 
@@ -350,6 +354,76 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     plan_line.setWordWrap(True)
     layout.addWidget(plan_line)
 
+    # --- 30-day program calendar (tap a day to preview its plan) ---
+    cal_head = QLabel("Program calendar \u2014 tap a day to preview")
+    cal_head_font = cal_head.font()
+    cal_head_font.setBold(True)
+    cal_head.setFont(cal_head_font)
+    layout.addWidget(cal_head)
+
+    cal_wrap = QFrame()
+    cal_grid = QGridLayout(cal_wrap)
+    cal_grid.setSpacing(3)
+    cal_grid.setContentsMargins(0, 2, 0, 2)
+    layout.addWidget(cal_wrap)
+
+    def _swatch(text: str, phase: str) -> str:
+        return (
+            f"<span style='background:{_PHASE_BG[phase]};border:1px solid "
+            f"{_PHASE_ACCENT[phase]};padding:1px 6px;border-radius:4px;color:#222'>{text}</span>"
+        )
+
+    legend = QLabel(
+        _swatch("Encode", PHASE_ENCODE) + " " + _swatch("Recall", PHASE_RECALL)
+        + " " + _swatch("Consolidate", PHASE_CONSOLIDATE)
+        + " &nbsp; <b>ring = today</b>"
+    )
+    legend.setTextFormat(Qt.TextFormat.RichText)
+    layout.addWidget(legend)
+
+    def preview_day(d: int) -> None:
+        plan = day_plan(d, cal["horizon_days"], prog.all_topics())
+        topic = plan["topic"]
+        blocks = "  ".join(f"{b['stage']} {b['minutes']}m" for b in plan["blocks"])
+        tooltip(
+            f"Day {d + 1} \u00b7 {plan['phase']} \u2014 {topic.section} \u00b7 {topic.name}\n{blocks}",
+            parent=mw,
+            period=4000,
+        )
+
+    def rebuild_calendar() -> None:
+        while cal_grid.count():
+            item = cal_grid.takeAt(0)
+            widget = item.widget() if item is not None else None
+            if widget is not None:
+                widget.deleteLater()
+        topics = prog.all_topics()
+        horizon = cal["horizon_days"]
+        di_today = day_index(cal["start_date"], _today_str())
+        cols = 7
+        for d in range(horizon):
+            plan = day_plan(d, horizon, topics)
+            phase = plan["phase"]
+            topic = plan["topic"]
+            cell = QPushButton(str(d + 1))
+            cell.setFixedSize(48, 38)
+            cell.setAutoDefault(False)
+            cell.setDefault(False)
+            is_today = d == di_today
+            accent = _PHASE_ACCENT.get(phase, "#888")
+            bg = _PHASE_BG.get(phase, "#eeeeee")
+            border = f"2px solid {accent}" if is_today else "1px solid #d7d9e6"
+            weight = "700" if is_today else "500"
+            cell.setStyleSheet(
+                f"QPushButton {{ background:{bg}; border:{border}; border-radius:6px; "
+                f"color:#222; font-weight:{weight}; }} "
+                f"QPushButton:hover {{ border:2px solid {accent}; }}"
+            )
+            cell.setToolTip(f"Day {d + 1} \u00b7 {phase}\n{topic.section} \u00b7 {topic.name}")
+            qconnect(cell.clicked, lambda _=False, dd=d: preview_day(dd))
+            r, c = divmod(d, cols)
+            cal_grid.addWidget(cell, r, c)
+
     line = QFrame()
     line.setFrameShape(QFrame.Shape.HLine)
     line.setEnabled(False)
@@ -479,6 +553,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         set_cal(col, current["start_date"], horizon)
         cal["horizon_days"] = horizon
         tooltip(f"Exam in {horizon} day(s) \u2014 horizon set to {horizon}.", parent=mw)
+        rebuild_calendar()
         refresh()
 
     qconnect(settings_btn.clicked, edit_settings)
@@ -527,8 +602,9 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lambda _e: None
     ).run_in_background()
 
+    rebuild_calendar()
     refresh()
-    dialog.resize(560, 520)
+    dialog.resize(640, 720)
     dialog.exec()
 
 
