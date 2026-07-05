@@ -332,6 +332,51 @@ def _snapshot_html(assessment) -> str:
     )
 
 
+# Scoped stylesheet for the home dashboard (all classes prefixed ``mcatp-`` so
+# nothing leaks into Anki's deck browser). Design-engineering rules applied:
+# every cell is a fixed border-box and the "today" marker is a box-shadow ring
+# (not a wider border) with an unchanged font weight — so selecting today causes
+# NO layout shift (the bug where day 3 rendered smaller). Numbers use
+# tabular-nums; hairlines are inset shadows; hover is gated to hover-capable
+# devices; focus-visible + reduced-motion are honoured. The accent is passed per
+# render via the ``--mcatp-accent`` custom property (today's phase colour).
+_HOME_CSS = """<style>
+.mcatp-wrap{max-width:640px;margin:18px auto 8px;padding:16px 18px 14px;border-radius:14px;
+text-align:left;-webkit-font-smoothing:antialiased;
+box-shadow:inset 0 0 0 1px rgba(128,128,128,.26);
+background:radial-gradient(135% 90% at 50% 0,rgba(75,86,210,.10),rgba(75,86,210,0))}
+.mcatp-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.mcatp-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.mcatp-day{font-size:13px;opacity:.65;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mcatp-topic{font-size:13px;opacity:.82;margin-top:4px}
+.mcatp-grid{display:grid;grid-template-columns:repeat(7,40px);gap:6px;justify-content:center;margin:14px auto}
+.mcatp-cell{box-sizing:border-box;height:34px;display:flex;align-items:center;justify-content:center;
+border-radius:9px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;
+color:#1c1c1e;text-decoration:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+transition:box-shadow .15s ease}
+.mcatp-encode{background:#e8ecfb}
+.mcatp-recall{background:#e7f6ec}
+.mcatp-consolidate{background:#f3e9fb}
+.mcatp-cell--today{box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 0 0 2px var(--mcatp-accent,#4b56d2)}
+.mcatp-cell:focus-visible{outline:2px solid #555;outline-offset:1px}
+.mcatp-legend{text-align:center;font-size:11px;opacity:.82;margin:2px 0 12px}
+.mcatp-chip{padding:1px 7px;margin:0 2px;border-radius:5px;color:#1c1c1e;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.mcatp-note{margin-left:6px;font-weight:600;opacity:.75}
+.mcatp-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.mcatp-btn{display:inline-block;padding:7px 15px;border-radius:9px;font-size:12.5px;font-weight:600;
+color:#fff;background:var(--mcatp-accent,#4b56d2);text-decoration:none;
+transition:filter .15s ease,transform .1s ease}
+.mcatp-btn--ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 1px rgba(128,128,128,.45)}
+.mcatp-btn:active{transform:translateY(1px)}
+@media (hover:hover){
+.mcatp-cell:hover{box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 0 0 2px rgba(0,0,0,.28)}
+.mcatp-btn:hover{filter:brightness(1.08)}
+.mcatp-btn--ghost:hover{background:rgba(128,128,128,.12)}
+}
+@media (prefers-reduced-motion:reduce){.mcatp-cell,.mcatp-btn{transition:none}}
+</style>"""
+
+
 def home_html(col) -> str:  # type: ignore[no-untyped-def]
     """Compact program dashboard prepended to the deck-browser home page (the real
     front door): Day N of H, phase + topic, a phase-colored calendar with today
@@ -363,67 +408,57 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         ""
         if done
         else (
-            f"<div style='font-size:13px;opacity:.8;margin-top:3px'>{phase} \u00b7 "
+            f"<div class='mcatp-topic'>{phase} \u00b7 "
             f"{_html.escape(topic.section)} \u00b7 <b>{_html.escape(topic.name)}</b></div>"
         )
     )
 
+    phase_cls = {
+        PHASE_ENCODE: "mcatp-encode",
+        PHASE_RECALL: "mcatp-recall",
+        PHASE_CONSOLIDATE: "mcatp-consolidate",
+    }
     cells = []
     for d in range(horizon):
         p = phase_for(d, horizon)
-        bg = _PHASE_BG.get(p, "#eee")
-        ac = _PHASE_ACCENT.get(p, "#888")
         is_today = (not done) and d == di
-        border = f"2px solid {ac}" if is_today else "1px solid rgba(128,128,128,.35)"
-        weight = "800" if is_today else "500"
+        today_cls = " mcatp-cell--today" if is_today else ""
+        aria = f"Day {d + 1}, {p}" + (", today" if is_today else "")
         cells.append(
             f"<a href=# onclick=\"pycmd('mcat-home:day:{d}');return false\" "
-            f'title="Day {d + 1} \u00b7 {p}" '
-            f"style=\"display:flex;align-items:center;justify-content:center;"
-            f"width:34px;height:28px;background:{bg};border:{border};border-radius:6px;"
-            f'color:#222;font-weight:{weight};font-size:12px;text-decoration:none">{d + 1}</a>'
+            f"class=\"mcatp-cell {phase_cls.get(p, 'mcatp-encode')}{today_cls}\" "
+            f"title=\"Day {d + 1} \u00b7 {p}\" aria-label=\"{aria}\">{d + 1}</a>"
         )
-    grid = (
-        "<div style='display:grid;grid-template-columns:repeat(7,34px);gap:4px;"
-        "justify-content:center;margin:10px 0'>" + "".join(cells) + "</div>"
-    )
-
-    def _chip(label: str, p: str) -> str:
-        return (
-            f"<span style='background:{_PHASE_BG[p]};border:1px solid {_PHASE_ACCENT[p]};"
-            f"padding:1px 6px;border-radius:4px;color:#222;font-size:11px'>{label}</span>"
-        )
+    grid = "<div class='mcatp-grid'>" + "".join(cells) + "</div>"
 
     legend = (
-        _chip("Encode", PHASE_ENCODE) + " " + _chip("Recall", PHASE_RECALL) + " "
-        + _chip("Consolidate", PHASE_CONSOLIDATE) + " &nbsp;<b>ring = today</b>"
+        "<span class='mcatp-chip mcatp-encode'>Encode</span>"
+        "<span class='mcatp-chip mcatp-recall'>Recall</span>"
+        "<span class='mcatp-chip mcatp-consolidate'>Consolidate</span>"
+        "<span class='mcatp-note'>ring = today</span>"
     )
 
-    def _btn(label: str, cmd: str) -> str:
+    def _btn(label: str, cmd: str, ghost: bool = False) -> str:
+        cls = "mcatp-btn mcatp-btn--ghost" if ghost else "mcatp-btn"
         return (
             f"<a href=# onclick=\"pycmd('mcat-home:{cmd}');return false\" "
-            f"style='display:inline-block;padding:6px 14px;margin:0 4px;border-radius:7px;"
-            f"background:{accent};color:#fff;font-weight:600;font-size:12px;"
-            f"text-decoration:none'>{label}</a>"
+            f'class="{cls}">{label}</a>'
         )
 
     actions = (
         _btn("Open program \u25b8", "today")
-        + _btn("Diagnostic", "diagnostic")
-        + _btn("Readiness", "readiness")
+        + _btn("Diagnostic", "diagnostic", ghost=True)
+        + _btn("Readiness", "readiness", ghost=True)
     )
 
     return (
-        "<div style=\"max-width:640px;margin:18px auto 8px;padding:14px 18px;"
-        "border:1px solid rgba(128,128,128,.3);border-radius:12px;"
-        "background:linear-gradient(180deg,rgba(75,86,210,.08),rgba(75,86,210,0))\">"
-        "<div style='display:flex;justify-content:space-between;align-items:baseline'>"
-        "<div style='font-size:16px;font-weight:800'>MCAT program</div>"
-        f"<div style='font-size:13px;opacity:.7'>{head_day}</div></div>"
-        f"{topic_line}{grid}"
-        f"<div style='text-align:center;opacity:.75;margin-bottom:10px'>{legend}</div>"
-        f"<div style='text-align:center'>{actions}</div>"
-        "</div>"
+        _HOME_CSS
+        + f"<div class='mcatp-wrap' style='--mcatp-accent:{accent}'>"
+        + "<div class='mcatp-head'><div class='mcatp-title'>MCAT program</div>"
+        + f"<div class='mcatp-day'>{head_day}</div></div>"
+        + f"{topic_line}{grid}"
+        + f"<div class='mcatp-legend'>{legend}</div>"
+        + f"<div class='mcatp-actions'>{actions}</div></div>"
     )
 
 
