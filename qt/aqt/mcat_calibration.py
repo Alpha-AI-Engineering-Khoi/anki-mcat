@@ -149,8 +149,13 @@ def main():
             print(f"reliability chart : {path}  (replay validated vs engine)")
         else:
             OUT_PNG.unlink(missing_ok=True)
-            print("reliability chart : SKIPPED (honest) — independent replay does not agree with")
-            print("  the engine on this thin/unoptimized review set, so no diagram is published.")
+            populated = len(reliability_bins(pairs))
+            print("reliability chart : SKIPPED (honest).")
+            print(f"  The independent py-fsrs replay populates only {populated} of 10 retention bins")
+            print("  (its default short-term handling overestimates stability on this short-interval")
+            print("  demo data, so predictions cluster near R=1). A faithful reliability curve isn't")
+            print(f"  supported; the deliverable is Anki's own engine: log loss {ll_anki:.3f} / "
+                  f"RMSE(bins) {rmse_anki*100:.1f}%.")
         print("=" * 68)
     finally:
         col.close()
