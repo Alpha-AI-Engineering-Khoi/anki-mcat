@@ -42,10 +42,17 @@ reviews**:
 
 Reproduce: `PYTHONPATH=out/pylib out/pyenv/bin/python qt/aqt/mcat_calibration.py`
 
-Honest limits: this collection's FSRS params are unoptimized and the review set is
-thin (personal testing history), so a per-review **reliability diagram** cannot yet be
-reconstructed trustworthily outside the engine. The reported metric is Anki's own
-calibration on the real reviews; the diagram improves as real review volume grows.
+Honest limits: the real reviews are all **same-day** (0 spaced \u2265 1 day apart yet), and a
+reliability *curve* plots predicted-vs-observed recall over an *elapsed interval* \u2014 so a
+**personal** curve can't be drawn until real spaced study accrues. The metric above is Anki's
+own calibration on the real reviews.
+
+Method demonstration (**generated data, not measured**): to show the reliability-diagram
+method on data with proper spread, `mcat_calibration.py --demo` generates realistic
+spaced-review outcomes (mild overconfidence + noise) and produces
+[`calibration-reliability-demo.png`](calibration-reliability-demo.png) \u2014 log loss 0.56,
+RMSE(bins) 2.7% over 1,200 generated reviews. Personal calibration replaces this as real
+spaced study accrues.
 
 ## 3. Performance model — paraphrase / memory→performance gap (PRD 7d)
 

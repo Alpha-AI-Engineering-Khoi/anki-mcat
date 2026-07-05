@@ -97,7 +97,26 @@ def reliability_bins(pairs, nb=10):
     return [((i + 0.5) / nb, sum(b) / len(b), len(b)) for i, b in enumerate(bk) if b]
 
 
-def chart(bs, ll, brier, rmse, n, path: Path):
+def synthetic_pairs(n: int = 1200, seed: int = 7):
+    """DEMONSTRATION data: generate (predicted_R, observed, ts) pairs for spaced
+    reviews so the reliability method can be shown when a learner has no spaced
+    history yet. Predicted retention is spread across bins; true recall sits a
+    touch below prediction (mild overconfidence that grows at the high end, plus
+    per-review noise) so the curve shows *realistic* calibration, not a fake
+    perfect diagonal. This is generated, not measured \u2014 for demonstration only."""
+    import random
+
+    rng = random.Random(seed)
+    pairs = []
+    for _ in range(n):
+        pred = rng.uniform(0.50, 0.985)
+        bias = -0.06 * (pred ** 3)  # more overconfident at high predicted R
+        true_p = min(0.999, max(0.02, pred + bias + rng.gauss(0, 0.03)))
+        pairs.append((pred, 1.0 if rng.random() < true_p else 0.0, 0))
+    return pairs
+
+
+def chart(bs, ll, brier, rmse, n, path: Path, demo: bool = False):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -113,22 +132,49 @@ def chart(bs, ll, brier, rmse, n, path: Path):
     ax.set_ylim(0, 1)
     ax.set_xlabel("Predicted retention (FSRS)")
     ax.set_ylabel("Observed recall")
-    ax.set_title("MCAT memory-model calibration (held-out reviews)")
+    ax.set_title("MCAT memory-model calibration" + (" \u2014 demonstration" if demo else " (held-out reviews)"))
+    rmse_label = "RMSE(bins)" if demo else "Anki RMSE(bins)"
     ax.text(
         0.02, 0.97,
-        f"held-out log loss {ll:.3f}\nBrier {brier:.3f}\nAnki RMSE(bins) {rmse*100:.1f}%\nn = {n} reviews",
+        f"log loss {ll:.3f}\nBrier {brier:.3f}\n{rmse_label} {rmse*100:.1f}%\nn = {n} reviews",
         transform=ax.transAxes, va="top", fontsize=9,
         bbox=dict(boxstyle="round", fc="white", ec="#ddd"),
     )
     ax.legend(loc="lower right", fontsize=8)
-    fig.tight_layout()
+    if demo:
+        # honest, unobtrusive provenance: this curve is generated, not measured.
+        fig.text(0.5, 0.005, "Demonstration on generated spaced-review data (not measured)",
+                 ha="center", fontsize=8, color="#999")
+    fig.tight_layout(rect=(0, 0.03, 1, 1) if demo else None)
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(str(path), dpi=130)
     return path
 
 
+DEMO_PNG = Path("docs/mcat/calibration-reliability-demo.png")
+
+
 def main():
-    col_path = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("--") else "/tmp/mcat_cal_col.anki2"
+    args = sys.argv[1:]
+    if "--demo" in args or "--synthetic" in args:
+        pairs = synthetic_pairs()
+        brier, ll = metrics(pairs)
+        bins = reliability_bins(pairs)
+        tot = sum(c for _, _, c in bins)
+        rmse = math.sqrt(sum((p - o) ** 2 * c for p, o, c in bins) / tot)
+        path = chart(bins, ll, brier, rmse, len(pairs), DEMO_PNG, demo=True)
+        print("=" * 68)
+        print("MCAT MEMORY-MODEL CALIBRATION \u2014 DEMONSTRATION (generated data)")
+        print("=" * 68)
+        print(f"generated spaced reviews : {len(pairs)}")
+        print(f"log loss {ll:.3f} \u00b7 Brier {brier:.3f} \u00b7 RMSE(bins) {rmse*100:.1f}%")
+        print(f"reliability chart        : {path}")
+        print("NOTE: generated for demonstration \u2014 NOT measured. Your personal")
+        print("      calibration accrues on your own reviews with real spaced study.")
+        print("=" * 68)
+        return
+
+    col_path = args[0] if args and not args[0].startswith("--") else "/tmp/mcat_cal_col.anki2"
     col = _c.Collection(col_path)
     try:
         revs = graded_reviews(col)
