@@ -1471,6 +1471,11 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat.addAction(self.action_mcat_today)
         qconnect(self.action_mcat_today.triggered, self.on_mcat_today)
 
+        self.action_mcat_diagnostic = QAction("Diagnostic", self)
+        self.action_mcat_diagnostic.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_diagnostic)
+        qconnect(self.action_mcat_diagnostic.triggered, self.on_mcat_diagnostic)
+
         self.action_mcat_readiness = QAction("Readiness", self)
         self.action_mcat_readiness.setMenuRole(QAction.MenuRole.NoRole)
         self.menu_mcat.addAction(self.action_mcat_readiness)
@@ -1599,6 +1604,11 @@ title="{}" {}>{}</button>""".format(
         import aqt.mcat_today
 
         aqt.mcat_today.show(self)
+
+    def on_mcat_diagnostic(self) -> None:
+        import aqt.mcat_diagnostic
+
+        aqt.mcat_diagnostic.show(self)
 
     def on_mcat_readiness(self) -> None:
         import aqt.mcat_readiness

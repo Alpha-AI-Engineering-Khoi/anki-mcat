@@ -310,6 +310,51 @@ def readiness_projection(performance: ScoreRange) -> ReadinessProjection:
     )
 
 
+# --- 30-day projection (the plan may be aggressive; the NUMBER stays honest) --
+# Anchored on a MEASURED diagnostic (paraphrase accuracy). Below the measurement
+# minimum we ABSTAIN (None). The point reflects an adherence-based expected gain
+# toward a ceiling with diminishing returns; the range is deliberately wide
+# (measurement uncertainty + extrapolation), and confidence is never "high"
+# because the growth rate is not yet validated against real exam outcomes.
+DIAGNOSTIC_MIN_ANSWERS = 10  # mirrors mcat_paraphrase.MIN_PARAPHRASE_ATTEMPTS
+_PROJ_CEILING = 0.90  # optimistic attainable proportion
+_PROJ_GAIN_RATE = 0.45  # share of remaining headroom capturable over a full program
+
+
+def project_readiness(
+    diagnostic: ScoreRange | None, days_remaining: int, horizon: int
+) -> ReadinessProjection | None:
+    """Project exam-day readiness from a measured diagnostic. Abstains (None)
+    when the diagnostic is None (too few answers). Never a bare point: the range
+    widens with the extrapolation and with measurement uncertainty."""
+    if diagnostic is None:
+        return None
+    horizon = max(1, horizon)
+    days_remaining = max(0, min(int(days_remaining), horizon))
+    frac = days_remaining / horizon  # share of the program still ahead
+    p0 = diagnostic.point
+    margin = max(0.03, (diagnostic.high - diagnostic.low) / 2)
+    headroom = max(0.0, _PROJ_CEILING - p0)
+    exp_gain = _PROJ_GAIN_RATE * frac * headroom
+    point = _clamp01(p0 + exp_gain)
+    low = _clamp01(p0 - margin)  # honest floor: the plan might only hold current level
+    high = _clamp01(point + 0.8 * exp_gain + margin)  # strong-adherence upside
+    return ReadinessProjection.make(
+        _scaled_score(low), _scaled_score(point), _scaled_score(high)
+    )
+
+
+def projection_confidence(attempts: int, days_remaining: int, horizon: int) -> str:
+    """'abstain' below the answer minimum; else 'low' / 'moderate' \u2014 never 'high',
+    because the growth rate is not yet validated against real outcomes."""
+    if attempts < DIAGNOSTIC_MIN_ANSWERS:
+        return "abstain"
+    horizon = max(1, horizon)
+    if attempts < 20 or days_remaining > horizon * 0.6:
+        return "low"
+    return "moderate"
+
+
 def memory_confidence(card_count: int) -> str:
     if card_count >= 80:
         return "high"
