@@ -1,0 +1,255 @@
+<!doctype html>
+<!-- MCAT Speedrun — Synapse canvas (higher-order encoding map).
+     Loaded in a QWebEngineView from qt/aqt/mcat_encode.py. Data model matches
+     mcat_program.py: concepts=[{id,parent,label}], links=[{src,dst,label}]. -->
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="./vis-network.min.js"></script>
+<script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+<style>
+  :root { --bg:#f6f7fb; --panel:#ffffff; --ink:#1a1a1a; --sub:#666; --accent:#4b56d2;
+          --line:#e2e4ee; --chip:#eef0fb; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font-family:-apple-system,Helvetica,Arial,sans-serif;
+              color:var(--ink); background:var(--bg); overflow:hidden; }
+  #bar { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--panel);
+         border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  #bar .brand { font-weight:700; font-size:15px; color:var(--accent); margin-right:6px; letter-spacing:.2px; }
+  #bar .grow { flex:1; }
+  #bar .sep { width:1px; height:20px; background:var(--line); margin:0 4px; }
+  button { font:inherit; font-size:13px; padding:6px 11px; border:1px solid var(--line);
+           background:#fff; color:var(--ink); border-radius:7px; cursor:pointer; }
+  button:hover { border-color:#c7cbe0; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button.ai { color:var(--accent); border-color:#cdd2f2; }
+  #status { font-size:12px; color:var(--sub); margin-right:6px; }
+  #net { position:absolute; top:49px; bottom:0; left:0; right:0; }
+  #hint { position:absolute; left:12px; bottom:10px; font-size:11px; color:var(--sub);
+          background:rgba(255,255,255,.8); padding:4px 8px; border-radius:6px; pointer-events:none; }
+  #warn { position:absolute; right:12px; top:58px; max-width:300px; font-size:11px; color:#8a5a00; }
+  #warn div { background:#fff7e6; border:1px solid #ffe1a6; border-radius:6px; padding:4px 8px; margin-bottom:4px; }
+  .hidden { display:none !important; }
+  /* modal */
+  #modal { position:absolute; inset:0; background:rgba(20,20,30,.28); display:flex;
+           align-items:center; justify-content:center; z-index:20; }
+  #modal .card { background:#fff; border-radius:12px; padding:18px; width:340px; box-shadow:0 8px 30px rgba(0,0,0,.18); }
+  #modal .mtitle { font-weight:600; margin-bottom:10px; }
+  #chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .chip { background:var(--chip); border:1px solid #dfe3f7; color:var(--accent); border-radius:999px; padding:5px 12px; }
+  .chip.sel { background:var(--accent); color:#fff; }
+  #relText { width:100%; padding:8px; border:1px solid var(--line); border-radius:7px; margin-bottom:12px; }
+  .mbtns { display:flex; justify-content:flex-end; gap:8px; }
+  /* chat */
+  #chat { position:absolute; right:0; top:49px; bottom:0; width:320px; background:var(--panel);
+          border-left:1px solid var(--line); display:flex; flex-direction:column; z-index:15; }
+  .chead { display:flex; justify-content:space-between; align-items:center; padding:10px 12px;
+           border-bottom:1px solid var(--line); font-weight:600; }
+  .chead button { border:none; font-size:18px; padding:0 6px; }
+  #chatLog { flex:1; overflow:auto; padding:10px 12px; font-size:13px; }
+  #chatLog .msg { margin-bottom:10px; }
+  #chatLog .me { color:var(--ink); font-weight:600; }
+  #chatLog .ai { color:#333; background:#f2f3fb; border-radius:8px; padding:8px 10px; white-space:pre-wrap; }
+  .crow { display:flex; gap:6px; padding:10px; border-top:1px solid var(--line); }
+  .crow input { flex:1; padding:8px; border:1px solid var(--line); border-radius:7px; }
+  .spin { opacity:.6; pointer-events:none; }
+</style>
+</head>
+<body>
+  <div id="bar">
+    <span class="brand">Synapse</span>
+    <button id="bAdd">+ Concept</button>
+    <button id="bLink">Draw arrow</button>
+    <button id="bDel">Delete</button>
+    <span class="sep"></span>
+    <button id="bSeed" class="ai">AI: seed concepts</button>
+    <button id="bArrows" class="ai">AI: propose arrows</button>
+    <button id="bAuto" class="ai">AI: auto-build</button>
+    <span class="sep"></span>
+    <button id="bChat" class="ai">Chat</button>
+    <span class="grow"></span>
+    <span id="status"></span>
+    <button id="bSave" class="primary">Save map</button>
+  </div>
+  <div id="net"></div>
+  <div id="warn"></div>
+  <div id="hint">Drag concepts to arrange · "Draw arrow" then drag node→node · double-click to rename.</div>
+
+  <div id="modal" class="hidden">
+    <div class="card">
+      <div class="mtitle" id="modalTitle">Name the relationship</div>
+      <div id="chips">
+        <button class="chip" data-v="causes">causes</button>
+        <button class="chip" data-v="part of">part of</button>
+        <button class="chip" data-v="regulates">regulates</button>
+        <button class="chip" data-v="contrast with">contrast with</button>
+      </div>
+      <input id="relText" placeholder="or type a relationship…" />
+      <div class="mbtns">
+        <button id="mCancel">Cancel</button>
+        <button id="mOk" class="primary">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="chat" class="hidden">
+    <div class="chead"><span>Ask about your map</span><button id="chatClose">×</button></div>
+    <div id="chatLog"></div>
+    <div class="crow">
+      <input id="chatInput" placeholder="e.g. have you considered grouping by pathway?" />
+      <button id="chatSend" class="primary">Send</button>
+    </div>
+  </div>
+
+<script>
+"use strict";
+const nodes = new vis.DataSet([]);
+const edges = new vis.DataSet([]);
+const container = document.getElementById("net");
+const NODE_STYLE = { shape: "box", margin: 10, widthConstraint: { maximum: 160 },
+  color: { background: "#ffffff", border: "#4b56d2", highlight: { background: "#eef0fb", border: "#4b56d2" } },
+  font: { color: "#1a1a1a", size: 14 }, borderWidth: 1.5, shapeProperties: { borderRadius: 8 } };
+const options = {
+  nodes: NODE_STYLE,
+  edges: { arrows: "to", color: { color: "#9aa0c7", highlight: "#4b56d2" },
+    font: { size: 12, color: "#4b56d2", strokeWidth: 3, strokeColor: "#fff", align: "middle" }, smooth: { type: "cubicBezier" } },
+  physics: { enabled: true, barnesHut: { springLength: 130, gravitationalConstant: -6000 }, stabilization: { iterations: 120 } },
+  interaction: { hover: true, multiselect: true, navigationButtons: false },
+  manipulation: {
+    enabled: false,
+    addNode: (data, cb) => { data.label = "concept"; cb(data); setTimeout(() => editLabel(data.id), 30); },
+    addEdge: (data, cb) => {
+      if (data.from === data.to) { cb(null); return; }
+      openModal("Name the relationship", (label) => { data.label = label; data.arrows = "to"; cb(data); relint(); });
+    },
+  },
+};
+const network = new vis.Network(container, { nodes, edges }, options);
+
+/* ---- Python bridge (QWebChannel) ---- */
+let py = null;
+function initBridge() {
+  try {
+    if (window.QWebChannel && window.qt && qt.webChannelTransport) {
+      new QWebChannel(qt.webChannelTransport, (ch) => { py = ch.objects.pybridge; if (py && py.ready) py.ready(); });
+      return;
+    }
+  } catch (e) {}
+}
+initBridge();
+function status(t) { document.getElementById("status").textContent = t || ""; }
+function busy(on) { document.body.classList.toggle("spin", !!on); }
+
+/* ---- data <-> model ---- */
+function nextId() { const ids = nodes.getIds().map(Number).filter((n) => !isNaN(n)); return (ids.length ? Math.max(...ids) : 0) + 1; }
+function collect() {
+  return {
+    concepts: nodes.get().map((n) => ({ id: Number(n.id), parent: (n.parent ?? null), label: (n.label || "").trim() })),
+    links: edges.get().map((e) => ({ src: Number(e.from), dst: Number(e.to), label: (e.label || "").trim() })),
+  };
+}
+window.loadMap = function (json) {
+  const m = typeof json === "string" ? JSON.parse(json) : json;
+  nodes.clear(); edges.clear();
+  nodes.add((m.concepts || []).map((c) => ({ id: c.id, label: c.label, parent: c.parent ?? null })));
+  edges.add((m.links || []).map((l, i) => ({ id: "e" + i, from: l.src, to: l.dst, label: l.label || "", arrows: "to" })));
+  relint();
+};
+// AI results: add fresh concept nodes (auto-ids), returns id map by label
+window.applyNodes = function (json) {
+  const arr = typeof json === "string" ? JSON.parse(json) : json;
+  let id = nextId(); const added = {};
+  arr.forEach((c) => { const label = (c.label || c).toString(); nodes.add({ id, label }); added[label] = id; id++; });
+  relint(); busy(false); status("AI added " + arr.length + " concepts");
+  return JSON.stringify(added);
+};
+window.applyLinks = function (json) {
+  const arr = typeof json === "string" ? JSON.parse(json) : json;
+  const byLabel = {}; nodes.get().forEach((n) => (byLabel[(n.label || "").trim().toLowerCase()] = n.id));
+  let base = edges.length, n = 0;
+  arr.forEach((l) => {
+    const s = byLabel[(l.src_label || "").trim().toLowerCase()], d = byLabel[(l.dst_label || "").trim().toLowerCase()];
+    if (s != null && d != null && s !== d) { edges.add({ id: "a" + (base + n++), from: s, to: d, label: l.label || "", arrows: "to" }); }
+  });
+  relint(); busy(false); status("AI proposed " + n + " arrows");
+};
+window.chatReply = function (text) { addChat("ai", text); busy(false); };
+
+/* ---- linter (mirrors mcat_program.lint_concepts, non-blocking) ---- */
+function relint() {
+  const box = document.getElementById("warn"); box.innerHTML = "";
+  const cs = nodes.get(), es = edges.get();
+  const indeg = {}, outdeg = {}; cs.forEach((c) => { indeg[c.id] = 0; outdeg[c.id] = 0; });
+  es.forEach((e) => { if (outdeg[e.from] != null) outdeg[e.from]++; if (indeg[e.to] != null) indeg[e.to]++; });
+  cs.forEach((c) => { if (indeg[c.id] === 1 && outdeg[c.id] === 1)
+    box.innerHTML += `<div>“${c.label}” is a lone one-in/one-out concept — merge or re-chunk.</div>`; });
+}
+
+/* ---- label modal (chips + free-text) ---- */
+let modalCb = null, chosen = "";
+function openModal(title, cb) {
+  document.getElementById("modalTitle").textContent = title || "Name the relationship";
+  chosen = ""; modalCb = cb;
+  document.querySelectorAll(".chip").forEach((c) => c.classList.remove("sel"));
+  const t = document.getElementById("relText"); t.value = "";
+  document.getElementById("modal").classList.remove("hidden"); t.focus();
+}
+function closeModal() { document.getElementById("modal").classList.add("hidden"); modalCb = null; }
+document.querySelectorAll(".chip").forEach((c) => c.onclick = () => {
+  document.querySelectorAll(".chip").forEach((x) => x.classList.remove("sel"));
+  c.classList.add("sel"); chosen = c.dataset.v; document.getElementById("relText").value = "";
+});
+document.getElementById("relText").oninput = () => { chosen = ""; document.querySelectorAll(".chip").forEach((x) => x.classList.remove("sel")); };
+document.getElementById("mCancel").onclick = () => { const cb = modalCb; closeModal(); if (cb) cb(null); /* addEdge cancel */ };
+document.getElementById("mOk").onclick = () => {
+  const label = (chosen || document.getElementById("relText").value || "related to").trim();
+  const cb = modalCb; closeModal(); if (cb) cb(label);
+};
+
+/* ---- node rename ---- */
+function editLabel(id) {
+  const n = nodes.get(id); if (!n) return;
+  const v = window.prompt("Concept name:", n.label || ""); if (v != null) { nodes.update({ id, label: v.trim() }); relint(); }
+}
+network.on("doubleClick", (p) => { if (p.nodes && p.nodes.length) editLabel(p.nodes[0]); });
+
+/* ---- toolbar ---- */
+document.getElementById("bAdd").onclick = () => network.addNodeMode();
+document.getElementById("bLink").onclick = () => network.addEdgeMode();
+document.getElementById("bDel").onclick = () => { network.deleteSelected(); relint(); };
+document.getElementById("bSave").onclick = () => {
+  const m = collect();
+  if (py && py.save) { py.save(JSON.stringify(m)); status("Saved · " + m.concepts.length + " concepts, " + m.links.length + " links"); }
+  else { status("(preview) " + m.concepts.length + " concepts, " + m.links.length + " links"); }
+};
+document.getElementById("bSeed").onclick = () => { if (py && py.aiSeed) { busy(true); status("AI seeding…"); py.aiSeed(); } else status("(no engine)"); };
+document.getElementById("bArrows").onclick = () => {
+  if (py && py.aiProposeArrows) { busy(true); status("AI proposing arrows…"); py.aiProposeArrows(JSON.stringify(collect())); } else status("(no engine)");
+};
+document.getElementById("bAuto").onclick = () => {
+  if (py && py.aiAutoBuild) { busy(true); status("AI building the whole map…"); py.aiAutoBuild(); } else status("(no engine)");
+};
+
+/* ---- chat ---- */
+document.getElementById("bChat").onclick = () => document.getElementById("chat").classList.toggle("hidden");
+document.getElementById("chatClose").onclick = () => document.getElementById("chat").classList.add("hidden");
+function addChat(who, text) {
+  const log = document.getElementById("chatLog");
+  const d = document.createElement("div"); d.className = "msg";
+  d.innerHTML = `<div class="${who}">${who === "me" ? "You" : "Synapse"}</div><div class="${who === "ai" ? "ai" : ""}">${text.replace(/</g, "&lt;")}</div>`;
+  log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+function sendChat() {
+  const inp = document.getElementById("chatInput"); const msg = inp.value.trim(); if (!msg) return;
+  addChat("me", msg); inp.value = "";
+  if (py && py.chat) { busy(true); py.chat(msg, JSON.stringify(collect())); } else addChat("ai", "(no engine connected)");
+}
+document.getElementById("chatSend").onclick = sendChat;
+document.getElementById("chatInput").addEventListener("keydown", (e) => { if (e.key === "Enter") sendChat(); });
+
+/* ask Python for the initial map once bridge is up (fallback: empty canvas) */
+setTimeout(() => { if (py && py.requestInit) py.requestInit(); }, 120);
+</script>
+</body>
+</html>
