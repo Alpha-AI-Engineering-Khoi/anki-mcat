@@ -191,27 +191,33 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
             f"<li><b>{k}</b>: {v}</li>" for k, v in _SKIM
         )
         intro = _prose(
-            "<h2 style='margin:0 0 2px'>Sample lesson \u00b7 about 5 minutes</h2>"
-            "<p style='margin:0 0 8px'>Most study tools ask you to trust "
-            "them. This one proves it on you. Skim the topic, try one reasoning "
-            "question cold, then build the connections yourself \u2014 and watch the "
-            "same question become answerable.</p>"
-            + _card(f"<b>Skim (don't memorize):</b><ul style='margin:6px 0 0 -8px'>{skim}</ul>")
+            "<h2 style='margin:0 0 2px'>See it for yourself \u00b7 5 minutes</h2>"
+            "<p style='margin:0 0 8px'>Most of the MCAT rewards reasoning, not "
+            "memory \u2014 and reasoning is something you build, not something you're "
+            "born with. The next five minutes won't ask you to believe that. They'll "
+            "show you: answer one question cold, build the idea in your own words, and "
+            "watch the same question become answerable.</p>"
             + _card(
-                "<b>Reasoning question \u2014 try it now, cold:</b><br>" + _QUESTION
+                "<b>First, skim for the big picture \u2014 don't memorize:</b>"
+                f"<ul style='margin:6px 0 0 -8px'>{skim}</ul>"
+            )
+            + _card(
+                "<b>Now, cold \u2014 before you've built anything, try this:</b><br>"
+                + _QUESTION
             )
         )
         lay.addWidget(intro)
-        lay.addWidget(_prose("<b>Your best answer</b> (or just \u201cnot sure\u201d):"))
+        lay.addWidget(_prose("<b>Your best shot</b> (\u201cnot sure\u201d is a fine answer):"))
         ans = QPlainTextEdit()
-        ans.setPlaceholderText("Take 20 seconds\u2026 what happens to Vmax and Km, and why?")
+        ans.setPlaceholderText("Twenty seconds \u2014 what happens to Vmax and Km, and why?")
         ans.setFixedHeight(84)
         refs["cold"] = ans  # echoed back on the retry page for a personal before/after
         lay.addWidget(ans)
         lay.addWidget(
             _prose(
-                f"<span style='color:{_muted()}'>Most people can't answer this from a skim "
-                "alone \u2014 that's the point. Recall \u2260 reasoning.</span>"
+                f"<span style='color:{_muted()}'>Stuck is okay \u2014 it's the honest "
+                "starting line. A skim hands you facts; it doesn't hand you reasoning. "
+                "That's the part you're about to build.</span>"
             )
         )
         lay.addStretch(1)
@@ -237,7 +243,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
                 "\u201crelated.\u201d An <b>arrow</b> says <i>how</i> and <i>which "
                 "way</i> \u2014 committing to that is the reasoning the MCAT tests.</p>"
                 + _card(
-                    f"<b>Ask yourself (restricted inquiry):</b>"
+                    f"<b>Ask yourself:</b>"
                     f"<ul style='margin:6px 0 8px -8px'>{prompts}</ul>"
                     f"<b>Arrows worth drawing:</b>"
                     f"<ul style='margin:6px 0 0 -8px'>{arrows}</ul>"
@@ -283,10 +289,10 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lay = QVBoxLayout(inner)
         lay.addWidget(
             _prose(
-                "<h3 style='margin:0 0 2px'>Same question \u2014 now with your map</h3>"
-                + _card("<b>Reasoning question:</b><br>" + _QUESTION)
-                + "<p>Trace the arrows you drew. Answer it in your "
-                "head first, then reveal how the map gets there.</p>"
+                "<h3 style='margin:0 0 2px'>Same question \u2014 now it's yours to reason through</h3>"
+                + _card("<b>The question:</b><br>" + _QUESTION)
+                + "<p>Follow the arrows you drew. Answer in your head first "
+                "\u2014 then reveal how the map gets there.</p>"
             )
         )
         # Personal before/after: echo back what the learner wrote cold (filled in on
@@ -333,7 +339,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lay = QVBoxLayout(w)
         lay.addWidget(
             _prose(
-                "<h3 style='margin:0 0 2px'>That wasn't a trick \u2014 here's the science</h3>"
+                "<h3 style='margin:0 0 2px'>That wasn't a trick \u2014 it's how understanding works</h3>"
                 + _card(
                     "<ul style='margin:2px 0 0 -8px'>"
                     "<li><b>Building your own map beats studying a ready-made one:</b> "
@@ -352,8 +358,9 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
                 + _card(
                     "<b>Your daily method:</b> "
                     "Scaffold \u2192 <b>Mindmap</b> \u2192 Recall \u2192 Ready.<br>"
-                    f"<span style='color:{_muted()}'>Mapping makes the reasoning answerable; "
-                    "retrieval makes it stick.</span>"
+                    f"<span style='color:{_muted()}'>Build the ideas and the reasoning "
+                    "follows; retrieve them and it lasts. That's the whole method "
+                    "\u2014 let's start Day 1.</span>"
                 )
             )
         )
