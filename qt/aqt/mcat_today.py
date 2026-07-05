@@ -356,16 +356,10 @@ background:radial-gradient(135% 90% at 50% 0,rgba(75,86,210,.10),rgba(75,86,210,
 .mcatp-grid{display:grid;grid-template-columns:repeat(7,minmax(0,40px));gap:6px;justify-content:center;margin:14px auto}
 .mcatp-cell{box-sizing:border-box;height:34px;display:flex;align-items:center;justify-content:center;
 border-radius:9px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;
-color:#1c1c1e;text-decoration:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
-transition:box-shadow .15s ease}
-.mcatp-encode{background:#e8ecfb}
-.mcatp-recall{background:#e7f6ec}
-.mcatp-consolidate{background:#f3e9fb}
-.mcatp-cell--today{box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 0 0 2px var(--mcatp-accent,#4b56d2)}
+color:#1c1c1e;text-decoration:none;background:#e7e8ef;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+transition:filter .15s ease}
+.mcatp-cell--today{background:var(--mcatp-accent,#4b56d2);color:#fff;box-shadow:none}
 .mcatp-cell:focus-visible{outline:2px solid #555;outline-offset:1px}
-.mcatp-legend{text-align:center;font-size:11px;opacity:.82;margin:2px 0 12px}
-.mcatp-chip{padding:1px 7px;margin:0 2px;border-radius:5px;color:#1c1c1e;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
-.mcatp-note{margin-left:6px;font-weight:600;opacity:.75}
 .mcatp-actions{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
 .mcatp-btn{display:inline-block;padding:7px 12px;border-radius:9px;font-size:12px;font-weight:600;
 color:#fff;background:var(--mcatp-accent,#4b56d2);text-decoration:none;
@@ -373,7 +367,7 @@ transition:filter .15s ease,transform .1s ease}
 .mcatp-btn--ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 1px rgba(128,128,128,.45)}
 .mcatp-btn:active{transform:translateY(1px)}
 @media (hover:hover){
-.mcatp-cell:hover{box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 0 0 2px rgba(0,0,0,.28)}
+.mcatp-cell:hover{filter:brightness(.96)}
 .mcatp-btn:hover{filter:brightness(1.08)}
 .mcatp-btn--ghost:hover{background:rgba(128,128,128,.12)}
 }
@@ -401,7 +395,7 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
     plan = day_plan(show_day, horizon, topics)
     topic = plan["topic"]
     phase = plan["phase"]
-    accent = _PHASE_ACCENT.get(phase, "#4b56d2")
+    accent = "#4b56d2"  # one brand accent: today's cell + the action buttons
 
     head_day = (
         f"Program complete \u2014 {horizon}-day plan finished"
@@ -417,11 +411,6 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         )
     )
 
-    phase_cls = {
-        PHASE_ENCODE: "mcatp-encode",
-        PHASE_RECALL: "mcatp-recall",
-        PHASE_CONSOLIDATE: "mcatp-consolidate",
-    }
     cells = []
     for d in range(horizon):
         p = phase_for(d, horizon)
@@ -430,17 +419,10 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         aria = f"Day {d + 1}, {p}" + (", today" if is_today else "")
         cells.append(
             f"<a href=# onclick=\"pycmd('mcat-home:day:{d}');return false\" "
-            f"class=\"mcatp-cell {phase_cls.get(p, 'mcatp-encode')}{today_cls}\" "
+            f'class="mcatp-cell{today_cls}" '
             f"title=\"Day {d + 1} \u00b7 {p}\" aria-label=\"{aria}\">{d + 1}</a>"
         )
     grid = "<div class='mcatp-grid'>" + "".join(cells) + "</div>"
-
-    legend = (
-        "<span class='mcatp-chip mcatp-encode'>Encode</span>"
-        "<span class='mcatp-chip mcatp-recall'>Recall</span>"
-        "<span class='mcatp-chip mcatp-consolidate'>Consolidate</span>"
-        "<span class='mcatp-note'>ring = today</span>"
-    )
 
     def _btn(label: str, cmd: str, ghost: bool = False) -> str:
         cls = "mcatp-btn mcatp-btn--ghost" if ghost else "mcatp-btn"
@@ -461,7 +443,6 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         + "<div class='mcatp-head'><div class='mcatp-title'>MCAT program</div>"
         + f"<div class='mcatp-day'>{head_day}</div></div>"
         + f"{topic_line}{grid}"
-        + f"<div class='mcatp-legend'>{legend}</div>"
         + f"<div class='mcatp-actions'>{actions}</div></div>"
     )
 
