@@ -341,6 +341,10 @@ def _snapshot_html(assessment) -> str:
 # devices; focus-visible + reduced-motion are honoured. The accent is passed per
 # render via the ``--mcatp-accent`` custom property (today's phase colour).
 _HOME_CSS = """<style>
+.mcat-home{display:flex;flex-wrap:wrap;gap:22px;justify-content:center;align-items:flex-start}
+.mcat-home-main{flex:1 1 400px;max-width:600px;text-align:center}
+.mcat-home-side{flex:0 1 360px;min-width:320px;text-align:left}
+.mcat-home-side .mcatp-wrap{margin:0;max-width:none;width:100%;box-sizing:border-box}
 .mcatp-wrap{max-width:640px;margin:18px auto 8px;padding:16px 18px 14px;border-radius:14px;
 text-align:left;-webkit-font-smoothing:antialiased;
 box-shadow:inset 0 0 0 1px rgba(128,128,128,.26);
@@ -349,7 +353,7 @@ background:radial-gradient(135% 90% at 50% 0,rgba(75,86,210,.10),rgba(75,86,210,
 .mcatp-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
 .mcatp-day{font-size:13px;opacity:.65;font-variant-numeric:tabular-nums;white-space:nowrap}
 .mcatp-topic{font-size:13px;opacity:.82;margin-top:4px}
-.mcatp-grid{display:grid;grid-template-columns:repeat(7,40px);gap:6px;justify-content:center;margin:14px auto}
+.mcatp-grid{display:grid;grid-template-columns:repeat(7,minmax(0,40px));gap:6px;justify-content:center;margin:14px auto}
 .mcatp-cell{box-sizing:border-box;height:34px;display:flex;align-items:center;justify-content:center;
 border-radius:9px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;
 color:#1c1c1e;text-decoration:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
@@ -362,8 +366,8 @@ transition:box-shadow .15s ease}
 .mcatp-legend{text-align:center;font-size:11px;opacity:.82;margin:2px 0 12px}
 .mcatp-chip{padding:1px 7px;margin:0 2px;border-radius:5px;color:#1c1c1e;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
 .mcatp-note{margin-left:6px;font-weight:600;opacity:.75}
-.mcatp-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.mcatp-btn{display:inline-block;padding:7px 15px;border-radius:9px;font-size:12.5px;font-weight:600;
+.mcatp-actions{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.mcatp-btn{display:inline-block;padding:7px 12px;border-radius:9px;font-size:12px;font-weight:600;
 color:#fff;background:var(--mcatp-accent,#4b56d2);text-decoration:none;
 transition:filter .15s ease,transform .1s ease}
 .mcatp-btn--ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 1px rgba(128,128,128,.45)}

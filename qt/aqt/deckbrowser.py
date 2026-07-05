@@ -52,10 +52,14 @@ class DeckBrowserContent:
     Attributes:
         tree {str} -- HTML of the deck tree section
         stats {str} -- HTML of the stats section
+        mcat {str} -- optional right-column HTML (MCAT program dashboard)
     """
 
     tree: str
     stats: str
+    # Optional right-hand column on the home page. Defaults to empty so a
+    # non-MCAT deck browser renders exactly as before.
+    mcat: str = ""
 
 
 @dataclass
@@ -146,12 +150,17 @@ class DeckBrowser:
 
     _body = """
 <center>
+<div class=mcat-home>
+<div class=mcat-home-main>
 <table cellspacing=0 cellpadding=3>
 %(tree)s
 </table>
 
 <br>
 %(stats)s
+</div>
+%(mcat)s
+</div>
 </center>
 """
 
