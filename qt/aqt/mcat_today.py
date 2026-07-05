@@ -414,7 +414,7 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
     )
 
     return (
-        "<div style=\"max-width:640px;margin:0 auto 16px;padding:14px 18px;"
+        "<div style=\"max-width:640px;margin:18px auto 8px;padding:14px 18px;"
         "border:1px solid rgba(128,128,128,.3);border-radius:12px;"
         "background:linear-gradient(180deg,rgba(75,86,210,.08),rgba(75,86,210,0))\">"
         "<div style='display:flex;justify-content:space-between;align-items:baseline'>"

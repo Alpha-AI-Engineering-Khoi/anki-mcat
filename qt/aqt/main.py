@@ -1673,12 +1673,14 @@ title="{}" {}>{}</button>""".format(
             pass
 
     def _mcat_deck_browser_content(self, deck_browser, content) -> None:  # type: ignore[no-untyped-def]
-        # The program calendar is the home page: prepend the Today dashboard above
-        # the deck list. Guarded so a render failure can never break the deck list.
+        # The program calendar is the home page: render the Today dashboard just
+        # below the deck list. It goes in the stats slot (outside the deck <table>)
+        # so it sits under the decks, not above them. Guarded so a render failure
+        # can never break the deck list.
         try:
             from aqt import mcat_today
 
-            content.tree = mcat_today.home_html(self.col) + content.tree
+            content.stats = mcat_today.home_html(self.col) + content.stats
         except Exception:
             pass
 
