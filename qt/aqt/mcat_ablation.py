@@ -133,6 +133,38 @@ def _require_build(build_id: str) -> None:
         raise ValueError(f"unknown build id {build_id!r}; expected one of {BUILD_IDS}")
 
 
+# --- active build (the dev ablation switch) ----------------------------------
+# Which build the app is currently running as. None -> normal app (everything
+# on). A/B/C -> that build's mode: the encode workflow (Prime->Connect->Build)
+# is gated to BUILDS[id].encode, so a solo tester genuinely experiences the
+# ablated vs full study loop. Study time can then be attributed to the build.
+
+
+def active_build_in(state: dict) -> str | None:
+    b = state.get("active_build")
+    return b if b in BUILDS else None
+
+
+def set_active_build_in(state: dict, build_id: str | None) -> dict:
+    if build_id is None:
+        state.pop("active_build", None)
+    else:
+        _require_build(build_id)
+        state["active_build"] = build_id
+    return state
+
+
+def encode_enabled_for(build_id: str | None) -> bool:
+    """Is the encode workflow available in this build? Normal (None) + full C ->
+    yes; ablated B and plain-Anki A -> no."""
+    return build_id is None or BUILDS[build_id].encode
+
+
+def focus_enabled_for(build_id: str | None) -> bool:
+    """Is Focus (points-at-stake) ordering on in this build? Normal + B/C -> yes."""
+    return build_id is None or BUILDS[build_id].focus
+
+
 def record_in(state: dict, build_id: str) -> dict:
     """The normalized record for a build id (does not mutate ``state``)."""
     _require_build(build_id)
@@ -309,6 +341,23 @@ def summary(col) -> dict[str, dict]:  # type: ignore[no-untyped-def]
 def report(col) -> dict:  # type: ignore[no-untyped-def]
     """The live report from real recorded study (never simulated)."""
     return report_in(_load(col), simulated=False)
+
+
+def active_build(col) -> str | None:  # type: ignore[no-untyped-def]
+    return active_build_in(_load(col))
+
+
+def set_active_build(col, build_id: str | None):  # type: ignore[no-untyped-def]
+    state = set_active_build_in(_load(col), build_id)
+    return col.set_config(CONFIG_KEY, state)
+
+
+def encode_enabled(col) -> bool:  # type: ignore[no-untyped-def]
+    return encode_enabled_for(active_build(col))
+
+
+def focus_enabled(col) -> bool:  # type: ignore[no-untyped-def]
+    return focus_enabled_for(active_build(col))
 
 
 # --- re-runnable report (offline, like mcat_eval) ---------------------------

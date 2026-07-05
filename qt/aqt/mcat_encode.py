@@ -57,8 +57,27 @@ def _status_text(rec: dict) -> str:
     )
 
 
+def _encode_gated(mw) -> bool:  # type: ignore[no-untyped-def]
+    """True (and warns) when the active ablation build has the encode workflow
+    OFF (builds A/B). Keeps the ablation honest: you can't encode in a build
+    whose whole point is that encoding is disabled."""
+    from aqt import mcat_ablation as ab
+    from aqt.utils import showInfo
+
+    if ab.encode_enabled(mw.col):
+        return False
+    showInfo(
+        "The encode workflow (Spark \u2192 Synapse) is OFF in this ablation build. "
+        "Switch to Normal or build C in Tools \u2192 MCAT \u2192 Dev tools to use it.",
+        parent=mw,
+    )
+    return True
+
+
 def show(mw) -> None:  # type: ignore[no-untyped-def]
     """The launcher: pick a topic, then open Prime / Connect / Build."""
+    if _encode_gated(mw):
+        return
     from aqt.qt import (
         QComboBox,
         QDialog,
@@ -123,6 +142,8 @@ def open_for(mw, topic: "prog.Topic", stage: str | None = None) -> None:  # type
     """Open one encode stage for a preselected topic (entry point for the Today
     panel). ``stage`` is "prime" / "connect" / "build"; anything else falls back
     to the topic-picker launcher. Keeps ``show(mw)`` as the standalone flow."""
+    if _encode_gated(mw):
+        return
     if stage == "prime":
         _prime_dialog(mw, topic)
     elif stage == "connect":

@@ -186,6 +186,30 @@ def set_reflect_in(state: dict, date_str: str, text: str) -> dict:
     return state
 
 
+# --- dev-only day override (program time-travel for testing) -----------------
+# When set, the program acts as if today were this 0-based day, so the whole
+# timeline (phase, topic, calendar, stage gating) can be tested without waiting
+# real days. Cleared -> back to the real date. Lives in the same synced config.
+
+
+def get_day_override_in(state: dict) -> int | None:
+    v = state.get("dev_day_override")
+    return int(v) if isinstance(v, int) else None
+
+
+def set_day_override_in(state: dict, day: int | None) -> dict:
+    if day is None:
+        state.pop("dev_day_override", None)
+    else:
+        state["dev_day_override"] = max(0, int(day))
+    return state
+
+
+def effective_day_index(start_date: str, today: str, override: int | None) -> int:
+    """The day the program should render: the dev override if set, else real."""
+    return override if override is not None else day_index(start_date, today)
+
+
 # --- collection-bound wrappers ----------------------------------------------
 
 
@@ -229,6 +253,15 @@ def get_reflect(col, date_str: str) -> str:  # type: ignore[no-untyped-def]
 
 def save_reflect(col, date_str: str, text: str):  # type: ignore[no-untyped-def]
     state = set_reflect_in(_load(col), date_str, text)
+    return col.set_config(CAL_KEY, state)
+
+
+def get_day_override(col) -> int | None:  # type: ignore[no-untyped-def]
+    return get_day_override_in(_load(col))
+
+
+def set_day_override(col, day: int | None):  # type: ignore[no-untyped-def]
+    state = set_day_override_in(_load(col), day)
     return col.set_config(CAL_KEY, state)
 
 
@@ -302,6 +335,7 @@ def _snapshot_html(assessment) -> str:
 def show(mw) -> None:  # type: ignore[no-untyped-def]
     """The Today front door: today's phase + topic, the five stage buttons, a
     daily reflection, a progress line, and a compact readiness snapshot."""
+    from aqt import mcat_ablation as ab  # noqa: PLC0415
     from aqt import mcat_encode as encode  # noqa: PLC0415
     from aqt import mcat_models as m  # noqa: PLC0415
     from aqt import mcat_program as prog  # noqa: PLC0415
@@ -327,6 +361,9 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     today = _today_str()
     cal = ensure_started(col)
 
+    def eff_di() -> int:
+        return effective_day_index(cal["start_date"], _today_str(), get_day_override(col))
+
     holder: dict = {"assessment": None}
     ready_shown = {"v": False}
     alive = {"v": True}
@@ -348,6 +385,15 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     subhead = QLabel("")
     subhead.setWordWrap(True)
     layout.addWidget(subhead)
+
+    dev_banner = QLabel("")
+    dev_banner.setWordWrap(True)
+    dev_banner.setStyleSheet(
+        "background:#fff4d6; border:1px solid #f0c96b; border-radius:6px; "
+        "padding:3px 8px; color:#7a5300;"
+    )
+    dev_banner.setVisible(False)
+    layout.addWidget(dev_banner)
 
     plan_line = QLabel("")
     plan_line.setEnabled(False)
@@ -399,7 +445,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
                 widget.deleteLater()
         topics = prog.all_topics()
         horizon = cal["horizon_days"]
-        di_today = day_index(cal["start_date"], _today_str())
+        di_today = eff_di()
         cols = 7
         for d in range(horizon):
             plan = day_plan(d, horizon, topics)
@@ -434,6 +480,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     layout.addLayout(grid)
     markers: dict[str, QLabel] = {}
     hints: dict[str, QLabel] = {}
+    stage_buttons: dict = {}
 
     def add_row(index: int, stage: str, button_text: str, on_click) -> None:
         marker = QLabel("\u2014")
@@ -453,10 +500,11 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         grid.addWidget(button, index, 3)
         markers[stage] = marker
         hints[stage] = hint
+        stage_buttons[stage] = button
         qconnect(button.clicked, on_click)
 
     def current_topic():
-        di = day_index(cal["start_date"], _today_str())
+        di = eff_di()
         return topic_for_day(di, prog.all_topics())
 
     def open_encode(stage: str):
@@ -559,7 +607,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     qconnect(settings_btn.clicked, edit_settings)
 
     def refresh() -> None:
-        di = day_index(cal["start_date"], _today_str())
+        di = eff_di()
         horizon = cal["horizon_days"]
         plan = day_plan(di, horizon, prog.all_topics())
         topic = plan["topic"]
@@ -583,6 +631,24 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         for stage in STAGES:
             markers[stage].setText("\u2713" if done[stage] else "\u2014")
             hints[stage].setText(_stage_hint(plan, stage))
+
+        # dev: the ablation build gates the encode stages; a day override retitles.
+        build = ab.active_build(col)
+        enc_on = ab.encode_enabled(col)
+        for st in ("Prime", "Connect", "Build"):
+            stage_buttons[st].setEnabled(enc_on)
+            if not enc_on:
+                hints[st].setText(f"off in build {build}")
+        override = get_day_override(col)
+        bits = []
+        if override is not None:
+            bits.append(f"DEV \u2014 viewing day {override + 1} of {horizon} (not the real date)")
+        if build:
+            bits.append(
+                f"Build {build}: {ab.BUILDS[build].name} \u00b7 encode {'on' if enc_on else 'off'}"
+            )
+        dev_banner.setText("      ".join(bits))
+        dev_banner.setVisible(bool(bits))
 
         progress.setText(f"Stages done today: {sum(done.values())} / {len(STAGES)}")
 

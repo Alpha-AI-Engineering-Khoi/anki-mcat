@@ -1529,6 +1529,13 @@ title="{}" {}>{}</button>""".format(
         self.menu_mcat.addAction(self.action_mcat_library)
         qconnect(self.action_mcat_library.triggered, self.on_mcat_library)
 
+        self.menu_mcat.addSeparator()
+
+        self.action_mcat_devtools = QAction("Dev tools", self)
+        self.action_mcat_devtools.setMenuRole(QAction.MenuRole.NoRole)
+        self.menu_mcat.addAction(self.action_mcat_devtools)
+        qconnect(self.action_mcat_devtools.triggered, self.on_mcat_devtools)
+
         # View
         qconnect(
             m.actionZoomIn.triggered,
@@ -1642,6 +1649,11 @@ title="{}" {}>{}</button>""".format(
         import aqt.mcat_ablation
 
         aqt.mcat_ablation.show(self)
+
+    def on_mcat_devtools(self) -> None:
+        import aqt.mcat_devtools
+
+        aqt.mcat_devtools.show(self)
 
     def hide_menubar(self) -> None:
         self.form.menubar.setFixedHeight(0)
