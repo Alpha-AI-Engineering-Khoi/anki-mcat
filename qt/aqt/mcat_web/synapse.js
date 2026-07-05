@@ -27,6 +27,16 @@ const options = {
 };
 const network = new vis.Network(container, { nodes, edges }, options);
 
+// After nodes/edges change programmatically (load or AI), let physics settle
+// then frame everything so freshly-added nodes are actually in view.
+function refit() {
+  if (!nodes.length) return;
+  try {
+    network.once("stabilized", () => { try { network.fit({ animation: { duration: 300 } }); } catch (e) {} });
+    network.stabilize();
+  } catch (e) { try { network.fit(); } catch (e2) {} }
+}
+
 /* ---- Python bridge (Anki pycmd) ---- */
 function send(cmd) { if (window.pycmd) { pycmd(cmd); return true; } return false; }
 function status(t) { document.getElementById("status").textContent = t || ""; }
@@ -46,14 +56,14 @@ window.loadMap = function (json) {
   nodes.clear(); edges.clear();
   nodes.add((m.concepts || []).map((c) => ({ id: c.id, label: c.label, parent: c.parent ?? null })));
   edges.add((m.links || []).map((l, i) => ({ id: "e" + i, from: l.src, to: l.dst, label: l.label || "", arrows: "to" })));
-  relint(); busy(false); status("Loaded " + (m.concepts || []).length + " concepts");
+  relint(); busy(false); status("Loaded " + (m.concepts || []).length + " concepts"); refit();
 };
 // Python -> JS: add fresh concept nodes (auto-ids), keeping the current map.
 window.applyNodes = function (json) {
   const arr = typeof json === "string" ? JSON.parse(json) : json;
   let id = nextId();
   arr.forEach((c) => { const label = (c.label || c).toString(); nodes.add({ id, label }); id++; });
-  relint(); busy(false); status("AI added " + arr.length + " concepts");
+  relint(); busy(false); status("AI added " + arr.length + " concepts"); refit();
 };
 // Python -> JS: add labeled arrows between existing nodes (matched by label).
 window.applyLinks = function (json) {
@@ -64,7 +74,7 @@ window.applyLinks = function (json) {
     const s = byLabel[(l.src_label || "").trim().toLowerCase()], d = byLabel[(l.dst_label || "").trim().toLowerCase()];
     if (s != null && d != null && s !== d) { edges.add({ id: "a" + (base + n++), from: s, to: d, label: l.label || "", arrows: "to" }); }
   });
-  relint(); busy(false); status("AI proposed " + n + " arrows");
+  relint(); busy(false); status("AI proposed " + n + " arrows"); refit();
 };
 window.chatReply = function (text) { addChat("ai", text); busy(false); };
 
