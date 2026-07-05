@@ -145,6 +145,14 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     quiz_row.addStretch(1)
     layout.addLayout(quiz_row)
 
+    demo_row = QHBoxLayout()
+    demo_btn = QPushButton("Load demo pilot data")
+    clear_btn = QPushButton("Clear pilot data")
+    demo_row.addWidget(demo_btn)
+    demo_row.addWidget(clear_btn)
+    demo_row.addStretch(1)
+    layout.addLayout(demo_row)
+
     buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
     qconnect(buttons.rejected, dialog.reject)
     layout.addWidget(buttons)
@@ -198,6 +206,14 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     def open_results() -> None:
         ab.show(mw)
 
+    def do_load_demo() -> None:
+        ab.load_demo(col)
+        tooltip("Loaded demo pilot data (generated, labeled). Open results to view.", parent=mw)
+
+    def do_clear() -> None:
+        ab.clear_data(col)
+        tooltip("Cleared pilot data.", parent=mw)
+
     qconnect(jump_btn.clicked, do_jump)
     qconnect(reset_btn.clicked, do_reset)
     qconnect(normal_btn.clicked, lambda: set_build(None))
@@ -207,7 +223,9 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     qconnect(min_btn.clicked, log_minutes)
     qconnect(quiz_btn.clicked, log_quiz)
     qconnect(results_btn.clicked, open_results)
+    qconnect(demo_btn.clicked, do_load_demo)
+    qconnect(clear_btn.clicked, do_clear)
 
     refresh()
-    dialog.resize(620, 420)
+    dialog.resize(620, 470)
     dialog.exec()

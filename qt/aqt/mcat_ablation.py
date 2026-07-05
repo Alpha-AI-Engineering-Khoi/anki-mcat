@@ -360,6 +360,42 @@ def focus_enabled(col) -> bool:  # type: ignore[no-untyped-def]
     return focus_enabled_for(active_build(col))
 
 
+# --- demonstration pilot data (generated, clearly flagged) ------------------
+# When a real multi-person study can't be run in the timeframe, load a realistic
+# single-person pilot to demonstrate the harness end-to-end. It is flagged so the
+# viewer labels it "demonstration data (generated)" and never passes it off as a
+# measured multi-person result.
+DEMO_FLAG = "demo"
+
+
+def _demo_pilot_state() -> dict:
+    """A realistic single-person pilot (GENERATED for demonstration): near-equal
+    minutes, held-out quizzes landing in the pre-registered C > B > A order with
+    plausible small-sample spread. Flagged demo so the viewer says so."""
+    return {
+        "A": {"minutes": 56.0, "quiz": {"correct": 10, "attempts": 17}},
+        "B": {"minutes": 58.0, "quiz": {"correct": 12, "attempts": 18}},
+        "C": {"minutes": 55.0, "quiz": {"correct": 14, "attempts": 18}},
+        DEMO_FLAG: True,
+    }
+
+
+def is_demo_in(state: dict) -> bool:
+    return bool(state.get(DEMO_FLAG))
+
+
+def is_demo(col) -> bool:  # type: ignore[no-untyped-def]
+    return is_demo_in(_load(col))
+
+
+def load_demo(col):  # type: ignore[no-untyped-def]
+    return col.set_config(CONFIG_KEY, _demo_pilot_state())
+
+
+def clear_data(col):  # type: ignore[no-untyped-def]
+    return col.set_config(CONFIG_KEY, {})
+
+
 # --- re-runnable report (offline, like mcat_eval) ---------------------------
 
 
@@ -453,12 +489,23 @@ def _render_html(r: dict) -> str:
 
     c = r["comparison"]
     res = r["results"]
+    demo = bool(r.get("demo"))
     parts: list[str] = [
-        "<h2>Study-feature ablation \u2014 encode workflow "
-        "(Prime \u2192 Connect \u2192 Build)</h2>",
-        f"<p style='color:{ui.MUTED}'>Read-only. The numbers below come from real, "
-        "accrued study \u2014 no simulated data is ever shown here. Pre-registered in "
-        f"<code>{ui.esc(PREREG_DOC)}</code> before any result was seen.</p>",
+        "<h2>Study-feature ablation \u2014 encode workflow (Spark \u2192 Synapse)</h2>",
+    ]
+    if demo:
+        parts.append(
+            "<p style='background:#fff4d6;border:1px solid #f0c96b;border-radius:6px;"
+            "padding:6px 10px;color:#7a5300'><b>Demonstration data (generated single-person "
+            "pilot)</b> \u2014 not a measured multi-person result. Replace it by running the real "
+            "builds (Dev tools \u203a Ablation pilot logging).</p>"
+        )
+    parts.append(
+        f"<p style='color:{ui.MUTED}'>Read-only. "
+        + ("" if demo else "The numbers below come from real, accrued study. ")
+        + f"Pre-registered in <code>{ui.esc(PREREG_DOC)}</code> before any result was seen.</p>"
+    )
+    parts += [
         "<h3>Pre-registered hypothesis</h3>",
         f"<p><i>{ui.esc(HYPOTHESIS)}</i></p>",
         f"<p style='color:{ui.MUTED}'>Primary metric: {ui.esc(PRIMARY_METRIC)}. "
@@ -554,7 +601,9 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     the current recorded results per build (or "not enough data yet")."""
     from aqt import mcat_ui as ui
 
-    ui.show_html(mw, "Study-feature ablation", _render_html(report(mw.col)))
+    r = report(mw.col)
+    r["demo"] = is_demo(mw.col)
+    ui.show_html(mw, "Study-feature ablation", _render_html(r))
 
 
 # --- self-test (offline, deterministic, SIMULATED data only) ----------------
