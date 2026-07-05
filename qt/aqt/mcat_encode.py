@@ -21,15 +21,6 @@ from __future__ import annotations
 from aqt import mcat_ai as ai
 from aqt import mcat_program as prog
 
-# The four seeded inquiry prompts (Connect). Seeded per keyword; the learner
-# edits or rewrites them. AI never answers them.
-_CONNECT_TEMPLATES = [
-    "What's most relevant to me about {kw}?",
-    "What am I curious about with {kw}?",
-    "Why do I need to know {kw}?",
-    "Where would I apply {kw}?",
-]
-
 
 def _spans_for(topic: "prog.Topic") -> list[dict]:
     """Source spans for this topic, or [] when the bundled source is a different
@@ -39,20 +30,6 @@ def _spans_for(topic: "prog.Topic") -> list[dict]:
     except Exception:
         return []
     return spans if src_topic == topic.tag else []
-
-
-def _status_text(rec: dict) -> str:
-    def mark(flag: bool) -> str:
-        return "\u2713" if flag else "\u2014"
-
-    primed = bool(rec.get("primed"))
-    connected = any((q or "").strip() for q in rec.get("connect", []))
-    built = len(rec.get("concepts", [])) > 0
-    return (
-        f"Primed {mark(primed)}     \u00b7     "
-        f"Connected {mark(connected)}     \u00b7     "
-        f"Built {mark(built)}"
-    )
 
 
 def _encode_gated(mw) -> bool:  # type: ignore[no-untyped-def]
@@ -137,14 +114,12 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
 
 def open_for(mw, topic: "prog.Topic", stage: str | None = None) -> None:  # type: ignore[no-untyped-def]
     """Open one encode stage for a preselected topic (entry point for the Today
-    panel). ``stage`` is "prime" / "connect" / "build"; anything else falls back
-    to the topic-picker launcher. Keeps ``show(mw)`` as the standalone flow."""
+    panel). ``stage`` is "prime" (Spark) or "build" (Synapse); anything else
+    falls back to the topic-picker launcher. Keeps ``show(mw)`` standalone."""
     if _encode_gated(mw):
         return
     if stage == "prime":
         _prime_dialog(mw, topic)
-    elif stage == "connect":
-        _connect_dialog(mw, topic)
     elif stage == "build":
         _build_dialog(mw, topic)
     else:
@@ -253,65 +228,6 @@ def _prime_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     dialog.exec()
 
 
-def _connect_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-def]
-    from aqt.qt import (
-        QDialog,
-        QDialogButtonBox,
-        QLabel,
-        QLineEdit,
-        QVBoxLayout,
-        qconnect,
-    )
-    from aqt.utils import disable_help_button, tooltip
-
-    spans = _spans_for(topic)
-    keywords = ai.keyword_candidates(spans, topic.name) or [topic.name]
-    rec = prog.get_record(mw.col, topic)
-    saved = rec.get("connect") or []
-
-    dialog = QDialog(mw)
-    dialog.setWindowTitle(f"Connect: {topic.name}")
-    disable_help_button(dialog)
-    mw.garbage_collect_on_dialog_finish(dialog)
-
-    layout = QVBoxLayout(dialog)
-    layout.addWidget(
-        QLabel(
-            "Make it personal. Edit these into your own questions \u2014 "
-            "you answer them, not the AI."
-        )
-    )
-
-    edits: list = []
-    for i, template in enumerate(_CONNECT_TEMPLATES):
-        # Strip trailing punctuation so a keyword can't produce "…cofactors.?"
-        # when slotted into a question template.
-        keyword = keywords[i % len(keywords)].rstrip(" .;:,?!")
-        if i < len(saved) and (saved[i] or "").strip():
-            seed = saved[i]
-        else:
-            seed = template.format(kw=keyword)
-        edit = QLineEdit(seed)
-        layout.addWidget(edit)
-        edits.append(edit)
-
-    buttons = QDialogButtonBox()
-    save_btn = buttons.addButton("Save questions", QDialogButtonBox.ButtonRole.ActionRole)
-    buttons.addButton(QDialogButtonBox.StandardButton.Close)
-    layout.addWidget(buttons)
-
-    def do_save() -> None:
-        prog.save_connect(mw.col, topic, [e.text() for e in edits])
-        tooltip(f"Saved your questions for \u201c{topic.name}\u201d.", parent=mw)
-        dialog.accept()
-
-    qconnect(save_btn.clicked, do_save)
-    qconnect(buttons.rejected, dialog.reject)
-
-    dialog.resize(560, 260)
-    dialog.exec()
-
-
 def _build_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-def]
     """Synapse: the higher-order encoding map.
 
@@ -349,95 +265,4 @@ def _build_dialog(mw, topic: "prog.Topic") -> None:  # type: ignore[no-untyped-d
     qconnect(dialog.finished, lambda _code: cleanup())
 
     dialog.resize(1040, 700)
-    dialog.exec()
-
-
-def _confirm_overflow_card(mw, topic: "prog.Topic", spans: list[dict], detail: str) -> None:  # type: ignore[no-untyped-def]
-    """Draft an overflow detail into a flashcard and add it via Anki's normal
-    add-note operation, tagged to the topic and linked to its source span."""
-    from aqt.operations.note import add_note
-    from aqt.qt import (
-        QDialog,
-        QDialogButtonBox,
-        QLabel,
-        QLineEdit,
-        QPlainTextEdit,
-        QVBoxLayout,
-        qconnect,
-    )
-    from aqt.utils import askUser, disable_help_button, showWarning, tooltip
-
-    card = ai.draft_overflow_card(detail, spans, topic.tag)
-
-    dialog = QDialog(mw)
-    dialog.setWindowTitle("Send to cards")
-    disable_help_button(dialog)
-    mw.garbage_collect_on_dialog_finish(dialog)
-
-    layout = QVBoxLayout(dialog)
-    layout.addWidget(
-        QLabel(
-            "A detail you couldn't relate becomes a flashcard \u2014 review it "
-            "later instead of memorizing now."
-        )
-    )
-    layout.addWidget(QLabel("Front:"))
-    front = QLineEdit(card["front"])
-    layout.addWidget(front)
-    layout.addWidget(QLabel("Back:"))
-    back = QPlainTextEdit(card["back"])
-    layout.addWidget(back)
-    meta = QLabel(
-        f"Tagged {topic.tag} \u00b7 source span {card['source_span'] or '\u2014'}"
-    )
-    meta.setEnabled(False)
-    layout.addWidget(meta)
-
-    buttons = QDialogButtonBox()
-    add_btn = buttons.addButton("Add card", QDialogButtonBox.ButtonRole.AcceptRole)
-    buttons.addButton(QDialogButtonBox.StandardButton.Cancel)
-    layout.addWidget(buttons)
-
-    def do_add() -> None:
-        # Sanitize before the fields become HTML in a note (QA-6): raw <script> /
-        # on*= handlers or invisible chars must never reach a rendered card.
-        front_text = ai.sanitize(front.text()).strip()
-        back_text = ai.sanitize(back.toPlainText()).strip()
-        if not front_text or not back_text:
-            showWarning("A card needs both a front and a back.", parent=dialog)
-            return
-        # Provenance gate: only tag a REAL span id. If the draft has no verified
-        # source, make the learner confirm rather than silently adding untraced.
-        valid_span_ids = {s["id"] for s in spans}
-        span_id = card["source_span"] if card["source_span"] in valid_span_ids else ""
-        if not span_id and not askUser(
-            "This card has no verified source span, so it won't trace back to a "
-            "named source. Add it anyway?",
-            parent=dialog,
-            defaultno=True,
-            title="No verified source",
-        ):
-            return
-        col = mw.col
-        notetype = col.models.by_name("Basic") or col.models.current()
-        if notetype is None:
-            showWarning("No note type is available to add a card.", parent=dialog)
-            return
-        note = col.new_note(notetype)
-        note.fields[0] = front_text
-        if len(note.fields) > 1:
-            note.fields[1] = back_text
-        tags = [topic.tag, "mcat::overflow"]
-        if span_id:
-            tags.append(f"mcat::src::{span_id}")
-        note.tags = tags
-        deck_id = col.decks.current()["id"]
-        add_note(parent=mw, note=note, target_deck_id=deck_id).success(
-            lambda _out: (tooltip("Added overflow card.", parent=mw), dialog.accept())
-        ).run_in_background()
-
-    qconnect(add_btn.clicked, do_add)
-    qconnect(buttons.rejected, dialog.reject)
-
-    dialog.resize(480, 360)
     dialog.exec()
