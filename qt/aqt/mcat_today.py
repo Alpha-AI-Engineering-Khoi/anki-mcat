@@ -680,6 +680,17 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
             stage_buttons[st].setEnabled(enc_on)
             if not enc_on:
                 hints[st].setText(f"off in build {build}")
+
+        # The blue "next action" button = the first incomplete, actionable stage,
+        # so the highlight advances (Spark -> Synapse -> ...) as stages are done.
+        current = next(
+            (s for s in STAGES if not done[s] and stage_buttons[s].isEnabled()), None
+        )
+        for s in STAGES:
+            is_current = s == current
+            stage_buttons[s].setDefault(is_current)
+            stage_buttons[s].setAutoDefault(is_current)
+
         override = get_day_override(col)
         bits = []
         if override is not None:
