@@ -5,21 +5,21 @@
 encoding *on the learner*, then backs it with cited evidence.
 
 Honesty (see ``brainlifts/anki-for-mcat/brainlift.md``, SPOV 2): the claim is
-**building the connections yourself beats passively reading/memorizing** — NOT
+**building the connections yourself beats passively reading/memorizing**, NOT
 "maps beat flashcards." Retrieval + feedback is the hinge (Karpicke & Blunt,
 2011), which is exactly why Recall follows Mindmap in the program. So the demo
 does not stage a rigged score; it lets the learner *experience* a reasoning
 question becoming answerable after they build the map, then shows real numbers.
 
 Arc (a 4-page wizard):
-  1. Cold open  — skim the topic, try a reasoning question with no map (the
+  1. Cold open: skim the topic, try a reasoning question with no map (the
      honest "before").
-  2. Build      — the REAL Mindmap canvas, concepts pre-seeded (Day-1 beginner ->
+  2. Build: the REAL Mindmap canvas, concepts pre-seeded (Day-1 beginner ->
      seed the scaffold, per the expertise-reversal SPOV); the learner draws the
      labeled arrows (the generative act).
-  3. Retry      — the same question, now traceable through their arrows + quick
+  3. Retry: the same question, now traceable through their arrows + quick
      recall checks.
-  4. Evidence   — cited effect sizes + handoff into the Day-1 board.
+  4. Evidence: cited effect sizes + handoff into the Day-1 board.
 
 The demo uses a fixed, isolated topic slug (``onboarding.enzymes``) so it never
 touches the 50 real program topics.
@@ -56,11 +56,11 @@ _SKIM = [
 
 _QUESTION = (
     "A competitive inhibitor is added to an enzyme-catalyzed reaction. "
-    "What happens to <b>Vmax</b> and <b>Km</b> \u2014 and <i>why</i>?"
+    "What happens to <b>Vmax</b> and <b>Km</b>, and <i>why</i>?"
 )
 
 _PROMPTS = [
-    "Where does the competitive inhibitor bind \u2014 and what does it compete with?",
+    "Where does the competitive inhibitor bind, and what does it compete with?",
     "What happens if you flood the system with extra substrate?",
     "Which number moves: the ceiling (Vmax), or the substrate needed for half-max (Km)?",
 ]
@@ -78,18 +78,18 @@ _SUGGESTED_ARROWS = [
 _MODEL_ANSWER = (
     "Trace your arrows: the competitive inhibitor competes with substrate for the "
     "<b>same active site</b>. Because it only <i>competes</i>, flooding the system "
-    "with extra substrate outcompetes it \u2014 so the reaction still reaches its "
+    "with extra substrate outcompetes it, so the reaction still reaches its "
     "full ceiling. <b>Vmax is unchanged.</b> But you now need more substrate to get "
     "to half-max, so <b>Km increases</b> (apparent affinity drops).<br><br>"
-    "You didn't recall that \u2014 you <i>reasoned</i> it from the structure you "
+    "You didn't recall that. You <i>reasoned</i> it from the structure you "
     "built. That's the ~65% of the MCAT that is reasoning, not recall."
 )
 
 _RECALL = [
     ("Where does a competitive inhibitor bind?",
-     "The active site \u2014 it mimics the substrate and competes for the same pocket."),
+     "The active site: it mimics the substrate and competes for the same pocket."),
     ("Does a competitive inhibitor lower Vmax?",
-     "No \u2014 it's surmountable: enough substrate restores full Vmax. It raises Km."),
+     "No. It's surmountable: enough substrate restores full Vmax. It raises Km."),
 ]
 
 
@@ -138,7 +138,7 @@ def _muted() -> str:
 
 
 def _card(html: str) -> str:
-    # No box — plain text with light spacing (the learner asked for normal text,
+    # No box: plain text with light spacing (the learner asked for normal text,
     # not cards). Text uses the native palette; secondary notes use _muted().
     return f"<div style='margin:8px 0'>{html}</div>"
 
@@ -193,29 +193,29 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         intro = _prose(
             "<h2 style='margin:0 0 2px'>See it for yourself \u00b7 5 minutes</h2>"
             "<p style='margin:0 0 8px'>Most of the MCAT rewards reasoning, not "
-            "memory \u2014 and reasoning is something you build, not something you're "
+            "memory. Reasoning is something you build, not something you're "
             "born with. The next five minutes won't ask you to believe that. They'll "
             "show you: answer one question cold, build the idea in your own words, and "
             "watch the same question become answerable.</p>"
             + _card(
-                "<b>First, skim for the big picture \u2014 don't memorize:</b>"
+                "<b>First, skim for the big picture (don't memorize):</b>"
                 f"<ul style='margin:6px 0 0 -8px'>{skim}</ul>"
             )
             + _card(
-                "<b>Now, cold \u2014 before you've built anything, try this:</b><br>"
+                "<b>Now try this cold, before you've built anything:</b><br>"
                 + _QUESTION
             )
         )
         lay.addWidget(intro)
         lay.addWidget(_prose("<b>Your best shot</b> (\u201cnot sure\u201d is a fine answer):"))
         ans = QPlainTextEdit()
-        ans.setPlaceholderText("Twenty seconds \u2014 what happens to Vmax and Km, and why?")
+        ans.setPlaceholderText("Twenty seconds: what happens to Vmax and Km, and why?")
         ans.setFixedHeight(84)
         refs["cold"] = ans  # echoed back on the retry page for a personal before/after
         lay.addWidget(ans)
         lay.addWidget(
             _prose(
-                f"<span style='color:{_muted()}'>Stuck is okay \u2014 it's the honest "
+                f"<span style='color:{_muted()}'>Stuck is okay. It's the honest "
                 "starting line. A skim hands you facts; it doesn't hand you reasoning. "
                 "That's the part you're about to build.</span>"
             )
@@ -241,7 +241,7 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
                 "concepts, then name the link.</p>"
                 f"<p style='margin:0 0 6px;color:{_muted()}'>A plain line just says "
                 "\u201crelated.\u201d An <b>arrow</b> says <i>how</i> and <i>which "
-                "way</i> \u2014 committing to that is the reasoning the MCAT tests.</p>"
+                "way</i>. Committing to that is the reasoning the MCAT tests.</p>"
                 + _card(
                     f"<b>Ask yourself:</b>"
                     f"<ul style='margin:6px 0 8px -8px'>{prompts}</ul>"
@@ -289,10 +289,10 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lay = QVBoxLayout(inner)
         lay.addWidget(
             _prose(
-                "<h3 style='margin:0 0 2px'>Same question \u2014 now it's yours to reason through</h3>"
+                "<h3 style='margin:0 0 2px'>Same question, now it's yours to reason through</h3>"
                 + _card("<b>The question:</b><br>" + _QUESTION)
-                + "<p>Follow the arrows you drew. Answer in your head first "
-                "\u2014 then reveal how the map gets there.</p>"
+                + "<p>Follow the arrows you drew. Answer in your head first, "
+                "then reveal how the map gets there.</p>"
             )
         )
         # Personal before/after: echo back what the learner wrote cold (filled in on
@@ -312,8 +312,8 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lay.addWidget(
             _prose(
                 "<h3 style='margin:12px 0 2px'>Quick recall check</h3>"
-                f"<p style='margin:0 0 4px;color:{_muted()}'>Answer each out loud first "
-                "\u2014 <i>then</i> check. The attempt is what makes it stick.</p>"
+                f"<p style='margin:0 0 4px;color:{_muted()}'>Answer each out loud first, "
+                "<i>then</i> check. The attempt is what makes it stick.</p>"
             )
         )
         for q, a in _RECALL:
@@ -339,28 +339,28 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
         lay = QVBoxLayout(w)
         lay.addWidget(
             _prose(
-                "<h3 style='margin:0 0 2px'>That wasn't a trick \u2014 it's how understanding works</h3>"
+                "<h3 style='margin:0 0 2px'>That wasn't a trick. It's how understanding works</h3>"
                 + _card(
                     "<ul style='margin:2px 0 0 -8px'>"
                     "<li><b>Building your own map beats studying a ready-made one:</b> "
                     "g = 0.72 vs 0.43 (Schroeder et al., 2018).</li>"
                     "<li><b>Explaining <i>why</i> a link exists is a strong, low-cost "
-                    "gain:</b> g = 0.55 (Bisra et al., 2018) \u2014 which is exactly what "
+                    "gain:</b> g = 0.55 (Bisra et al., 2018), which is exactly what "
                     "labeling an arrow forces you to do.</li>"
                     "<li><b>The generation effect:</b> you remember what you produce, "
                     "not what you read (Slamecka & Graf, 1978).</li>"
                     "<li><b>The honest catch:</b> building is step one. You lock it in "
-                    "with retrieval + feedback \u2014 that's your <b>Recall</b> stage. "
-                    "(Retrieval can even beat mapping when it corrects your errors "
-                    "\u2014 Karpicke & Blunt, 2011. Feedback is the hinge.)</li>"
+                    "with retrieval + feedback. That's your <b>Recall</b> stage. "
+                    "(Retrieval can even beat mapping when it corrects your errors, "
+                    "per Karpicke & Blunt, 2011. Feedback is the hinge.)</li>"
                     "</ul>"
                 )
                 + _card(
                     "<b>Your daily method:</b> "
                     "Scaffold \u2192 <b>Mindmap</b> \u2192 Recall \u2192 Ready.<br>"
                     f"<span style='color:{_muted()}'>Build the ideas and the reasoning "
-                    "follows; retrieve them and it lasts. That's the whole method "
-                    "\u2014 let's start Day 1.</span>"
+                    "follows; retrieve them and it lasts. That's the whole method. "
+                    "Let's start Day 1.</span>"
                 )
             )
         )
