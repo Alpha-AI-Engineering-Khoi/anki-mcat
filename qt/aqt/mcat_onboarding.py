@@ -411,17 +411,15 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     idx = {"i": 0}
     nav = QHBoxLayout()
     back_btn = QPushButton("Back")
-    skip_btn = QPushButton("Skip")
     next_btn = QPushButton("")
     next_btn.setDefault(True)
     nav.addWidget(back_btn)
     nav.addStretch(1)
-    nav.addWidget(skip_btn)
     nav.addWidget(next_btn)
     root.addLayout(nav)
 
     _NEXT_LABELS = [
-        "Start the 5-minute proof \u2192",
+        "Start",
         "Build the map \u2192",
         "See the question again \u2192",
         "Show me the evidence \u2192",
@@ -431,7 +429,6 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
     def render_nav() -> None:
         i = idx["i"]
         back_btn.setVisible(i > 0)
-        skip_btn.setVisible(i < len(pages) - 1)
         next_btn.setText(_NEXT_LABELS[i])
 
     def go(i: int) -> None:
@@ -490,7 +487,6 @@ def show(mw) -> None:  # type: ignore[no-untyped-def]
 
     qconnect(next_btn.clicked, on_next)
     qconnect(back_btn.clicked, lambda: go(idx["i"] - 1))
-    qconnect(skip_btn.clicked, dialog.reject)
 
     def on_finished(_code: int) -> None:
         if canvas["cleanup"]:
