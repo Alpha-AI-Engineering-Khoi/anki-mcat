@@ -418,13 +418,18 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         "<script>(function(){"
         f"var DAYS={json.dumps(days_data)};var H={horizon};"
         f"window.mcatpSel={default_sel};"
+        # Day-1-only actions (Replay onboarding) must follow the SELECTED day, not the
+        # day the board was rendered for, so they disappear when previewing other days.
+        "function day1only(d){var r=document.getElementById('mcatp-replay');"
+        "if(r)r.style.display=(d===0)?'':'none';}"
         "window.mcatpPick=function(el,d){"
         "var c=el.parentNode.getElementsByClassName('mcatp-cell');"
         "for(var i=0;i<c.length;i++)c[i].classList.remove('mcatp-cell--selected');"
         "el.classList.add('mcatp-cell--selected');window.mcatpSel=d;var o=DAYS[d];"
         "var a=document.getElementById('mcatp-day');if(a)a.textContent='Day '+o.n+' of '+H;"
         "var l=document.getElementById('mcatp-lead');if(l)l.textContent=o.lead;"
-        "var b=document.getElementById('mcatp-name');if(b)b.textContent=o.name;};"
+        "var b=document.getElementById('mcatp-name');if(b)b.textContent=o.name;day1only(d);};"
+        f"day1only({default_sel});"
         "})();</script>"
     )
 
@@ -433,10 +438,11 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         "class='mcatp-btn'>Open program</a>"
     )
 
-    def _ghost(label: str, cmd: str) -> str:
+    def _ghost(label: str, cmd: str, el_id: str = "") -> str:
+        idattr = f' id="{el_id}"' if el_id else ""
         return (
-            f"<a href=# onclick=\"pycmd('mcat-home:{cmd}');return false\" "
-            f'class="mcatp-btn mcatp-btn--ghost">{label}</a>'
+            f"<a href=# onclick=\"pycmd('mcat-home:{cmd}');return false\""
+            f'{idattr} class="mcatp-btn mcatp-btn--ghost">{label}</a>'
         )
 
     # Day 1: the 5-min sample lesson leads until the learner has done it; after that
@@ -460,7 +466,7 @@ def home_html(col) -> str:  # type: ignore[no-untyped-def]
         # Lesson done: the program board leads; keep the diagnostic baseline + a replay.
         actions = (
             open_btn
-            + _ghost("Replay onboarding", "onboarding")
+            + _ghost("Replay onboarding", "onboarding", "mcatp-replay")
             + _ghost("Diagnostic", "diagnostic")
             + _ghost("Scores", "scores")
         )
