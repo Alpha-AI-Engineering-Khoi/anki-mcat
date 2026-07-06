@@ -628,10 +628,10 @@ def show(mw, day=None) -> None:  # type: ignore[no-untyped-def]
             lambda e: showWarning(f"Could not compute readiness: {e}", parent=mw)
         ).run_in_background()
 
-    add_row(0, "Scaffold", "Scaffold\u2026", lambda: open_encode("prime"))
-    add_row(1, "Mindmap", "Mindmap\u2026", lambda: open_encode("build"))
-    add_row(2, "Recall", "Study now\u2026", open_recall)
-    add_row(3, "Ready", "Check readiness\u2026", open_ready)
+    add_row(0, "Scaffold", "Scaffold", lambda: open_encode("prime"))
+    add_row(1, "Mindmap", "Mindmap", lambda: open_encode("build"))
+    add_row(2, "Recall", "Study now", open_recall)
+    add_row(3, "Ready", "Check readiness", open_ready)
 
     line2 = QFrame()
     line2.setFrameShape(QFrame.Shape.HLine)
